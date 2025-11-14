@@ -61,8 +61,8 @@ const App: React.FC = () => {
       <Header />
       <main className="py-8 px-4 md:px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center animate-fade-in">
-             <div className="w-64 h-64 mx-auto mb-6">
+          <div className="text-center">
+             <div className="w-72 h-72 mx-auto mb-6 animate-fade-in">
               <img 
                 src="/sancho-logo.png" 
                 alt="Sancho Logo - A faithful guide reading poetry" 
@@ -70,11 +70,11 @@ const App: React.FC = () => {
               />
             </div>
             {quoteLoading ? (
-              <p className="text-muted max-w-2xl mx-auto italic">
+              <p className="text-muted max-w-2xl mx-auto italic animate-fade-in" style={{animationDelay: '0.3s'}}>
                 Loading wisdom from Don Quixote...
               </p>
             ) : sanchoQuote ? (
-              <div className="max-w-2xl mx-auto">
+              <div className="max-w-2xl mx-auto animate-fade-in" style={{animationDelay: '0.3s', opacity: 0, animationFillMode: 'forwards'}}>
                 <p className="text-default italic text-lg">"{sanchoQuote.quote}"</p>
                 <p className="text-muted text-sm mt-2">{sanchoQuote.context}</p>
               </div>
