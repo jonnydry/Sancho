@@ -64,11 +64,12 @@ Sancho is your faithful guide to poetry, featuring:
 
 ### Key Features
 1. **Sancho Quote Feature**: Displays AI-generated authentic quotes from Sancho Panza (Don Quixote) on page load
-2. **Theme System**: Supports light/dark mode with 3 color schemes (Dark, Paper, Slate)
-3. **AI Poetry Examples**: Uses XAI's Grok to generate poetry examples on demand
-4. **Search & Filter**: Filter by type (Form, Meter, Device) and search by name
-5. **Responsive Design**: Mobile-friendly interface with smooth animations
-6. **Secure Backend**: API key protected server-side architecture
+2. **Glassomorphic Sticky Header**: Semi-transparent header with backdrop blur stays pinned at top while scrolling
+3. **Theme System**: Supports light/dark mode with 3 color schemes (Dark, Paper, Slate)
+4. **AI Poetry Examples**: Uses XAI's Grok to generate poetry examples on demand
+5. **Search & Filter**: Filter by type (Form, Meter, Device) and search by name
+6. **Responsive Design**: Mobile-friendly interface with smooth animations
+7. **Secure Backend**: API key protected server-side architecture
 
 ## Environment Variables
 
