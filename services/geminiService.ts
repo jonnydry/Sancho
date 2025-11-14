@@ -7,7 +7,11 @@ if (!API_KEY) {
   console.warn("XAI_API_KEY environment variable not set. AI features will not work.");
 }
 
-const openai = new OpenAI({ baseURL: "https://api.x.ai/v1", apiKey: API_KEY });
+const openai = new OpenAI({ 
+  baseURL: "https://api.x.ai/v1", 
+  apiKey: API_KEY,
+  dangerouslyAllowBrowser: true
+});
 
 export const findPoetryExample = async (topic: string): Promise<GeminiExampleResponse> => {
   if (!API_KEY) {

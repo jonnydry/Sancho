@@ -84,8 +84,29 @@ npm run preview
 
 None documented yet.
 
+## Security Considerations
+
+⚠️ **Important**: This app currently makes XAI API calls directly from the browser using `dangerouslyAllowBrowser: true`. This exposes your API key in client-side code and is **NOT secure for production use**.
+
+**For production deployments, you should:**
+1. Create a backend API server (Node.js/Express, Python/Flask, etc.)
+2. Move the XAI API calls to the backend
+3. Have the frontend call your backend API instead
+4. Keep the XAI_API_KEY only on the server side
+
+This current setup is acceptable for:
+- Development and testing
+- Personal/private use
+- Learning purposes
+
+But should NOT be used for:
+- Public production deployments
+- Apps with untrusted users
+- Any scenario where API key exposure is a concern
+
 ## Notes
 
 - The service file is still named `geminiService.ts` but now uses XAI's API  
 - Tailwind CSS is loaded via CDN (not recommended for production)
 - For production deployment, consider installing Tailwind as a PostCSS plugin
+- Originally designed for AI Studio environment, adapted for Replit
