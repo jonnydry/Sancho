@@ -41,7 +41,7 @@ const App: React.FC = () => {
       <main className="py-8 px-4 md:px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center animate-fade-in">
-             <div className="w-32 h-32 mx-auto mb-4">
+             <div className="w-44 h-44 mx-auto mb-4">
               <img 
                 src="/sancho-logo.png" 
                 alt="Sancho Logo - A faithful guide reading poetry" 
