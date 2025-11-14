@@ -1,0 +1,5 @@
+{
+  "name": "Sancho",
+  "description": "Sancho is a comprehensive reference tool for poetry forms, meters, and devices, using AI to find famous examples. Features a clean, minimalist interface with dark/light modes and multiple color themes.",
+  "requestFramePermissions": []
+}
