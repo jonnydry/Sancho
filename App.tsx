@@ -20,16 +20,53 @@ const App: React.FC = () => {
   const allData = useMemo(() => [...poetryData, ...poeticDevicesData], []);
 
   useEffect(() => {
+    const CACHE_KEY = 'sancho_quotes_cache';
+    const MAX_CACHE_SIZE = 15;
+
     const loadQuote = async () => {
       try {
         const quote = await fetchSanchoQuote();
         setSanchoQuote(quote);
+        
+        try {
+          const cached = localStorage.getItem(CACHE_KEY);
+          const cachedQuotes: SanchoQuoteResponse[] = cached ? JSON.parse(cached) : [];
+          
+          const isDuplicate = cachedQuotes.some(
+            q => q.quote === quote.quote
+          );
+          
+          if (!isDuplicate) {
+            const updatedCache = [quote, ...cachedQuotes].slice(0, MAX_CACHE_SIZE);
+            localStorage.setItem(CACHE_KEY, JSON.stringify(updatedCache));
+          }
+        } catch (storageError) {
+          console.warn('Failed to cache quote:', storageError);
+        }
       } catch (error) {
-        console.error('Failed to load Sancho quote:', error);
-        setSanchoQuote({
-          quote: "Your faithful guide to poetic forms, meters, and devices.",
-          context: "Explore structures, see classic snippets, and find new examples with the power of AI."
-        });
+        console.error('Failed to load Sancho quote from API:', error);
+        
+        try {
+          const cached = localStorage.getItem(CACHE_KEY);
+          if (cached) {
+            const cachedQuotes: SanchoQuoteResponse[] = JSON.parse(cached);
+            if (cachedQuotes.length > 0) {
+              const randomIndex = Math.floor(Math.random() * cachedQuotes.length);
+              setSanchoQuote(cachedQuotes[randomIndex]);
+              console.log('Using cached quote (offline mode)');
+            } else {
+              throw new Error('No cached quotes available');
+            }
+          } else {
+            throw new Error('No cache available');
+          }
+        } catch (cacheError) {
+          console.error('Failed to load cached quote:', cacheError);
+          setSanchoQuote({
+            quote: "Your faithful guide to poetic forms, meters, and devices.",
+            context: "Explore structures, see classic snippets, and find new examples with the power of AI."
+          });
+        }
       } finally {
         setQuoteLoading(false);
       }
@@ -74,7 +111,7 @@ const App: React.FC = () => {
                 Loading wisdom from Don Quixote...
               </p>
             ) : sanchoQuote ? (
-              <div className="max-w-2xl mx-auto animate-fade-in" style={{animationDelay: '0.3s', opacity: 0, animationFillMode: 'forwards'}}>
+              <div className="max-w-2xl mx-auto animate-fade-in" style={{animationDelay: '0.3s'}}>
                 <p className="text-default italic text-lg">"{sanchoQuote.quote}"</p>
                 <p className="text-muted text-sm mt-2">{sanchoQuote.context}</p>
               </div>

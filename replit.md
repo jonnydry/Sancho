@@ -127,5 +127,7 @@ None documented yet.
 - For production deployment, consider installing Tailwind as a PostCSS plugin
 - Custom Sancho logo displays prominently at 288px (w-72 h-72) for maximum visibility
 - Quote feature includes smooth fade-in animation with 0.3s delay after logo appears
-- Quote feature fetches new Sancho wisdom on each page load
+- Quote feature fetches new Sancho wisdom on each page load via XAI API
+- Intelligent quote caching: stores up to 15 unique quotes in localStorage for offline access
+- Offline fallback: displays random cached quote if connection is lost or API fails
 - Originally designed for AI Studio environment, migrated and enhanced for Replit
