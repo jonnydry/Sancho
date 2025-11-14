@@ -1,20 +1,41 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { poetryData } from './data/poetryData';
 import { poeticDevicesData } from './data/poeticDevicesData';
 import { Header } from './components/Header';
 import { PoetryCard } from './components/PoetryCard';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { SearchFilter } from './components/SearchFilter';
-import { PoetryItem } from './types';
+import { PoetryItem, SanchoQuoteResponse } from './types';
 import { PoetryDetailModal } from './components/PoetryDetailModal';
+import { fetchSanchoQuote } from './services/geminiService';
 
 
 const App: React.FC = () => {
   const [modalItem, setModalItem] = useState<PoetryItem | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<'all' | 'Form' | 'Meter' | 'Device'>('all');
+  const [sanchoQuote, setSanchoQuote] = useState<SanchoQuoteResponse | null>(null);
+  const [quoteLoading, setQuoteLoading] = useState(true);
 
   const allData = useMemo(() => [...poetryData, ...poeticDevicesData], []);
+
+  useEffect(() => {
+    const loadQuote = async () => {
+      try {
+        const quote = await fetchSanchoQuote();
+        setSanchoQuote(quote);
+      } catch (error) {
+        console.error('Failed to load Sancho quote:', error);
+        setSanchoQuote({
+          quote: "Your faithful guide to poetic forms, meters, and devices.",
+          context: "Explore structures, see classic snippets, and find new examples with the power of AI."
+        });
+      } finally {
+        setQuoteLoading(false);
+      }
+    };
+    loadQuote();
+  }, []);
 
   const handleCardClick = (item: PoetryItem) => {
     setModalItem(item);
@@ -50,9 +71,16 @@ const App: React.FC = () => {
             </div>
             <div className="w-16 h-px bg-border mx-auto mb-6"></div>
             <h2 className="text-3xl font-bold text-default">Sancho</h2>
-            <p className="mt-2 text-muted max-w-2xl mx-auto">
-              Your faithful guide to poetic forms, meters, and devices. Explore structures, see classic snippets, and find new examples with the power of AI.
-            </p>
+            {quoteLoading ? (
+              <p className="mt-2 text-muted max-w-2xl mx-auto italic">
+                Loading wisdom from Don Quixote...
+              </p>
+            ) : sanchoQuote ? (
+              <div className="mt-2 max-w-2xl mx-auto">
+                <p className="text-default italic text-lg">"{sanchoQuote.quote}"</p>
+                <p className="text-muted text-sm mt-2">{sanchoQuote.context}</p>
+              </div>
+            ) : null}
           </div>
 
           <div className="border-b border-default my-8"></div>

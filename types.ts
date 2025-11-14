@@ -28,3 +28,8 @@ export interface GeminiExampleResponse {
   title: string;
   explanation: string;
 }
+
+export interface SanchoQuoteResponse {
+  quote: string;
+  context: string;
+}

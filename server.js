@@ -69,6 +69,43 @@ app.post('/api/poetry-example', async (req, res) => {
   }
 });
 
+app.get('/api/sancho-quote', async (req, res) => {
+  try {
+    if (!process.env.XAI_API_KEY) {
+      return res.status(500).json({ error: 'API key not configured on server' });
+    }
+
+    const prompt = `Please provide a single authentic quote from Sancho Panza from the novel "Don Quixote" by Miguel de Cervantes. The quote should be wise, humorous, or insightful - something that reflects Sancho's character. Respond with JSON in this format: { "quote": "the actual quote text", "context": "brief context about when/why Sancho said this" }`;
+
+    const response = await openai.chat.completions.create({
+      model: "grok-2-1212",
+      messages: [
+        {
+          role: "system",
+          content: "You are a literature expert specializing in Don Quixote. Provide authentic quotes from Sancho Panza that capture his wisdom and personality."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.7,
+    });
+
+    const jsonText = response.choices[0].message.content || "{}";
+    const parsedJson = JSON.parse(jsonText);
+    
+    res.json(parsedJson);
+  } catch (error) {
+    console.error("Error fetching Sancho quote from XAI:", error);
+    res.status(500).json({ 
+      error: "Failed to fetch quote",
+      details: error.message 
+    });
+  }
+});
+
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Backend server is running' });
 });
