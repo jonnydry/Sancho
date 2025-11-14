@@ -99,13 +99,16 @@ const App: React.FC = () => {
       <main className="py-8 px-4 md:px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center">
-             <div className="w-72 h-72 mx-auto mb-6 animate-fade-in">
+             <div className="w-72 h-72 mx-auto mb-4 animate-fade-in">
               <img 
                 src="/sancho-logo.png" 
                 alt="Sancho Logo - A faithful guide reading poetry" 
                 className="w-full h-full object-contain" 
               />
             </div>
+            <p className="text-muted text-sm uppercase tracking-wider mb-6 animate-fade-in" style={{animationDelay: '0.2s'}}>
+              A Poetic Reference Squire
+            </p>
             {quoteLoading ? (
               <p className="text-muted max-w-2xl mx-auto italic animate-fade-in" style={{animationDelay: '0.3s'}}>
                 Loading wisdom from Don Quixote...

@@ -126,7 +126,8 @@ None documented yet.
 - Tailwind CSS is loaded via CDN (works but not optimal for production)
 - For production deployment, consider installing Tailwind as a PostCSS plugin
 - Custom Sancho logo displays prominently at 288px (w-72 h-72) for maximum visibility
-- Quote feature includes smooth fade-in animation with 0.3s delay after logo appears
+- Tagline "A Poetic Reference Squire" appears below logo with elegant uppercase styling
+- Quote feature includes smooth fade-in animation sequence (logo → tagline → quote)
 - Quote feature fetches new Sancho wisdom on each page load via XAI API
 - Intelligent quote caching: stores up to 15 unique quotes in localStorage for offline access
 - Offline fallback: displays random cached quote if connection is lost or API fails
