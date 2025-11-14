@@ -8,7 +8,6 @@ import { SearchFilter } from './components/SearchFilter';
 import { PoetryItem } from './types';
 import { PoetryDetailModal } from './components/PoetryDetailModal';
 
-const LOGO_DATA_URL = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMC4yNCAxMi4yNGE2IDYgMCAwIDAtOC40OS04LjQ5TDUgMTAuNVYxOWg4LjV6Ij48L3BhdGg+PGxpbmUgeDE9IjE2IiB5MT0iOCIgeDI9IjIiIHkyPSIyMiI+PC9saW5lPjxsaW5lIHgxPSIxNy41IiB5MT0iMTUiIHgyPSI5IiB5Mj0iMTUiPjwvbGluZT48L3N2Zz4=';
 
 const App: React.FC = () => {
   const [modalItem, setModalItem] = useState<PoetryItem | null>(null);
@@ -42,11 +41,11 @@ const App: React.FC = () => {
       <main className="py-8 px-4 md:px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center animate-fade-in">
-             <div className="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center border-2 border-dashed border-muted/30">
+             <div className="w-32 h-32 mx-auto mb-4">
               <img 
-                src={LOGO_DATA_URL} 
-                alt="Sancho Logo" 
-                className="w-12 h-12 text-muted" 
+                src="/sancho-logo.png" 
+                alt="Sancho Logo - A faithful guide reading poetry" 
+                className="w-full h-full object-contain" 
               />
             </div>
             <div className="w-16 h-px bg-border mx-auto mb-6"></div>
