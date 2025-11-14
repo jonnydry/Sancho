@@ -9,20 +9,25 @@ Sancho is your faithful guide to poetry, featuring:
 - Explore poetic meters (iambic pentameter, trochaic, etc.)  
 - Learn about poetic devices (metaphor, alliteration, enjambment, etc.)
 - Generate AI-powered examples using XAI's Grok model
+- Dynamic Sancho Panza quotes from Don Quixote displayed on homepage
 - Beautiful theme system with multiple color schemes (Dark, Paper, Slate)
 - Responsive design with Tailwind CSS
+- Custom Sancho logo featuring a donkey reading poetry
 
 ## Recent Changes
 
+- **2025-11-14**: Added AI-powered Sancho Panza quote feature that displays authentic quotes from Don Quixote
+- **2025-11-14**: Implemented secure backend architecture (Express server on port 3001) to protect API key
+- **2025-11-14**: Updated site logo to custom Sancho image (40% larger for readability)
+- **2025-11-14**: Configured Vite proxy to route API calls to backend server
 - **2025-11-14**: Migrated from Google Gemini AI to XAI (Grok) for poetry example generation
-- **2025-11-14**: Configured for Replit environment with port 5000
-- **2025-11-14**: Removed conflicting import maps to work with Vite bundler
-- **2025-11-14**: Set up XAI integration with API key management
+- **2025-11-14**: Configured for Replit environment with proper CORS and host settings
 
 ## Project Architecture
 
 ### Tech Stack
-- **Frontend**: React 19 with TypeScript
+- **Frontend**: React 19 with TypeScript (Port 5000)
+- **Backend**: Express.js (Port 3001)
 - **Build Tool**: Vite 6
 - **Styling**: Tailwind CSS (CDN)
 - **AI**: XAI Grok API (grok-2-1212 model)
@@ -46,19 +51,24 @@ Sancho is your faithful guide to poetry, featuring:
 ├── hooks/             # Custom React hooks
 │   └── useTheme.ts   # Theme hook
 ├── services/          # API services
-│   └── geminiService.ts  # XAI API integration (legacy name)
+│   └── geminiService.ts  # Backend API integration (handles poetry examples & Sancho quotes)
+├── public/            # Static assets
+│   └── sancho-logo.png  # Custom Sancho logo image
+├── server.js          # Express backend server (port 3001)
 ├── App.tsx            # Main app component
 ├── index.tsx          # App entry point
 ├── types.ts           # TypeScript type definitions
-└── vite.config.ts     # Vite configuration
+└── vite.config.ts     # Vite configuration with API proxy
 
 ```
 
 ### Key Features
-1. **Theme System**: Supports light/dark mode with 3 color schemes (Dark, Paper, Slate)
-2. **AI Integration**: Uses XAI's Grok to generate poetry examples on demand
-3. **Search & Filter**: Filter by type (Form, Meter, Device) and search by name
-4. **Responsive Design**: Mobile-friendly interface with smooth animations
+1. **Sancho Quote Feature**: Displays AI-generated authentic quotes from Sancho Panza (Don Quixote) on page load
+2. **Theme System**: Supports light/dark mode with 3 color schemes (Dark, Paper, Slate)
+3. **AI Poetry Examples**: Uses XAI's Grok to generate poetry examples on demand
+4. **Search & Filter**: Filter by type (Form, Meter, Device) and search by name
+5. **Responsive Design**: Mobile-friendly interface with smooth animations
+6. **Secure Backend**: API key protected server-side architecture
 
 ## Environment Variables
 
@@ -66,13 +76,22 @@ Sancho is your faithful guide to poetry, featuring:
 
 ## Development
 
-The app runs on port 5000 and uses Vite's development server with hot module replacement (HMR).
+The app uses a dual-server architecture:
+- **Frontend (Vite)**: Port 5000 with hot module replacement (HMR)
+- **Backend (Express)**: Port 3001 for secure API calls to XAI
+
+The workflow automatically starts both servers concurrently.
 
 ### Running Locally
 ```bash
 npm install
-npm run dev
+npm run dev  # Starts both backend (3001) and frontend (5000)
 ```
+
+### API Endpoints
+- `POST /api/poetry-example`: Generate poetry examples (requires topic in request body)
+- `GET /api/sancho-quote`: Fetch a Sancho Panza quote from Don Quixote
+- `GET /health`: Health check endpoint
 
 ### Building for Production
 ```bash
@@ -84,29 +103,28 @@ npm run preview
 
 None documented yet.
 
-## Security Considerations
+## Security
 
-⚠️ **Important**: This app currently makes XAI API calls directly from the browser using `dangerouslyAllowBrowser: true`. This exposes your API key in client-side code and is **NOT secure for production use**.
+✅ **Secure Architecture Implemented**: This app uses a secure backend proxy pattern to protect the XAI API key.
 
-**For production deployments, you should:**
-1. Create a backend API server (Node.js/Express, Python/Flask, etc.)
-2. Move the XAI API calls to the backend
-3. Have the frontend call your backend API instead
-4. Keep the XAI_API_KEY only on the server side
+**Security Features:**
+- ✅ Backend Express server handles all XAI API calls
+- ✅ API key stored server-side only (never exposed to browser)
+- ✅ CORS configured for development and production environments
+- ✅ Frontend uses Vite proxy to route API requests to backend
+- ✅ Server binds to 0.0.0.0 for deployment compatibility
 
-This current setup is acceptable for:
-- Development and testing
-- Personal/private use
-- Learning purposes
-
-But should NOT be used for:
-- Public production deployments
-- Apps with untrusted users
-- Any scenario where API key exposure is a concern
+**Production Ready:**
+- The current architecture is secure for production deployment
+- API key is protected from client-side exposure
+- CORS settings should be updated with your production domain
+- Ensure XAI_API_KEY is set in deployment environment
 
 ## Notes
 
-- The service file is still named `geminiService.ts` but now uses XAI's API  
-- Tailwind CSS is loaded via CDN (not recommended for production)
+- The service file is named `geminiService.ts` (legacy name) but handles all backend API calls
+- Tailwind CSS is loaded via CDN (works but not optimal for production)
 - For production deployment, consider installing Tailwind as a PostCSS plugin
-- Originally designed for AI Studio environment, adapted for Replit
+- Custom Sancho logo displays at 176px (w-44 h-44) for optimal text readability
+- Quote feature fetches new Sancho wisdom on each page load
+- Originally designed for AI Studio environment, migrated and enhanced for Replit
