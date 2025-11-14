@@ -62,21 +62,19 @@ const App: React.FC = () => {
       <main className="py-8 px-4 md:px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center animate-fade-in">
-             <div className="w-44 h-44 mx-auto mb-4">
+             <div className="w-64 h-64 mx-auto mb-6">
               <img 
                 src="/sancho-logo.png" 
                 alt="Sancho Logo - A faithful guide reading poetry" 
                 className="w-full h-full object-contain" 
               />
             </div>
-            <div className="w-16 h-px bg-border mx-auto mb-6"></div>
-            <h2 className="text-3xl font-bold text-default">Sancho</h2>
             {quoteLoading ? (
-              <p className="mt-2 text-muted max-w-2xl mx-auto italic">
+              <p className="text-muted max-w-2xl mx-auto italic">
                 Loading wisdom from Don Quixote...
               </p>
             ) : sanchoQuote ? (
-              <div className="mt-2 max-w-2xl mx-auto">
+              <div className="max-w-2xl mx-auto">
                 <p className="text-default italic text-lg">"{sanchoQuote.quote}"</p>
                 <p className="text-muted text-sm mt-2">{sanchoQuote.context}</p>
               </div>

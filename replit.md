@@ -125,6 +125,6 @@ None documented yet.
 - The service file is named `geminiService.ts` (legacy name) but handles all backend API calls
 - Tailwind CSS is loaded via CDN (works but not optimal for production)
 - For production deployment, consider installing Tailwind as a PostCSS plugin
-- Custom Sancho logo displays at 176px (w-44 h-44) for optimal text readability
+- Custom Sancho logo displays prominently at 256px (w-64 h-64) for maximum visibility
 - Quote feature fetches new Sancho wisdom on each page load
 - Originally designed for AI Studio environment, migrated and enhanced for Replit
