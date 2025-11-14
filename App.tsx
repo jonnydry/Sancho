@@ -7,7 +7,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { SearchFilter } from './components/SearchFilter';
 import { PoetryItem, SanchoQuoteResponse } from './types';
 import { PoetryDetailModal } from './components/PoetryDetailModal';
-import { fetchSanchoQuote } from './services/geminiService';
+import { fetchSanchoQuote } from './services/apiService';
 
 
 const App: React.FC = () => {
@@ -151,7 +151,7 @@ const App: React.FC = () => {
       </main>
        <footer className="text-center py-8 px-4">
         <p className="text-sm text-muted">
-            Built with React, Tailwind, and the Gemini API.
+            Built with React, Tailwind, and XAI's Grok API.
         </p>
       </footer>
 

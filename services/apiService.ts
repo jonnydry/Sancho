@@ -1,6 +1,6 @@
-import { GeminiExampleResponse, SanchoQuoteResponse } from '../types';
+import { PoetryExampleResponse, SanchoQuoteResponse } from '../types';
 
-export const findPoetryExample = async (topic: string): Promise<GeminiExampleResponse> => {
+export const findPoetryExample = async (topic: string): Promise<PoetryExampleResponse> => {
   try {
     const response = await fetch('/api/poetry-example', {
       method: 'POST',
@@ -16,7 +16,7 @@ export const findPoetryExample = async (topic: string): Promise<GeminiExampleRes
     }
 
     const data = await response.json();
-    return data as GeminiExampleResponse;
+    return data as PoetryExampleResponse;
 
   } catch (error) {
     console.error("Error fetching poetry example from backend:", error);

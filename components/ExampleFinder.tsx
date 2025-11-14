@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { findPoetryExample } from '../services/geminiService';
-import { GeminiExampleResponse } from '../types';
+import { findPoetryExample } from '../services/apiService';
+import { PoetryExampleResponse } from '../types';
 import { SparklesIcon } from './icons/SparklesIcon';
 import { SpinnerIcon } from './icons/SpinnerIcon';
 
@@ -9,7 +9,7 @@ interface ExampleFinderProps {
 }
 
 export const ExampleFinder: React.FC<ExampleFinderProps> = ({ topic }) => {
-  const [example, setExample] = useState<GeminiExampleResponse | null>(null);
+  const [example, setExample] = useState<PoetryExampleResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

@@ -11,7 +11,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   });
 
   const [color, setColorState] = useState<ThemeColor>(() => {
-    return (localStorage.getItem('theme-color') as ThemeColor) || 'dark';
+    const storedColor = localStorage.getItem('theme-color') as ThemeColor;
+    // Default to 'dark' theme for all users (authenticated or not)
+    return storedColor || 'dark';
   });
 
   useEffect(() => {
@@ -38,6 +40,40 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const setColor = useCallback((newColor: ThemeColor) => {
     setColorState(newColor);
   }, []);
+
+  // Enforce theme restrictions: reset premium themes if stored but user logs out
+  useEffect(() => {
+    // Check authentication status and reset theme if needed
+    const checkAuthAndResetTheme = async () => {
+      try {
+        const response = await fetch('/api/auth/user', { credentials: 'include' });
+        if (response.ok) {
+          const data = await response.json();
+          const isAuthenticated = data.authenticated;
+          
+          // Get current color from state
+          const currentColor = localStorage.getItem('theme-color') || 'dark';
+          
+          // If not authenticated and using a premium theme, reset to dark
+          if (!isAuthenticated && (currentColor === 'paper' || currentColor === 'slate')) {
+            setColorState('dark');
+            localStorage.setItem('theme-color', 'dark');
+          }
+        }
+      } catch (error) {
+        console.error('Failed to check auth status for theme enforcement:', error);
+      }
+    };
+    
+    // Run once on mount
+    checkAuthAndResetTheme();
+    
+    // Set up interval to check auth status every 10 seconds
+    // This helps catch logout events even if user doesn't reload the page
+    const intervalId = setInterval(checkAuthAndResetTheme, 10000);
+    
+    return () => clearInterval(intervalId);
+  }, []); // Empty dependency array - only set up once on mount
   
   const toggleMode = useCallback(() => {
     setModeState(prevMode => prevMode === 'light' ? 'dark' : 'light');

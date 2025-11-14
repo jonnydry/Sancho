@@ -1,20 +1,23 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Sancho - Poetry Guide
 
-# Run and deploy your AI Studio app
-
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/drive/1Hl4ddTqYRCX6oWeGTAiXlV_QsaDEtJ71
+A React-based web application for exploring poetic forms, meters, and devices. Built with React, TypeScript, Vite, and powered by XAI's Grok for AI-generated poetry examples.
 
 ## Run Locally
 
 **Prerequisites:**  Node.js
 
-
 1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+   ```bash
+   npm install
+   ```
+
+2. Set the `XAI_API_KEY` environment variable (via Replit Secrets or `.env.local`)
+
 3. Run the app:
-   `npm run dev`
+   ```bash
+   npm run dev
+   ```
+
+4. Open your browser to `http://localhost:5000`
+
+For detailed documentation, see [replit.md](replit.md).

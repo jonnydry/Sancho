@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import OpenAI from 'openai';
+import { setupAuth, isAuthenticated } from './server/replitAuth.js';
+import { storage } from './server/storage.js';
 
 if (!process.env.XAI_API_KEY) {
   console.error('ERROR: XAI_API_KEY environment variable is not set.');
@@ -20,6 +22,9 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
+
+// Setup authentication (must be done before routes)
+await setupAuth(app);
 
 const openai = new OpenAI({ 
   baseURL: "https://api.x.ai/v1", 
@@ -103,6 +108,27 @@ app.get('/api/sancho-quote', async (req, res) => {
       error: "Failed to fetch quote",
       details: error.message 
     });
+  }
+});
+
+// Auth route to get current user - publicly accessible for auth status polling
+app.get('/api/auth/user', async (req, res) => {
+  try {
+    // Check if user is authenticated via session
+    if (req.isAuthenticated() && req.user && req.user.claims) {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (user) {
+        return res.json({ authenticated: true, user });
+      }
+    }
+    
+    // Not authenticated
+    return res.json({ authenticated: false, user: null });
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    return res.status(500).json({ authenticated: false, error: "Failed to fetch user" });
   }
 });
 

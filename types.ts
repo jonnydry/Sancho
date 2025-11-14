@@ -22,7 +22,7 @@ export interface ThemeContextType extends Theme {
   toggleMode: () => void;
 }
 
-export interface GeminiExampleResponse {
+export interface PoetryExampleResponse {
   example: string;
   author: string;
   title: string;
