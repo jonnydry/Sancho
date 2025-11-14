@@ -65,7 +65,18 @@ export async function setupAuth(app) {
   const config = await getOidcConfig();
   
   // Explicit frontend origin for OAuth callbacks
-  const frontendOrigin = process.env.FRONTEND_ORIGIN ?? "http://localhost:5000";
+  // In Replit: use REPLIT_DEV_DOMAIN or REPLIT_DOMAINS with https
+  // In local dev: use localhost:5000 with http
+  let frontendOrigin;
+  if (process.env.REPLIT_DEV_DOMAIN) {
+    frontendOrigin = `https://${process.env.REPLIT_DEV_DOMAIN}`;
+  } else if (process.env.REPLIT_DOMAINS) {
+    frontendOrigin = `https://${process.env.REPLIT_DOMAINS}`;
+  } else {
+    frontendOrigin = process.env.FRONTEND_ORIGIN ?? "http://localhost:5000";
+  }
+  
+  console.log("Frontend origin for OAuth:", frontendOrigin);
 
   const verify = async (tokens, verified) => {
     const user = {};
