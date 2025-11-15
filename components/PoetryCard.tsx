@@ -36,8 +36,8 @@ export const PoetryCard: React.FC<PoetryCardProps> = ({ item, onSelect, animatio
       className="w-full text-left bg-bg-alt rounded-2xl shadow-md overflow-hidden transition-all duration-300 ease-in-out animate-fade-in hover:shadow-xl hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-accent border border-default"
       style={{ animationDelay: `${animationIndex * 50}ms` }}
     >
-      <div className="p-6">
-        <div className="flex justify-between items-start mb-4">
+      <div className="p-6 flex flex-col h-full">
+        <div className="flex justify-between items-start mb-3">
           <h3 className="text-xl font-bold text-default flex-1 pr-4 m-0">{item.name}</h3>
           <div className="flex items-center space-x-2 flex-shrink-0">
             <Tag type={item.type} />
@@ -47,7 +47,7 @@ export const PoetryCard: React.FC<PoetryCardProps> = ({ item, onSelect, animatio
             />
           </div>
         </div>
-        <p className="text-muted mb-4 mt-0">{item.description}</p>
+        <p className="text-muted mb-4 mt-0 min-h-[3rem]">{item.description}</p>
         
         <div className="mb-4">
             <h4 className="font-semibold text-sm text-default mb-2 mt-0">Conventions:</h4>
@@ -56,7 +56,7 @@ export const PoetryCard: React.FC<PoetryCardProps> = ({ item, onSelect, animatio
             </ul>
         </div>
         
-        <div>
+        <div className="mt-auto">
           <h4 className="font-semibold text-sm text-default mb-2 mt-0">Classic Snippet:</h4>
           <p className="text-sm text-muted italic mt-0">"{item.exampleSnippet}"</p>
         </div>
