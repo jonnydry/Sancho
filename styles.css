@@ -3,104 +3,25 @@
 /* Enable class-based dark mode for Tailwind v4 */
 @variant dark (&:where(.dark, .dark *));
 
-/* Define custom color utilities for Tailwind v4 */
+/* Configure Tailwind v4 custom colors to use dynamic CSS variables */
 @theme {
-  --color-bg: oklch(from white l c h);
-  --color-bg-alt: oklch(from rgb(248 250 252) l c h);
-  --color-default: oklch(from rgb(15 23 42) l c h);
-  --color-muted: oklch(from rgb(71 85 105) l c h);
-  --color-border: oklch(from rgb(226 232 240) l c h);
-  --color-accent: oklch(from rgb(15 23 42) l c h);
-  --color-accent-hover: oklch(from black l c h);
-  --color-accent-text: oklch(from white l c h);
-  --color-tag-form: oklch(from rgb(244 63 94) l c h);
-  --color-tag-form-text: oklch(from rgb(197 48 48) l c h);
-  --color-tag-meter: oklch(from rgb(16 185 129) l c h);
-  --color-tag-meter-text: oklch(from rgb(5 122 85) l c h);
-  --color-tag-device: oklch(from rgb(99 102 241) l c h);
-  --color-tag-device-text: oklch(from rgb(67 56 202) l c h);
+  --color-bg: rgb(var(--color-bg) / <alpha-value>);
+  --color-bg-alt: rgb(var(--color-bg-alt) / <alpha-value>);
+  --color-default: rgb(var(--color-text) / <alpha-value>);
+  --color-muted: rgb(var(--color-text-muted) / <alpha-value>);
+  --color-border: rgb(var(--color-border) / <alpha-value>);
+  --color-accent: rgb(var(--color-accent) / <alpha-value>);
+  --color-accent-hover: rgb(var(--color-accent-hover) / <alpha-value>);
+  --color-accent-text: rgb(var(--color-accent-text) / <alpha-value>);
+  --color-tag-form: rgb(var(--color-tag-form-bg-rgb) / <alpha-value>);
+  --color-tag-form-text: rgb(var(--color-tag-form-text-rgb) / <alpha-value>);
+  --color-tag-meter: rgb(var(--color-tag-meter-bg-rgb) / <alpha-value>);
+  --color-tag-meter-text: rgb(var(--color-tag-meter-text-rgb) / <alpha-value>);
+  --color-tag-device: rgb(var(--color-tag-device-bg-rgb) / <alpha-value>);
+  --color-tag-device-text: rgb(var(--color-tag-device-text-rgb) / <alpha-value>);
 }
 
-/* Override theme colors for dark mode and color themes */
-@layer theme {
-  .dark {
-    --color-bg: oklch(from rgb(17 17 17) l c h);
-    --color-bg-alt: oklch(from rgb(38 38 38) l c h);
-    --color-default: oklch(from rgb(229 229 229) l c h);
-    --color-muted: oklch(from rgb(163 163 163) l c h);
-    --color-border: oklch(from rgb(64 64 64) l c h);
-    --color-accent: oklch(from rgb(245 245 245) l c h);
-    --color-accent-hover: oklch(from white l c h);
-    --color-accent-text: oklch(from rgb(17 17 17) l c h);
-    --color-tag-form-text: oklch(from rgb(251 113 133) l c h);
-    --color-tag-meter-text: oklch(from rgb(52 211 153) l c h);
-    --color-tag-device-text: oklch(from rgb(129 140 248) l c h);
-  }
-
-  .theme-paper {
-    --color-bg: oklch(from rgb(244 241 234) l c h);
-    --color-bg-alt: oklch(from rgb(253 250 245) l c h);
-    --color-default: oklch(from rgb(68 64 60) l c h);
-    --color-muted: oklch(from rgb(120 113 108) l c h);
-    --color-border: oklch(from rgb(214 207 196) l c h);
-    --color-accent: oklch(from rgb(161 98 7) l c h);
-    --color-accent-hover: oklch(from rgb(146 64 14) l c h);
-    --color-accent-text: oklch(from white l c h);
-    --color-tag-form: oklch(from rgb(185 28 28) l c h);
-    --color-tag-form-text: oklch(from rgb(153 27 27) l c h);
-    --color-tag-meter: oklch(from rgb(3 105 161) l c h);
-    --color-tag-meter-text: oklch(from rgb(7 89 133) l c h);
-    --color-tag-device: oklch(from rgb(6 182 212) l c h);
-    --color-tag-device-text: oklch(from rgb(8 145 178) l c h);
-  }
-
-  .dark.theme-paper {
-    --color-bg: oklch(from rgb(41 37 36) l c h);
-    --color-bg-alt: oklch(from rgb(68 64 60) l c h);
-    --color-default: oklch(from rgb(231 229 228) l c h);
-    --color-muted: oklch(from rgb(168 162 158) l c h);
-    --color-border: oklch(from rgb(87 83 78) l c h);
-    --color-accent: oklch(from rgb(252 211 77) l c h);
-    --color-accent-hover: oklch(from rgb(253 224 71) l c h);
-    --color-accent-text: oklch(from rgb(41 37 36) l c h);
-    --color-tag-form-text: oklch(from rgb(248 113 113) l c h);
-    --color-tag-meter-text: oklch(from rgb(125 211 252) l c h);
-    --color-tag-device-text: oklch(from rgb(103 232 249) l c h);
-  }
-
-  .theme-slate {
-    --color-bg: oklch(from rgb(241 245 249) l c h);
-    --color-bg-alt: oklch(from white l c h);
-    --color-default: oklch(from rgb(51 65 85) l c h);
-    --color-muted: oklch(from rgb(100 116 139) l c h);
-    --color-border: oklch(from rgb(203 213 225) l c h);
-    --color-accent: oklch(from rgb(71 85 105) l c h);
-    --color-accent-hover: oklch(from rgb(30 41 59) l c h);
-    --color-accent-text: oklch(from white l c h);
-    --color-tag-form: oklch(from rgb(126 34 206) l c h);
-    --color-tag-form-text: oklch(from rgb(107 33 168) l c h);
-    --color-tag-meter: oklch(from rgb(13 116 128) l c h);
-    --color-tag-meter-text: oklch(from rgb(15 97 110) l c h);
-    --color-tag-device: oklch(from rgb(2 132 199) l c h);
-    --color-tag-device-text: oklch(from rgb(3 105 161) l c h);
-  }
-
-  .dark.theme-slate {
-    --color-bg: oklch(from rgb(30 41 59) l c h);
-    --color-bg-alt: oklch(from rgb(51 65 85) l c h);
-    --color-default: oklch(from rgb(203 213 225) l c h);
-    --color-muted: oklch(from rgb(148 163 184) l c h);
-    --color-border: oklch(from rgb(71 85 105) l c h);
-    --color-accent: oklch(from rgb(100 116 139) l c h);
-    --color-accent-hover: oklch(from rgb(148 163 184) l c h);
-    --color-accent-text: oklch(from rgb(30 41 59) l c h);
-    --color-tag-form-text: oklch(from rgb(192 132 252) l c h);
-    --color-tag-meter-text: oklch(from rgb(107 235 208) l c h);
-    --color-tag-device-text: oklch(from rgb(125 211 252) l c h);
-  }
-}
-
-/* --- THEME: Dark (Default) - Legacy CSS Variables --- */
+/* --- THEME: Dark (Default) --- */
 :root { /* Light Mode */
   --color-bg: 255 255 255; /* white */
   --color-bg-alt: 248 250 252; /* slate-50 */
