@@ -3,118 +3,119 @@
 /* Enable class-based dark mode for Tailwind v4 */
 @variant dark (&:where(.dark, .dark *));
 
-/* Configure Tailwind v4 custom colors to use dynamic CSS variables */
+/* Define Tailwind v4 custom color utilities using separate token names */
 @theme {
-  --color-bg: rgb(var(--color-bg) / <alpha-value>);
-  --color-bg-alt: rgb(var(--color-bg-alt) / <alpha-value>);
-  --color-default: rgb(var(--color-text) / <alpha-value>);
-  --color-muted: rgb(var(--color-text-muted) / <alpha-value>);
-  --color-border: rgb(var(--color-border) / <alpha-value>);
-  --color-accent: rgb(var(--color-accent) / <alpha-value>);
-  --color-accent-hover: rgb(var(--color-accent-hover) / <alpha-value>);
-  --color-accent-text: rgb(var(--color-accent-text) / <alpha-value>);
-  --color-tag-form: rgb(var(--color-tag-form-bg-rgb) / <alpha-value>);
-  --color-tag-form-text: rgb(var(--color-tag-form-text-rgb) / <alpha-value>);
-  --color-tag-meter: rgb(var(--color-tag-meter-bg-rgb) / <alpha-value>);
-  --color-tag-meter-text: rgb(var(--color-tag-meter-text-rgb) / <alpha-value>);
-  --color-tag-device: rgb(var(--color-tag-device-bg-rgb) / <alpha-value>);
-  --color-tag-device-text: rgb(var(--color-tag-device-text-rgb) / <alpha-value>);
+  /* Map Tailwind utility names to runtime CSS variables */
+  --color-bg: rgb(var(--app-bg) / <alpha-value>);
+  --color-bg-alt: rgb(var(--app-bg-alt) / <alpha-value>);
+  --color-default: rgb(var(--app-text) / <alpha-value>);
+  --color-muted: rgb(var(--app-text-muted) / <alpha-value>);
+  --color-border: rgb(var(--app-border) / <alpha-value>);
+  --color-accent: rgb(var(--app-accent) / <alpha-value>);
+  --color-accent-hover: rgb(var(--app-accent-hover) / <alpha-value>);
+  --color-accent-text: rgb(var(--app-accent-text) / <alpha-value>);
+  --color-tag-form: rgb(var(--app-tag-form) / <alpha-value>);
+  --color-tag-form-text: rgb(var(--app-tag-form-text) / <alpha-value>);
+  --color-tag-meter: rgb(var(--app-tag-meter) / <alpha-value>);
+  --color-tag-meter-text: rgb(var(--app-tag-meter-text) / <alpha-value>);
+  --color-tag-device: rgb(var(--app-tag-device) / <alpha-value>);
+  --color-tag-device-text: rgb(var(--app-tag-device-text) / <alpha-value>);
 }
 
-/* --- THEME: Dark (Default) --- */
+/* --- THEME: Dark (Default) - Runtime CSS Variables --- */
 :root { /* Light Mode */
-  --color-bg: 255 255 255; /* white */
-  --color-bg-alt: 248 250 252; /* slate-50 */
-  --color-text: 15 23 42; /* slate-900 */
-  --color-text-muted: 71 85 105; /* slate-600 */
-  --color-border: 226 232 240; /* slate-200 */
-  --color-accent: 15 23 42; /* slate-900 */
-  --color-accent-hover: 0 0 0; /* black */
-  --color-accent-text: 255 255 255; /* white */
-  --color-tag-form-bg-rgb: 244 63 94; /* rose-500 */
-  --color-tag-form-text-rgb: 197 48 48; /* rose-600 */
-  --color-tag-meter-bg-rgb: 16 185 129; /* emerald-500 */
-  --color-tag-meter-text-rgb: 5 122 85; /* emerald-600 */
-  --color-tag-device-bg-rgb: 99 102 241; /* indigo-500 */
-  --color-tag-device-text-rgb: 67 56 202; /* indigo-700 */
+  --app-bg: 255 255 255; /* white */
+  --app-bg-alt: 248 250 252; /* slate-50 */
+  --app-text: 15 23 42; /* slate-900 */
+  --app-text-muted: 71 85 105; /* slate-600 */
+  --app-border: 226 232 240; /* slate-200 */
+  --app-accent: 15 23 42; /* slate-900 */
+  --app-accent-hover: 0 0 0; /* black */
+  --app-accent-text: 255 255 255; /* white */
+  --app-tag-form: 244 63 94; /* rose-500 */
+  --app-tag-form-text: 197 48 48; /* rose-600 */
+  --app-tag-meter: 16 185 129; /* emerald-500 */
+  --app-tag-meter-text: 5 122 85; /* emerald-600 */
+  --app-tag-device: 99 102 241; /* indigo-500 */
+  --app-tag-device-text: 67 56 202; /* indigo-700 */
 }
 
 .dark { /* Dark Mode */
-  --color-bg: 17 17 17; /* near-black */
-  --color-bg-alt: 38 38 38; /* gray-900 */
-  --color-text: 229 229 229; /* gray-200 */
-  --color-text-muted: 163 163 163; /* gray-400 */
-  --color-border: 64 64 64; /* gray-800 */
-  --color-accent: 245 245 245; /* gray-100 */
-  --color-accent-hover: 255 255 255; /* white */
-  --color-accent-text: 17 17 17; /* near-black */
-  --color-tag-form-text-rgb: 251 113 133; /* rose-400 */
-  --color-tag-meter-text-rgb: 52 211 153; /* emerald-400 */
-  --color-tag-device-text-rgb: 129 140 248; /* indigo-400 */
+  --app-bg: 17 17 17; /* near-black */
+  --app-bg-alt: 38 38 38; /* gray-900 */
+  --app-text: 229 229 229; /* gray-200 */
+  --app-text-muted: 163 163 163; /* gray-400 */
+  --app-border: 64 64 64; /* gray-800 */
+  --app-accent: 245 245 245; /* gray-100 */
+  --app-accent-hover: 255 255 255; /* white */
+  --app-accent-text: 17 17 17; /* near-black */
+  --app-tag-form-text: 251 113 133; /* rose-400 */
+  --app-tag-meter-text: 52 211 153; /* emerald-400 */
+  --app-tag-device-text: 129 140 248; /* indigo-400 */
 }
 
 /* --- THEME: Paper --- */
 .theme-paper { /* Light Mode */
-  --color-bg: 244 241 234;
-  --color-bg-alt: 253 250 245;
-  --color-text: 68 64 60;
-  --color-text-muted: 120 113 108;
-  --color-border: 214 207 196;
-  --color-accent: 161 98 7;
-  --color-accent-hover: 146 64 14;
-  --color-accent-text: 255 255 255;
-  --color-tag-form-bg-rgb: 185 28 28; /* red-700 */
-  --color-tag-form-text-rgb: 153 27 27; /* red-800 */
-  --color-tag-meter-bg-rgb: 3 105 161; /* sky-700 */
-  --color-tag-meter-text-rgb: 7 89 133; /* sky-800 */
-  --color-tag-device-bg-rgb: 6 182 212; /* cyan-500 */
-  --color-tag-device-text-rgb: 8 145 178; /* cyan-700 */
+  --app-bg: 244 241 234;
+  --app-bg-alt: 253 250 245;
+  --app-text: 68 64 60;
+  --app-text-muted: 120 113 108;
+  --app-border: 214 207 196;
+  --app-accent: 161 98 7;
+  --app-accent-hover: 146 64 14;
+  --app-accent-text: 255 255 255;
+  --app-tag-form: 185 28 28; /* red-700 */
+  --app-tag-form-text: 153 27 27; /* red-800 */
+  --app-tag-meter: 3 105 161; /* sky-700 */
+  --app-tag-meter-text: 7 89 133; /* sky-800 */
+  --app-tag-device: 6 182 212; /* cyan-500 */
+  --app-tag-device-text: 8 145 178; /* cyan-700 */
 }
 
 .dark.theme-paper { /* Dark Mode */
-  --color-bg: 41 37 36;
-  --color-bg-alt: 68 64 60;
-  --color-text: 231 229 228;
-  --color-text-muted: 168 162 158;
-  --color-border: 87 83 78;
-  --color-accent: 252 211 77;
-  --color-accent-hover: 253 224 71;
-  --color-accent-text: 41 37 36;
-  --color-tag-form-text-rgb: 248 113 113; /* red-400 */
-  --color-tag-meter-text-rgb: 125 211 252; /* sky-300 */
-  --color-tag-device-text-rgb: 103 232 249; /* cyan-300 */
+  --app-bg: 41 37 36;
+  --app-bg-alt: 68 64 60;
+  --app-text: 231 229 228;
+  --app-text-muted: 168 162 158;
+  --app-border: 87 83 78;
+  --app-accent: 252 211 77;
+  --app-accent-hover: 253 224 71;
+  --app-accent-text: 41 37 36;
+  --app-tag-form-text: 248 113 113; /* red-400 */
+  --app-tag-meter-text: 125 211 252; /* sky-300 */
+  --app-tag-device-text: 103 232 249; /* cyan-300 */
 }
 
 /* --- THEME: Slate --- */
 .theme-slate { /* Light Mode */
-  --color-bg: 241 245 249;
-  --color-bg-alt: 255 255 255;
-  --color-text: 51 65 85;
-  --color-text-muted: 100 116 139;
-  --color-border: 203 213 225;
-  --color-accent: 71 85 105;
-  --color-accent-hover: 30 41 59;
-  --color-accent-text: 255 255 255;
-  --color-tag-form-bg-rgb: 126 34 206; /* purple-700 */
-  --color-tag-form-text-rgb: 107 33 168; /* purple-800 */
-  --color-tag-meter-bg-rgb: 13 116 128; /* teal-700 */
-  --color-tag-meter-text-rgb: 15 97 110; /* teal-800 */
-  --color-tag-device-bg-rgb: 2 132 199; /* sky-600 */
-  --color-tag-device-text-rgb: 3 105 161; /* sky-700 */
+  --app-bg: 241 245 249;
+  --app-bg-alt: 255 255 255;
+  --app-text: 51 65 85;
+  --app-text-muted: 100 116 139;
+  --app-border: 203 213 225;
+  --app-accent: 71 85 105;
+  --app-accent-hover: 30 41 59;
+  --app-accent-text: 255 255 255;
+  --app-tag-form: 126 34 206; /* purple-700 */
+  --app-tag-form-text: 107 33 168; /* purple-800 */
+  --app-tag-meter: 13 116 128; /* teal-700 */
+  --app-tag-meter-text: 15 97 110; /* teal-800 */
+  --app-tag-device: 2 132 199; /* sky-600 */
+  --app-tag-device-text: 3 105 161; /* sky-700 */
 }
 
 .dark.theme-slate { /* Dark Mode */
-  --color-bg: 30 41 59;
-  --color-bg-alt: 51 65 85;
-  --color-text: 203 213 225;
-  --color-text-muted: 148 163 184;
-  --color-border: 71 85 105;
-  --color-accent: 100 116 139;
-  --color-accent-hover: 148 163 184;
-  --color-accent-text: 30 41 59;
-  --color-tag-form-text-rgb: 192 132 252; /* purple-400 */
-  --color-tag-meter-text-rgb: 107 235 208; /* teal-300 */
-  --color-tag-device-text-rgb: 125 211 252; /* sky-300 */
+  --app-bg: 30 41 59;
+  --app-bg-alt: 51 65 85;
+  --app-text: 203 213 225;
+  --app-text-muted: 148 163 184;
+  --app-border: 71 85 105;
+  --app-accent: 100 116 139;
+  --app-accent-hover: 148 163 184;
+  --app-accent-text: 30 41 59;
+  --app-tag-form-text: 192 132 252; /* purple-400 */
+  --app-tag-meter-text: 107 235 208; /* teal-300 */
+  --app-tag-device-text: 125 211 252; /* sky-300 */
 }
 
 @keyframes fadeIn {
