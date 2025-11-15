@@ -18,6 +18,8 @@ Sancho is your faithful guide to poetry, featuring:
 
 ### Production-Ready Improvements (2025-11-15)
 - **✅ Tailwind CSS v4 Vite Plugin**: Migrated from CDN to proper Tailwind v4 with @tailwindcss/vite (27.5 KB CSS, 5.7 KB gzipped)
+- **✅ Tailwind Config with Class-Based Dark Mode**: Created tailwind.config.ts with `darkMode: 'class'` and CSS variable mappings
+- **✅ Theme System Fixed**: Fixed dark mode toggle and theme switcher with proper CSS variable integration
 - **✅ Comprehensive SEO**: Added meta tags (title, description, keywords, Open Graph, Twitter cards, JSON-LD structured data)
 - **✅ Custom Favicon**: Used sancho-logo.png as favicon for brand consistency
 - **✅ Rate Limiting**: API endpoints protected (10 req/min for poetry examples, 5 req/min for quotes)
@@ -28,7 +30,7 @@ Sancho is your faithful guide to poetry, featuring:
 - **✅ CORS Production Config**: Environment-aware CORS with FRONTEND_URL support
 - **✅ User-Friendly Error Messages**: Improved API error handling with fallbacks
 - **✅ Keyboard Shortcuts**: Modal closes with Escape key
-- **✅ Modal Readability**: Fully opaque modal background (white in light mode, dark gray in dark mode) with 80% backdrop opacity
+- **✅ Modal Readability**: Fully opaque modal background using theme colors with 80% backdrop opacity
 
 ### Earlier Changes
 - **2025-11-15**: Expanded poetry database to comprehensive coverage: added 13 new forms (Acrostic, Epigram, Epic, Couplet, Quatrain, Tercet, Senryu, Concrete Poetry, Ballade, Rubaiyat, Prose Poetry, Sapphic Stanza, Ekphrastic Poetry), 7 new meters (Iamb, Trochee, Dactyl, Anapest, Catalexis, Acephalous, Feminine Ending), and 18 new devices (Caesura, Anaphora, Imagery, Symbolism, Allusion, Metonymy, Paradox, Refrain, Internal Rhyme, Slant Rhyme, Cacophony, Euphony, Juxtaposition, Volta, Chiasmus, Epistrophe, Repetition, Pun) for a total of 90 poetry elements
