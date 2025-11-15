@@ -80,7 +80,11 @@ const App: React.FC = () => {
             setActiveFilter={setActiveFilter}
           />
 
-          {filteredData.length > 0 ? (
+          {isLoadingData ? (
+            <div className="text-center mt-16" role="status">
+              <p className="text-muted">Loading the poetry library...</p>
+            </div>
+          ) : filteredData.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
               {filteredData.map((item, index) => (
                 <PoetryCard

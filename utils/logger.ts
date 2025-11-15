@@ -1,4 +1,4 @@
-  // Simple logging utility for the Sancho application
+// Simple logging utility for the Sancho application
 // In production, this could be replaced with a more sophisticated logging solution
 
 export enum LogLevel {
@@ -8,18 +8,33 @@ export enum LogLevel {
   ERROR = 3,
 }
 
+const getRuntimeMode = (): string => {
+  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE) {
+    return import.meta.env.MODE;
+  }
+  if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV) {
+    return process.env.NODE_ENV;
+  }
+  return 'development';
+};
+
 class Logger {
   private level: LogLevel = LogLevel.INFO;
 
   constructor() {
     // Set log level based on environment
-    if (typeof window !== 'undefined') {
+    const mode = getRuntimeMode();
+    const isClient = typeof window !== 'undefined';
+    const isDev = mode === 'development';
+
+    if (isClient) {
       // Client-side
-      this.level = process.env.NODE_ENV === 'development' ? LogLevel.DEBUG : LogLevel.WARN;
-    } else {
-      // Server-side
-      this.level = process.env.NODE_ENV === 'development' ? LogLevel.DEBUG : LogLevel.INFO;
+      this.level = isDev ? LogLevel.DEBUG : LogLevel.WARN;
+      return;
     }
+
+    // Server-side
+    this.level = isDev ? LogLevel.DEBUG : LogLevel.INFO;
   }
 
   private shouldLog(level: LogLevel): boolean {
