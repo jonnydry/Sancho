@@ -7,6 +7,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { SearchFilter } from './components/SearchFilter';
 import { PoetryItem } from './types';
 import { PoetryDetailModal } from './components/PoetryDetailModal';
+import { SanchoQuote } from './components/SanchoQuote';
 
 const LOGO_DATA_URL = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMC4yNCAxMi4yNGE2IDYgMCAwIDAtOC40OS04LjQ5TDUgMTAuNVYxOWg4LjV6Ij48L3BhdGg+PGxpbmUgeDE9IjE2IiB5MT0iOCIgeDI9IjIiIHkyPSIyMiI+PC9saW5lPjxsaW5lIHgxPSIxNy41IiB5MT0iMTUiIHgyPSI5IiB5Mj0iMTUiPjwvbGluZT48L3N2Zz4=';
 
@@ -57,7 +58,9 @@ const App: React.FC = () => {
           </div>
 
           <div className="border-b border-default my-8"></div>
-        
+
+          <SanchoQuote />
+
           <SearchFilter
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
