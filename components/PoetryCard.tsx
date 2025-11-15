@@ -38,7 +38,7 @@ export const PoetryCard: React.FC<PoetryCardProps> = ({ item, onSelect, animatio
     >
       <div className="p-6">
         <div className="flex justify-between items-start mb-4">
-          <h3 className="text-xl font-bold text-default flex-1 pr-4">{item.name}</h3>
+          <h3 className="text-xl font-bold text-default flex-1 pr-4 m-0">{item.name}</h3>
           <div className="flex items-center space-x-2 flex-shrink-0">
             <Tag type={item.type} />
             <ArrowUpRightIcon
