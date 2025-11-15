@@ -31,7 +31,7 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
           type="text"
           placeholder="Search by name..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
           className="w-full pl-4 pr-10 py-2 bg-transparent text-default focus:outline-none"
         />
         {searchQuery && (

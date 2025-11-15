@@ -38,6 +38,12 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
     };
     window.addEventListener('keydown', handleEsc);
 
+    // Focus trap: focus the modal when it opens
+    const modalElement = document.querySelector('[role="dialog"]') as HTMLElement;
+    if (modalElement) {
+      modalElement.focus();
+    }
+
     return () => {
       window.removeEventListener('keydown', handleEsc);
     };

@@ -4,10 +4,40 @@ import OpenAI from 'openai';
 import { setupAuth, isAuthenticated } from './server/replitAuth.js';
 import { storage } from './server/storage.js';
 
+// Simple in-memory rate limiter (for production, use Redis or similar)
+const rateLimitStore = new Map();
+
+function rateLimit(maxRequests, windowMs) {
+  return (req, res, next) => {
+    const key = req.ip;
+    const now = Date.now();
+    const windowStart = now - windowMs;
+
+    if (!rateLimitStore.has(key)) {
+      rateLimitStore.set(key, []);
+    }
+
+    const requests = rateLimitStore.get(key);
+    // Remove old requests outside the window
+    const validRequests = requests.filter(time => time > windowStart);
+
+    if (validRequests.length >= maxRequests) {
+      return res.status(429).json({
+        error: 'Too many requests. Please try again later.'
+      });
+    }
+
+    validRequests.push(now);
+    rateLimitStore.set(key, validRequests);
+
+    next();
+  };
+}
+
+// Check for XAI API key but don't exit - allow graceful degradation for local dev
 if (!process.env.XAI_API_KEY) {
-  console.error('ERROR: XAI_API_KEY environment variable is not set.');
-  console.error('The backend server cannot function without an API key.');
-  process.exit(1);
+  console.warn('WARNING: XAI_API_KEY environment variable is not set.');
+  console.warn('AI features will be disabled. Set XAI_API_KEY to enable poetry examples and quotes.');
 }
 
 const app = express();
@@ -31,7 +61,7 @@ const openai = new OpenAI({
   apiKey: process.env.XAI_API_KEY
 });
 
-app.post('/api/poetry-example', async (req, res) => {
+app.post('/api/poetry-example', rateLimit(10, 60000), async (req, res) => { // 10 requests per minute
   try {
     const { topic } = req.body;
 
@@ -40,7 +70,9 @@ app.post('/api/poetry-example', async (req, res) => {
     }
 
     if (!process.env.XAI_API_KEY) {
-      return res.status(500).json({ error: 'API key not configured on server' });
+      return res.status(503).json({
+        error: 'AI features are currently disabled. Please configure XAI_API_KEY to enable poetry examples.'
+      });
     }
 
     const prompt = `Please provide a famous, concise example of a ${topic} in poetry. Include the author, the title, and a brief explanation of how it fits the conventions. Respond with JSON in this format: { "example": "string", "author": "string", "title": "string", "explanation": "string" }`;
@@ -74,10 +106,12 @@ app.post('/api/poetry-example', async (req, res) => {
   }
 });
 
-app.get('/api/sancho-quote', async (req, res) => {
+app.get('/api/sancho-quote', rateLimit(5, 60000), async (req, res) => { // 5 requests per minute
   try {
     if (!process.env.XAI_API_KEY) {
-      return res.status(500).json({ error: 'API key not configured on server' });
+      return res.status(503).json({
+        error: 'AI features are currently disabled. Please configure XAI_API_KEY to enable Sancho quotes.'
+      });
     }
 
     const prompt = `Please provide a single authentic quote from Sancho Panza from the novel "Don Quixote" by Miguel de Cervantes. The quote should be wise, humorous, or insightful - something that reflects Sancho's character. Respond with JSON in this format: { "quote": "the actual quote text", "context": "brief context about when/why Sancho said this" }`;
