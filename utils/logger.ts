@@ -1,4 +1,4 @@
-// Simple logging utility for the Sancho application
+  // Simple logging utility for the Sancho application
 // In production, this could be replaced with a more sophisticated logging solution
 
 export enum LogLevel {
