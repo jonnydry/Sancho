@@ -30,9 +30,30 @@ function rateLimit(maxRequests, windowMs) {
     validRequests.push(now);
     rateLimitStore.set(key, validRequests);
 
+    // Periodic cleanup: remove entries with no valid requests
+    if (validRequests.length === 0) {
+      rateLimitStore.delete(key);
+    }
+
     next();
   };
 }
+
+// Periodic cleanup of rate limit store to prevent memory leaks
+setInterval(() => {
+  const now = Date.now();
+  const maxAge = 60 * 60 * 1000; // 1 hour
+  const cutoff = now - maxAge;
+
+  for (const [key, requests] of rateLimitStore.entries()) {
+    const validRequests = requests.filter(time => time > cutoff);
+    if (validRequests.length === 0) {
+      rateLimitStore.delete(key);
+    } else {
+      rateLimitStore.set(key, validRequests);
+    }
+  }
+}, 30 * 60 * 1000); // Run cleanup every 30 minutes
 
 // Check for XAI API key but don't exit - allow graceful degradation for local dev
 if (!process.env.XAI_API_KEY) {
@@ -51,7 +72,55 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(express.json());
+app.use(express.json({ limit: '10mb' })); // Add payload size limit
+
+// Input validation middleware
+function validateInput(req, res, next) {
+  // Sanitize string inputs
+  const sanitizeString = (str, maxLength = 1000) => {
+    if (typeof str !== 'string') return '';
+    return str.trim().substring(0, maxLength).replace(/[<>]/g, '');
+  };
+
+  // Validate topic parameter for poetry examples
+  if (req.body && req.body.topic) {
+    req.body.topic = sanitizeString(req.body.topic, 200); // Max 200 chars for topic
+    if (!req.body.topic || req.body.topic.length < 2) {
+      return res.status(400).json({ error: 'Topic must be at least 2 characters long' });
+    }
+  }
+
+  // Check for suspicious patterns
+  const suspiciousPatterns = [
+    /\b(script|javascript|vbscript|onload|onerror)\b/i,
+    /<[^>]*>/,
+    /javascript:/i,
+    /data:text/i
+  ];
+
+  const checkForSuspiciousContent = (obj) => {
+    for (const key in obj) {
+      if (typeof obj[key] === 'string') {
+        for (const pattern of suspiciousPatterns) {
+          if (pattern.test(obj[key])) {
+            return res.status(400).json({ error: 'Invalid input detected' });
+          }
+        }
+      } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+        checkForSuspiciousContent(obj[key]);
+      }
+    }
+  };
+
+  if (req.body) {
+    checkForSuspiciousContent(req.body);
+  }
+
+  next();
+}
+
+// Apply input validation to API routes
+app.use('/api', validateInput);
 
 // Setup authentication (must be done before routes)
 await setupAuth(app);

@@ -36,16 +36,52 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
         onClose();
       }
     };
-    window.addEventListener('keydown', handleEsc);
 
-    // Focus trap: focus the modal when it opens
-    const modalElement = document.querySelector('[role="dialog"]') as HTMLElement;
-    if (modalElement) {
-      modalElement.focus();
+    const handleTab = (event: KeyboardEvent) => {
+      if (event.key === 'Tab') {
+        // Get all focusable elements within the modal
+        const modal = document.querySelector('[role="dialog"]') as HTMLElement;
+        if (!modal) return;
+
+        const focusableElements = modal.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements[0] as HTMLElement;
+        const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+
+        if (event.shiftKey) {
+          // Shift + Tab
+          if (document.activeElement === firstElement) {
+            event.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          // Tab
+          if (document.activeElement === lastElement) {
+            event.preventDefault();
+            firstElement.focus();
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleEsc);
+    window.addEventListener('keydown', handleTab);
+
+    // Focus trap: focus the first focusable element when modal opens
+    const modal = document.querySelector('[role="dialog"]') as HTMLElement;
+    if (modal) {
+      const firstFocusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])') as HTMLElement;
+      if (firstFocusable) {
+        firstFocusable.focus();
+      } else {
+        modal.focus();
+      }
     }
 
     return () => {
       window.removeEventListener('keydown', handleEsc);
+      window.removeEventListener('keydown', handleTab);
     };
   }, [onClose]);
 

@@ -1,6 +1,4 @@
-import React, { useState, useMemo } from 'react';
-import { poetryData } from './data/poetryData';
-import { poeticDevicesData } from './data/poeticDevicesData';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Header } from './components/Header';
 import { PoetryCard } from './components/PoetryCard';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -9,13 +7,32 @@ import { PoetryItem } from './types';
 import { PoetryDetailModal } from './components/PoetryDetailModal';
 import { SanchoQuote } from './components/SanchoQuote';
 
-
 const App: React.FC = () => {
   const [modalItem, setModalItem] = useState<PoetryItem | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<'all' | 'Form' | 'Meter' | 'Device'>('all');
+  const [allData, setAllData] = useState<PoetryItem[]>([]);
+  const [isLoadingData, setIsLoadingData] = useState(true);
 
-  const allData = useMemo(() => [...poetryData, ...poeticDevicesData], []);
+  // Lazy load poetry data to reduce initial bundle size
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [{ poetryData }, { poeticDevicesData }] = await Promise.all([
+          import('./data/poetryData'),
+          import('./data/poeticDevicesData')
+        ]);
+        setAllData([...poetryData, ...poeticDevicesData]);
+      } catch (error) {
+        console.error('Failed to load poetry data:', error);
+        setAllData([]);
+      } finally {
+        setIsLoadingData(false);
+      }
+    };
+
+    loadData();
+  }, []);
 
   const handleCardClick = (item: PoetryItem) => {
     setModalItem(item);
