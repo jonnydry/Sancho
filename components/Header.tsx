@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { useAuth } from '../hooks/useAuth.js';
 
@@ -8,9 +9,16 @@ export const Header: React.FC = () => {
   return (
     <header className="sticky top-0 w-full bg-default/80 backdrop-blur-md border-b border-default/50 z-50">
       <div className="max-w-4xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
-        <h1 className="text-lg md:text-xl font-bold text-default">
-          Sancho.ref
-        </h1>
+        <div className="flex items-center gap-6">
+          <Link to="/" className="text-lg md:text-xl font-bold text-default hover:text-accent transition-colors">
+            Sancho.ref
+          </Link>
+          <nav className="hidden md:flex gap-4">
+            <Link to="/about" className="text-sm text-muted hover:text-default transition-colors">
+              About
+            </Link>
+          </nav>
+        </div>
         <div className="flex items-center gap-4">
           <ThemeSwitcher />
           <div className="flex items-center gap-3">

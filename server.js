@@ -239,8 +239,30 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Backend server is running' });
 });
 
+// Serve static files from the dist directory in production
+if (process.env.NODE_ENV === 'production') {
+  const path = await import('path');
+  const { fileURLToPath } = await import('url');
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  
+  app.use(express.static(path.join(__dirname, 'dist')));
+  
+  // SPA catchall - serve index.html for all non-API routes
+  app.get('*', (req, res, next) => {
+    // Skip API routes
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  });
+}
+
 const HOST = '0.0.0.0';
 app.listen(PORT, HOST, () => {
   console.log(`Backend server running on http://${HOST}:${PORT}`);
   console.log(`Accessible at http://localhost:${PORT} in development`);
+  if (process.env.NODE_ENV === 'production') {
+    console.log('Serving production build from dist/');
+  }
 });

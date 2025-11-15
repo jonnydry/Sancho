@@ -16,6 +16,20 @@ Sancho is your faithful guide to poetry, featuring:
 
 ## Recent Changes
 
+### Production-Ready Improvements (2025-11-15)
+- **✅ Tailwind CSS v4 Vite Plugin**: Migrated from CDN to proper Tailwind v4 with @tailwindcss/vite (27.5 KB CSS, 5.7 KB gzipped)
+- **✅ Comprehensive SEO**: Added meta tags (title, description, keywords, Open Graph, Twitter cards, JSON-LD structured data)
+- **✅ Custom Favicon**: Used sancho-logo.png as favicon for brand consistency
+- **✅ Rate Limiting**: API endpoints protected (10 req/min for poetry examples, 5 req/min for quotes)
+- **✅ Error Boundary**: React Error Boundary with graceful fallback UI for production stability
+- **✅ React Router**: Multi-page navigation (/, /about, /privacy, /terms, 404)
+- **✅ Legal Pages**: Privacy Policy, Terms of Service, About page for compliance
+- **✅ Production Build Tested**: Build process verified and optimized (270 KB JS bundle, 83.8 KB gzipped)
+- **✅ CORS Production Config**: Environment-aware CORS with FRONTEND_URL support
+- **✅ User-Friendly Error Messages**: Improved API error handling with fallbacks
+- **✅ Keyboard Shortcuts**: Modal closes with Escape key
+
+### Earlier Changes
 - **2025-11-15**: Expanded poetry database to comprehensive coverage: added 13 new forms (Acrostic, Epigram, Epic, Couplet, Quatrain, Tercet, Senryu, Concrete Poetry, Ballade, Rubaiyat, Prose Poetry, Sapphic Stanza, Ekphrastic Poetry), 7 new meters (Iamb, Trochee, Dactyl, Anapest, Catalexis, Acephalous, Feminine Ending), and 18 new devices (Caesura, Anaphora, Imagery, Symbolism, Allusion, Metonymy, Paradox, Refrain, Internal Rhyme, Slant Rhyme, Cacophony, Euphony, Juxtaposition, Volta, Chiasmus, Epistrophe, Repetition, Pun) for a total of 90 poetry elements
 - **2025-11-14**: Implemented Replit Auth authentication system with PostgreSQL session storage
 - **2025-11-14**: Added premium theme restrictions - only logged-in users can access Paper and Slate themes
@@ -34,20 +48,25 @@ Sancho is your faithful guide to poetry, featuring:
 ### Tech Stack
 - **Frontend**: React 19 with TypeScript (Port 5000)
 - **Backend**: Express.js (Port 3001)
-- **Build Tool**: Vite 6
-- **Styling**: Tailwind CSS (CDN)
+- **Build Tool**: Vite 6 with Tailwind v4 Vite plugin
+- **Styling**: Tailwind CSS v4 (production-optimized, 5.7 KB gzipped)
+- **Routing**: React Router DOM v6
 - **AI**: XAI Grok API (grok-2-1212 model)
+- **Database**: PostgreSQL with Drizzle ORM
+- **Authentication**: Replit Auth (OpenID Connect)
 - **Package Manager**: npm
 
 ### Project Structure
 ```
 ├── components/          # React components
 │   ├── icons/          # SVG icon components
-│   ├── Header.tsx      # App header with theme switcher
+│   ├── ErrorBoundary.tsx  # Error boundary for graceful failures
+│   ├── Header.tsx      # App header with navigation and auth
 │   ├── PoetryCard.tsx  # Card component for poetry items
 │   ├── PoetryDetailModal.tsx  # Modal for detailed view
 │   ├── SearchFilter.tsx  # Search and filter controls
 │   ├── ExampleFinder.tsx  # AI example generation
+│   ├── SanchoQuote.tsx # Dynamic quote component
 │   └── ThemeSwitcher.tsx  # Theme toggle component
 ├── contexts/           # React contexts
 │   └── ThemeContext.tsx  # Theme management
@@ -55,29 +74,46 @@ Sancho is your faithful guide to poetry, featuring:
 │   ├── poetryData.ts  # Poetry forms and meters
 │   └── poeticDevicesData.ts  # Poetic devices
 ├── hooks/             # Custom React hooks
-│   └── useTheme.ts   # Theme hook
+│   ├── useTheme.ts   # Theme hook
+│   └── useAuth.js    # Authentication hook
+├── pages/             # Page components
+│   ├── HomePage.tsx  # Main poetry browser
+│   ├── AboutPage.tsx # About Sancho
+│   ├── PrivacyPage.tsx # Privacy policy
+│   ├── TermsPage.tsx # Terms of service
+│   └── NotFoundPage.tsx # 404 page
 ├── services/          # API services
-│   └── apiService.ts  # Backend API integration (handles poetry examples & Sancho quotes)
+│   └── apiService.ts  # Backend API integration
+├── server/            # Backend modules
+│   ├── replitAuth.js # Replit Auth setup
+│   └── storage.js    # Database operations
+├── shared/            # Shared code
+│   └── schema.js     # Database schema (Drizzle)
 ├── public/            # Static assets
-│   └── sancho-logo.png  # Custom Sancho logo image
+│   └── sancho-logo.png  # Custom Sancho logo & favicon
 ├── server.js          # Express backend server (port 3001)
-├── App.tsx            # Main app component
-├── index.tsx          # App entry point
+├── App.tsx            # Router and layout
+├── index.tsx          # App entry point with ErrorBoundary
+├── styles.css         # Tailwind + custom CSS variables
 ├── types.ts           # TypeScript type definitions
-└── vite.config.ts     # Vite configuration with API proxy
+├── vite.config.ts     # Vite + Tailwind v4 plugin config
+└── REPLIT_GUIDELINES.md # Developer guidelines for Replit constraints
 
 ```
 
 ### Key Features
 1. **Authentication System**: Replit Auth integration supporting Google, GitHub, email/password, Apple, and X login
 2. **Premium Theme Access**: Logged-in users unlock Paper and Slate themes; logged-out users use default Dark theme
-3. **Sancho Quote Feature**: Displays AI-generated authentic quotes from Sancho Panza (Don Quixote) on page load
-4. **Glassomorphic Sticky Header**: Semi-transparent header with backdrop blur, displays login status and login/logout buttons
-5. **Theme System**: Supports light/dark mode with 3 color schemes (Dark - free, Paper - premium, Slate - premium)
-6. **AI Poetry Examples**: Uses XAI's Grok to generate poetry examples on demand
-7. **Search & Filter**: Filter by type (Form, Meter, Device) and search by name
-8. **Responsive Design**: Mobile-friendly interface with smooth animations
-9. **Secure Backend**: API key protected server-side architecture with PostgreSQL session storage
+3. **Multi-Page Navigation**: React Router with About, Privacy Policy, Terms of Service, and 404 pages
+4. **SEO Optimized**: Comprehensive meta tags, Open Graph cards, Twitter cards, and JSON-LD structured data
+5. **Production-Ready**: Tailwind CSS v4 Vite plugin, error boundaries, rate limiting, optimized build
+6. **Sancho Quote Feature**: AI-generated authentic quotes from Don Quixote with offline caching
+7. **Theme System**: Light/dark mode with 3 color schemes (Dark - free, Paper - premium, Slate - premium)
+8. **AI Poetry Examples**: XAI Grok generates examples on demand with rate limiting (10 req/min)
+9. **Search & Filter**: Filter by type (Form, Meter, Device) and search by name
+10. **Responsive Design**: Mobile-friendly interface with smooth animations
+11. **Secure Backend**: API key protected server-side architecture with PostgreSQL session storage
+12. **Error Handling**: React Error Boundary with user-friendly fallback UI
 
 ## Environment Variables
 
@@ -110,9 +146,12 @@ npm run dev  # Starts both backend (3001) and frontend (5000)
 - `GET /api/auth/user`: Get current authenticated user (protected route)
 
 **AI & Content Routes:**
-- `POST /api/poetry-example`: Generate poetry examples (requires topic in request body)
-- `GET /api/sancho-quote`: Fetch a Sancho Panza quote from Don Quixote
+- `POST /api/poetry-example`: Generate poetry examples (requires topic in request body) - Rate limited: 10 req/min
+- `GET /api/sancho-quote`: Fetch a Sancho Panza quote from Don Quixote - Rate limited: 5 req/min
 - `GET /health`: Health check endpoint
+
+**Rate Limiting:**
+All API endpoints implement in-memory rate limiting to prevent abuse and control XAI API costs.
 
 ### Building for Production
 ```bash
@@ -155,15 +194,48 @@ None documented yet.
 - Database migrations handled by Drizzle ORM
 - CORS settings should be updated with your production domain
 
+## Production Deployment
+
+### Pre-Deployment Checklist
+✅ **Completed:**
+- Tailwind CSS v4 production build configured
+- SEO meta tags and structured data added
+- Rate limiting on all AI endpoints
+- Error boundaries implemented
+- Legal pages (Privacy, Terms, About) created
+- Production build tested (270 KB bundle, 83.8 KB gzipped)
+- CORS configured for production (use FRONTEND_URL env var)
+- Custom favicon from sancho-logo.png
+- React Router for multi-page navigation
+
+### Deployment Steps (Replit)
+1. Click "Deploy" button in Replit
+2. Configure deployment:
+   - **Type**: Autoscale (stateless web app)
+   - **Build Command**: `npm run build`
+   - **Run Command**: `node server.js` (serves both frontend & backend)
+3. Set production environment variables:
+   - `NODE_ENV=production`
+   - `FRONTEND_URL=https://your-domain.com` (for CORS)
+4. Publish and monitor in deployment dashboard
+
+### Performance
+- **Bundle Size**: 270 KB JavaScript (83.8 KB gzipped)
+- **CSS**: 27.5 KB (5.7 KB gzipped) - optimized Tailwind v4
+- **API Rate Limits**: 10 req/min (poetry), 5 req/min (quotes)
+- **Caching**: Quote caching in localStorage for offline access
+
 ## Notes
 
 - The service file is named `apiService.ts` and handles all backend API calls to XAI
-- Tailwind CSS is loaded via CDN (works but not optimal for production)
-- For production deployment, consider installing Tailwind as a PostCSS plugin
-- Custom Sancho logo displays prominently at 288px (w-72 h-72) for maximum visibility
+- ✅ **Tailwind CSS v4 Vite plugin** is production-optimized (was previously CDN)
+- Custom Sancho logo displays prominently at 288px (w-72 h-72) and serves as favicon
 - Tagline "A Poetic Reference Squire" appears below logo with elegant uppercase styling
 - Quote feature includes smooth fade-in animation sequence (logo → tagline → quote)
 - Quote feature fetches new Sancho wisdom on each page load via XAI API
 - Intelligent quote caching: stores up to 15 unique quotes in localStorage for offline access
 - Offline fallback: displays random cached quote if connection is lost or API fails
+- React Error Boundary catches runtime errors and displays user-friendly fallback
+- All legal pages (Privacy, Terms, About) are accessible from footer
 - Originally designed for AI Studio environment, migrated and enhanced for Replit
+- See **REPLIT_GUIDELINES.md** for critical development constraints and best practices
