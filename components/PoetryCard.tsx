@@ -47,18 +47,18 @@ export const PoetryCard: React.FC<PoetryCardProps> = ({ item, onSelect, animatio
             />
           </div>
         </div>
-        <p className="text-muted mb-4">{item.description}</p>
+        <p className="text-muted mb-4 mt-0">{item.description}</p>
         
         <div className="mb-4">
-            <h4 className="font-semibold text-sm text-default mb-2">Conventions:</h4>
+            <h4 className="font-semibold text-sm text-default mb-2 mt-0">Conventions:</h4>
             <ul className="list-disc list-inside space-y-1 text-sm text-muted">
                 {item.structure.map((rule, index) => <li key={index}>{rule}</li>)}
             </ul>
         </div>
         
         <div>
-          <h4 className="font-semibold text-sm text-default mb-2">Classic Snippet:</h4>
-          <p className="text-sm text-muted italic">"{item.exampleSnippet}"</p>
+          <h4 className="font-semibold text-sm text-default mb-2 mt-0">Classic Snippet:</h4>
+          <p className="text-sm text-muted italic mt-0">"{item.exampleSnippet}"</p>
         </div>
       </div>
     </button>
