@@ -61,7 +61,7 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
         className="relative bg-default rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto m-4 animate-modal-in border border-default"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6 md:p-8">
+        <div className="p-6">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 text-muted/50 hover:text-muted transition-colors"
@@ -71,28 +71,28 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
           </button>
 
           <div className="flex justify-between items-start mb-4">
-            <h2 id="modal-title" className="text-2xl font-bold text-default flex-1 pr-8">{item.name}</h2>
+            <h2 id="modal-title" className="text-2xl font-bold text-default flex-1 pr-4">{item.name}</h2>
             <Tag type={item.type} />
           </div>
-          <p className="text-default mb-6">{item.description}</p>
+          <p className="text-default mb-4">{item.description}</p>
 
           {item.origin && (
-            <div className="mb-6">
-              <h4 className="font-semibold text-default">Origin:</h4>
-              <p className="text-default mt-1">{item.origin}</p>
+            <div className="mb-4">
+              <h4 className="font-semibold text-default mb-2">Origin:</h4>
+              <p className="text-default">{item.origin}</p>
             </div>
           )}
           
-          <div className="space-y-4 mb-6">
-              <h4 className="font-semibold text-default">Conventions:</h4>
+          <div className="mb-4">
+              <h4 className="font-semibold text-default mb-2">Conventions:</h4>
               <ul className="list-disc list-inside space-y-1 text-default">
                   {item.structure.map((rule, index) => <li key={index}>{rule}</li>)}
               </ul>
           </div>
-          
-          <div className="mb-6">
-            <h4 className="font-semibold text-default">Classic Snippet:</h4>
-            <p className="text-default italic mt-1">"{item.exampleSnippet}"</p>
+
+          <div className="mb-4">
+            <h4 className="font-semibold text-default mb-2">Classic Snippet:</h4>
+            <p className="text-default italic">"{item.exampleSnippet}"</p>
           </div>
         </div>
         

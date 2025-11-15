@@ -26,7 +26,7 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
 }) => {
   return (
     <div className="space-y-4">
-      <div className="relative flex items-center w-full bg-bg-alt border border-default rounded-lg focus-within:ring-2 focus-within:ring-accent transition-all">
+      <div className="relative flex items-center w-full bg-bg-alt border border-default rounded-2xl focus-within:ring-2 focus-within:ring-accent transition-all">
         <input
           type="text"
           placeholder="Search by name..."
@@ -44,7 +44,7 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
           </button>
         )}
       </div>
-      <div className="flex items-center justify-center space-x-2 p-1 bg-bg-alt rounded-lg">
+      <div className="flex items-center justify-center space-x-2 p-1 bg-bg-alt rounded-2xl">
         {filters.map(({ label, value }) => (
           <button
             key={value}

@@ -28,8 +28,8 @@ export const ExampleFinder: React.FC<ExampleFinderProps> = ({ topic }) => {
   }, [topic]);
 
   return (
-    <div className="mt-4 p-4 border-t border-default">
-      <div className="flex items-center justify-between">
+    <div className="mt-4 p-6 border-t border-default">
+      <div className="flex items-center justify-between mb-4">
         <h4 className="font-semibold text-default">AI-Powered Example</h4>
         <button
           onClick={handleFindExample}
@@ -58,7 +58,7 @@ export const ExampleFinder: React.FC<ExampleFinderProps> = ({ topic }) => {
             </cite>
           </blockquote>
           <div>
-            <h5 className="font-semibold mb-1 text-default">Explanation</h5>
+            <h5 className="font-semibold mb-2 text-default">Explanation</h5>
             <p className="text-sm text-muted">{example.explanation}</p>
           </div>
         </div>
