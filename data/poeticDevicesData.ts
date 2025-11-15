@@ -143,5 +143,224 @@ export const poeticDevicesData: PoetryItem[] = [
       'Often used to create a more vivid image'
     ],
     exampleSnippet: 'Friends, Romans, countrymen, lend me your ears;'
+  },
+  {
+    name: 'Caesura',
+    type: 'Device',
+    description: 'A pause or break within a line of verse, often marked by punctuation. Can be medial (middle) or initial/terminal (beginning/end).',
+    structure: [
+      'A pause within a poetic line',
+      'Often indicated by punctuation (comma, dash, period)',
+      'Creates rhythm and emphasis',
+      'Masculine caesura: after a stressed syllable; Feminine: after unstressed'
+    ],
+    exampleSnippet: 'To be, or not to be: || that is the question' // || marks the caesura
+  },
+  {
+    name: 'Anaphora',
+    type: 'Device',
+    description: 'The repetition of a word or phrase at the beginning of successive clauses, lines, or sentences for emphasis and rhythm.',
+    structure: [
+      'Repetition at the beginning of lines or clauses',
+      'Creates emphasis and rhythm',
+      'Builds emotional intensity',
+      'Common in speeches and persuasive writing'
+    ],
+    exampleSnippet: 'We shall fight on the beaches, we shall fight on the landing grounds, we shall fight in the fields...'
+  },
+  {
+    name: 'Imagery',
+    type: 'Device',
+    description: 'Vivid descriptive language that appeals to one or more of the five senses, creating mental pictures for the reader.',
+    structure: [
+      'Appeals to the five senses: sight, sound, smell, taste, touch',
+      'Creates vivid mental pictures',
+      'Makes abstract ideas concrete',
+      'Essential element of poetic language'
+    ],
+    exampleSnippet: 'The fair breeze blew, the white foam flew, / The furrow followed free'
+  },
+  {
+    name: 'Symbolism',
+    type: 'Device',
+    description: 'The use of symbols to represent ideas or qualities, where an object, person, or action stands for something beyond its literal meaning.',
+    structure: [
+      'Objects or actions represent abstract ideas',
+      'Can be universal (dove = peace) or contextual',
+      'Adds depth and layers of meaning',
+      'Encourages interpretation'
+    ],
+    exampleSnippet: 'Two roads diverged in a yellow wood...' // Roads symbolize life choices
+  },
+  {
+    name: 'Allusion',
+    type: 'Device',
+    description: 'A brief, indirect reference to a person, place, event, or work of literature or art, meant to enrich the meaning through association.',
+    structure: [
+      'Indirect reference to historical, literary, or cultural material',
+      'Assumes reader\'s familiarity with the reference',
+      'Adds depth and layers of meaning',
+      'Can be biblical, mythological, literary, or historical'
+    ],
+    exampleSnippet: 'No! I am not Prince Hamlet, nor was meant to be' // Allusion to Shakespeare
+  },
+  {
+    name: 'Metonymy',
+    type: 'Device',
+    description: 'A figure of speech in which one thing is called by the name of something closely associated with it.',
+    structure: [
+      'Substitution of an associated term',
+      'Different from synecdoche (part-whole relationship)',
+      'Examples: "the crown" for royalty, "the White House" for U.S. presidency',
+      'Creates concise, vivid expression'
+    ],
+    exampleSnippet: 'The pen is mightier than the sword' // Pen = writing; sword = military force
+  },
+  {
+    name: 'Paradox',
+    type: 'Device',
+    description: 'A statement that appears self-contradictory but upon reflection reveals a deeper truth or insight.',
+    structure: [
+      'Seemingly contradictory statement',
+      'Reveals truth upon examination',
+      'Different from oxymoron (paradox is a statement, oxymoron is two words)',
+      'Challenges conventional thinking'
+    ],
+    exampleSnippet: 'I must be cruel only to be kind' // Hamlet
+  },
+  {
+    name: 'Refrain',
+    type: 'Device',
+    description: 'A line or group of lines repeated at intervals throughout a poem, usually at the end of each stanza.',
+    structure: [
+      'Repeated line(s) throughout the poem',
+      'Often appears at end of stanzas',
+      'Creates rhythm and emphasis',
+      'Common in ballads, villanelles, and songs'
+    ],
+    exampleSnippet: 'And miles to go before I sleep, / And miles to go before I sleep.' // Frost
+  },
+  {
+    name: 'Internal Rhyme',
+    type: 'Device',
+    description: 'A rhyme that occurs within a single line of verse, rather than at the end of lines.',
+    structure: [
+      'Rhyme within a line of poetry',
+      'Can occur mid-line or between middle and end',
+      'Creates musicality and connection',
+      'Adds complexity to sound patterns'
+    ],
+    exampleSnippet: 'Once upon a midnight dreary, while I pondered, weak and weary' // dreary/weary
+  },
+  {
+    name: 'Slant Rhyme',
+    type: 'Device',
+    description: 'A rhyme in which the sounds are similar but not identical. Also called half rhyme, near rhyme, or imperfect rhyme.',
+    structure: [
+      'Similar but not exact rhyme',
+      'Can involve consonance or assonance',
+      'Examples: "soul/oil," "years/yours"',
+      'Common in modern poetry',
+      'Creates subtle, sophisticated sound patterns'
+    ],
+    exampleSnippet: 'I heard a Fly buzz - when I died - / The Stillness in the Room / Was like the Stillness in the Air - / Between the Heaves of Storm -' // Room/Storm
+  },
+  {
+    name: 'Cacophony',
+    type: 'Device',
+    description: 'Harsh, discordant sounds created by combinations of words with hard consonants, creating an unpleasant or jarring effect.',
+    structure: [
+      'Harsh, discordant sounds',
+      'Uses hard consonants (k, t, g, d, p, b)',
+      'Creates tension or unpleasantness',
+      'Opposite of euphony',
+      'Often matches harsh content'
+    ],
+    exampleSnippet: 'Blow, winds, and crack your cheeks! rage! blow!'
+  },
+  {
+    name: 'Euphony',
+    type: 'Device',
+    description: 'Pleasant, harmonious sounds created by combinations of words, often using soft consonants and melodious vowels.',
+    structure: [
+      'Pleasant, harmonious sounds',
+      'Uses soft consonants (l, m, n, r, f, v, w, y)',
+      'Creates beauty and smoothness',
+      'Opposite of cacophony',
+      'Often matches pleasant content'
+    ],
+    exampleSnippet: 'Season of mists and mellow fruitfulness, / Close bosom-friend of the maturing sun'
+  },
+  {
+    name: 'Juxtaposition',
+    type: 'Device',
+    description: 'The placement of two or more things side by side, often to compare or contrast or to create an interesting effect.',
+    structure: [
+      'Placing contrasting elements side by side',
+      'Highlights differences or similarities',
+      'Creates emphasis through contrast',
+      'Can be ironic or illuminating'
+    ],
+    exampleSnippet: 'It was the best of times, it was the worst of times' // Dickens
+  },
+  {
+    name: 'Volta',
+    type: 'Device',
+    description: 'A turn of thought or argument in a poem, especially the point where a sonnet shifts from one idea to another.',
+    structure: [
+      'A turn or shift in the poem\'s argument or tone',
+      'In Italian sonnets: between octave and sestet (line 9)',
+      'In English sonnets: before the final couplet (line 13)',
+      'Signals a change in perspective or conclusion'
+    ],
+    exampleSnippet: 'But thy eternal summer shall not fade...' // Shift in Shakespeare\'s Sonnet 18
+  },
+  {
+    name: 'Chiasmus',
+    type: 'Device',
+    description: 'A rhetorical device in which two or more clauses are balanced against each other by reversing their grammatical structure.',
+    structure: [
+      'Reversal of grammatical structure (AB:BA)',
+      'Creates balance and emphasis',
+      'Memorable and quotable',
+      'Common in speeches and epigrams'
+    ],
+    exampleSnippet: 'Ask not what your country can do for you—ask what you can do for your country' // Kennedy
+  },
+  {
+    name: 'Epistrophe',
+    type: 'Device',
+    description: 'The repetition of a word or phrase at the end of successive clauses, lines, or sentences.',
+    structure: [
+      'Repetition at the end of lines or clauses',
+      'Opposite of anaphora',
+      'Creates emphasis and rhythm',
+      'Builds to a conclusion'
+    ],
+    exampleSnippet: 'When I was a child, I spoke as a child, I understood as a child, I thought as a child'
+  },
+  {
+    name: 'Repetition',
+    type: 'Device',
+    description: 'The use of the same word, phrase, or structure multiple times for emphasis, rhythm, or to create a particular effect.',
+    structure: [
+      'Repeating words, phrases, or structures',
+      'Creates emphasis and rhythm',
+      'Can build intensity or create patterns',
+      'Includes anaphora, epistrophe, and refrain as specific types'
+    ],
+    exampleSnippet: 'Rage, rage against the dying of the light' // Thomas
+  },
+  {
+    name: 'Pun',
+    type: 'Device',
+    description: 'A play on words that exploits multiple meanings of a term or similar-sounding words for humorous or rhetorical effect.',
+    structure: [
+      'Wordplay using multiple meanings',
+      'Can use homonyms or homophones',
+      'Often humorous or clever',
+      'Can create double meanings'
+    ],
+    exampleSnippet: 'Ask for me tomorrow, and you shall find me a grave man' // Mercutio in Romeo & Juliet (grave = serious/tomb)
   }
 ];
