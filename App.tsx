@@ -8,6 +8,7 @@ import { SearchFilter } from './components/SearchFilter';
 import { PoetryItem, SanchoQuoteResponse } from './types';
 import { PoetryDetailModal } from './components/PoetryDetailModal';
 import { fetchSanchoQuote } from './services/apiService';
+import { SanchoQuote } from './components/SanchoQuote';
 
 
 const App: React.FC = () => {
@@ -122,7 +123,9 @@ const App: React.FC = () => {
           </div>
 
           <div className="border-b border-default my-8"></div>
-        
+
+          <SanchoQuote />
+
           <SearchFilter
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
