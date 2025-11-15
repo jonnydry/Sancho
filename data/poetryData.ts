@@ -301,6 +301,181 @@ export const poetryData: PoetryItem[] = [
     ],
     exampleSnippet: 'Oh be resilient, my heart, / You are made of stone, after all. / Though the chisel has struck you a thousand times, / Did you not even once cry out?'
   },
+  {
+    name: 'Acrostic',
+    type: 'Form',
+    description: 'A poem in which the first letter of each line spells out a word, name, or phrase when read vertically.',
+    origin: 'An ancient form found in Greek and Latin texts, including biblical Hebrew poetry. Popular in medieval times and used widely in children\'s literature.',
+    structure: [
+      'Variable length',
+      'First letters of each line spell a word vertically',
+      'Can also use middle letters (mesostich) or last letters (telestich)',
+      'No required rhyme scheme or meter'
+    ],
+    exampleSnippet: 'Elizabeth it is in vain you say / "Love not" — thou sayest it in so sweet a way...'
+  },
+  {
+    name: 'Epigram',
+    type: 'Form',
+    description: 'A brief, interesting, memorable, and sometimes surprising or satirical statement, often in verse form.',
+    origin: 'An ancient Greek form, perfected by Latin poet Martial in the 1st century CE. Popular through Renaissance and Neoclassical periods.',
+    structure: [
+      'Very short, usually 2-4 lines',
+      'Witty or satirical content',
+      'Often has a surprising twist at the end',
+      'Concise and memorable phrasing'
+    ],
+    exampleSnippet: 'I am His Highness\' dog at Kew; / Pray tell me, sir, whose dog are you?'
+  },
+  {
+    name: 'Epic',
+    type: 'Form',
+    description: 'A lengthy narrative poem, often concerning a serious subject containing details of heroic deeds and events significant to a culture or nation.',
+    origin: 'One of the oldest poetic forms, with examples like The Epic of Gilgamesh (c. 2100 BCE), Homer\'s Iliad and Odyssey (8th century BCE), and Beowulf (c. 700-1000 CE).',
+    structure: [
+      'Very long narrative poem (often thousands of lines)',
+      'Elevated style and grand theme',
+      'Features a heroic protagonist',
+      'Often begins in medias res (in the middle of things)',
+      'Traditionally written in dactylic hexameter or blank verse'
+    ],
+    exampleSnippet: 'Arms and the man I sing, who first made way, / Predestined exile, from the Trojan shore...'
+  },
+  {
+    name: 'Couplet',
+    type: 'Form',
+    description: 'A pair of successive lines of verse, typically rhyming and of the same length, forming a complete thought.',
+    origin: 'A fundamental poetic unit used since ancient times. The heroic couplet (in iambic pentameter) was perfected by Alexander Pope in the 18th century.',
+    structure: [
+      '2 lines',
+      'Usually rhyming (AA)',
+      'Often in the same meter',
+      'Can stand alone or be part of a larger poem',
+      'Heroic couplet: iambic pentameter with rhyming AA'
+    ],
+    exampleSnippet: 'Good nature and good sense must ever join; / To err is human, to forgive, divine.'
+  },
+  {
+    name: 'Quatrain',
+    type: 'Form',
+    description: 'A stanza or poem of four lines, typically with alternating rhymes. The most common stanza form in English poetry.',
+    origin: 'Used extensively throughout poetic history across many cultures. A fundamental building block of poetry.',
+    structure: [
+      '4 lines',
+      'Common rhyme schemes: ABAB, AABB, ABBA, ABCB',
+      'Variable meter',
+      'Can stand alone or be part of a longer poem'
+    ],
+    exampleSnippet: 'The Curfew tolls the knell of parting day, / The lowing herd wind slowly o\'er the lea, / The plowman homeward plods his weary way, / And leaves the world to darkness and to me.'
+  },
+  {
+    name: 'Tercet',
+    type: 'Form',
+    description: 'A unit of three lines of verse, which may be rhymed or unrhymed. Also called a triplet when all three lines rhyme.',
+    origin: 'A basic poetic unit used across cultures. The terza rima form uses linked tercets, invented by Dante.',
+    structure: [
+      '3 lines',
+      'Can be rhymed (AAA, ABA) or unrhymed',
+      'Variable meter',
+      'When all three lines rhyme (AAA), called a triplet'
+    ],
+    exampleSnippet: 'My heart leaps up when I behold / A rainbow in the sky: / So was it when my life began;'
+  },
+  {
+    name: 'Senryu',
+    type: 'Form',
+    description: 'A Japanese poetic form similar to haiku in structure (5-7-5 syllables) but focusing on human nature, irony, and humor rather than nature.',
+    origin: 'Named after Edo-period poet Karai Senryu (1718-1790), who popularized this humorous, satirical variation of haiku.',
+    structure: [
+      '3 lines',
+      'Syllable structure: 5-7-5',
+      'Focuses on human foibles, not nature',
+      'Often humorous or satirical',
+      'No seasonal reference (kigo) required'
+    ],
+    exampleSnippet: 'I know I am no good / at love / but the barista / smiles at me'
+  },
+  {
+    name: 'Concrete Poetry',
+    type: 'Form',
+    description: 'Poetry in which the typographical arrangement of words is as important as the conventional elements of the poem. Also called shape poetry or visual poetry.',
+    origin: 'Ancient roots in Greek pattern poems, revived in the 1950s as a modernist/postmodernist movement by poets like Eugen Gomringer.',
+    structure: [
+      'Visual arrangement forms a shape or image',
+      'Typography and spatial arrangement convey meaning',
+      'Can be representational (shape relates to subject)',
+      'Words may be repeated, fragmented, or arranged in patterns'
+    ],
+    exampleSnippet: '[A poem arranged in the shape of a falling leaf, wings, or other visual form]'
+  },
+  {
+    name: 'Ballade',
+    type: 'Form',
+    description: 'A French verse form consisting of three main stanzas and a shorter concluding stanza (envoi), with a strict rhyme scheme and a refrain.',
+    origin: 'A medieval French form, one of the "formes fixes," distinct from the English ballad. François Villon was a master of this form in the 15th century.',
+    structure: [
+      'Three stanzas of eight lines each',
+      'Concluding envoi of four lines',
+      'Rhyme scheme: ababbcbC / ababbcbC / ababbcbC / bcbC',
+      'Capital C represents the refrain',
+      'Addresses a person in the envoi'
+    ],
+    exampleSnippet: 'Tell me now in what hidden way is / Lady Flora the lovely Roman? / Where\'s Hipparchia, and where is Thais...'
+  },
+  {
+    name: 'Rubaiyat',
+    type: 'Form',
+    description: 'A Persian poetic form consisting of quatrains with an AABA rhyme scheme, made famous in English by Edward FitzGerald\'s translation of Omar Khayyam.',
+    origin: 'A traditional Persian form, popularized in the West through Edward FitzGerald\'s 1859 translation of Omar Khayyam\'s Rubaiyat (11th-12th century).',
+    structure: [
+      'Quatrains (4-line stanzas)',
+      'Rhyme scheme: AABA',
+      'Often iambic pentameter in English translations',
+      'Each stanza typically stands alone as a complete thought'
+    ],
+    exampleSnippet: 'A Book of Verses underneath the Bough, / A Jug of Wine, a Loaf of Bread—and Thou / Beside me singing in the Wilderness— / Oh, Wilderness were Paradise enow!'
+  },
+  {
+    name: 'Prose Poetry',
+    type: 'Form',
+    description: 'Poetry written in prose form rather than verse, without line breaks, but retaining poetic qualities like imagery, rhythm, and emotional intensity.',
+    origin: 'Developed in 19th-century France by poets like Aloysius Bertrand and Charles Baudelaire. Became prominent in modernist poetry.',
+    structure: [
+      'Written in prose paragraphs, not verse lines',
+      'No line breaks or traditional poetic structure',
+      'Uses poetic devices: imagery, metaphor, rhythm',
+      'Often lyrical and compact',
+      'Blurs the boundary between poetry and prose'
+    ],
+    exampleSnippet: 'Once upon a time I lived in a house where bells were always ringing. Not happy bells: alarm bells, desperate bells, demented fire bells...'
+  },
+  {
+    name: 'Sapphic Stanza',
+    type: 'Form',
+    description: 'A classical Greek stanzaic form named after the poet Sappho, consisting of three hendecasyllabic lines and one shorter Adonic line.',
+    origin: 'Invented by the ancient Greek poet Sappho of Lesbos (c. 630-570 BCE), adapted into Latin by Catullus and Horace.',
+    structure: [
+      'Four lines per stanza',
+      'Three Sapphic lines (11 syllables each)',
+      'One Adonic line (5 syllables)',
+      'Specific metrical pattern in classical form',
+      'Often unrhymed in classical versions'
+    ],
+    exampleSnippet: 'Thou art dead now, and never / Memory of thee shall be, for / Thou hast not shared in the roses / That grow in Pieria.'
+  },
+  {
+    name: 'Ekphrastic Poetry',
+    type: 'Form',
+    description: 'Poetry that vividly describes or responds to a work of visual art, such as a painting, sculpture, or photograph.',
+    origin: 'From the Greek "ekphrasis" meaning description. An ancient tradition, with Homer\'s description of Achilles\' shield in The Iliad being a famous early example.',
+    structure: [
+      'No fixed structure or form',
+      'Subject is a work of visual art',
+      'Describes, interprets, or responds to the artwork',
+      'Often explores the relationship between visual and verbal art'
+    ],
+    exampleSnippet: 'Thou still unravish\'d bride of quietness, / Thou foster-child of silence and slow time...' // Keats on Grecian Urn
+  },
   // Meters
   {
     name: 'Iambic Trimeter',
@@ -467,5 +642,89 @@ export const poetryData: PoetryItem[] = [
       'Used for variation and effect, not typically for a whole poem.'
     ],
     exampleSnippet: 'Over the hill, over the dale, / Thorough bush, thorough brier,'
+  },
+  {
+    name: 'Iamb',
+    type: 'Meter',
+    description: 'A metrical foot consisting of one unstressed syllable followed by one stressed syllable. The most common foot in English poetry.',
+    structure: [
+      '2 syllables',
+      'Pattern: da-DUM (unstressed-stressed)',
+      'Examples: "today," "appear," "delight"',
+      'The building block of iambic meters'
+    ],
+    exampleSnippet: 'The world / is too / much with / us; late / and soon' // Each "/" separates iambs
+  },
+  {
+    name: 'Trochee',
+    type: 'Meter',
+    description: 'A metrical foot consisting of one stressed syllable followed by one unstressed syllable. The opposite of an iamb.',
+    structure: [
+      '2 syllables',
+      'Pattern: DUM-da (stressed-unstressed)',
+      'Examples: "garden," "highway," "poet"',
+      'Creates a falling, emphatic rhythm'
+    ],
+    exampleSnippet: 'Peter, / Peter, / pumpkin / eater' // Each "/" separates trochees
+  },
+  {
+    name: 'Dactyl',
+    type: 'Meter',
+    description: 'A metrical foot consisting of one stressed syllable followed by two unstressed syllables. Common in classical poetry.',
+    structure: [
+      '3 syllables',
+      'Pattern: DUM-da-da (stressed-unstressed-unstressed)',
+      'Examples: "elephant," "strawberry," "merrily"',
+      'Creates a rolling, falling rhythm'
+    ],
+    exampleSnippet: 'This is the / forest pri / meval. The / murmuring / pines and the / hemlocks'
+  },
+  {
+    name: 'Anapest',
+    type: 'Meter',
+    description: 'A metrical foot consisting of two unstressed syllables followed by one stressed syllable. The opposite of a dactyl.',
+    structure: [
+      '3 syllables',
+      'Pattern: da-da-DUM (unstressed-unstressed-stressed)',
+      'Examples: "understand," "contradict," "intervene"',
+      'Creates a galloping, rising rhythm'
+    ],
+    exampleSnippet: '\'Twas the night / before Christ / mas when all / through the house'
+  },
+  {
+    name: 'Catalexis',
+    type: 'Meter',
+    description: 'The omission of one or more unstressed syllables from the end of a line of verse, making the final metrical foot incomplete.',
+    structure: [
+      'Incomplete final foot',
+      'Catalectic line: missing final syllable(s)',
+      'Acatalectic line: complete (normal)',
+      'Creates variety and emphasis at line endings'
+    ],
+    exampleSnippet: 'Tyger! Tyger! burning bright / In the forests of the night' // Trochaic with catalectic ending
+  },
+  {
+    name: 'Acephalous',
+    type: 'Meter',
+    description: 'A line of verse that is missing the first syllable of the first metrical foot. Literally "headless" in Greek.',
+    structure: [
+      'Missing first syllable',
+      'Common in iambic and anapestic meters',
+      'Creates emphasis by beginning with a stressed syllable',
+      'Also called an initial truncation'
+    ],
+    exampleSnippet: 'Thus with the year / Seasons return' // Iambic but missing first unstressed syllable
+  },
+  {
+    name: 'Feminine Ending',
+    type: 'Meter',
+    description: 'An extra unstressed syllable at the end of a line of verse, creating a softer, more open conclusion.',
+    structure: [
+      'Extra unstressed syllable at line end',
+      'Common in iambic pentameter',
+      'Creates a gentler, less conclusive effect',
+      'Opposite of masculine ending (ends on stressed syllable)'
+    ],
+    exampleSnippet: 'To be or not to be, that is the question: / Whether \'tis nobler in the mind to suffer' // "question" and "suffer" are feminine endings
   },
 ];

@@ -5,9 +5,9 @@ A React-based web application for exploring poetic forms, meters, and devices. B
 ## Overview
 
 Sancho is your faithful guide to poetry, featuring:
-- Browse different poetic forms (sonnets, haikus, villanelles, etc.)
-- Explore poetic meters (iambic pentameter, trochaic, etc.)  
-- Learn about poetic devices (metaphor, alliteration, enjambment, etc.)
+- Browse **37 poetic forms** (sonnets, haikus, villanelles, epics, acrostics, etc.)
+- Explore **22 poetic meters** (iambic pentameter, trochaic, dactylic, metrical feet, etc.)
+- Learn about **31 poetic devices** (metaphor, alliteration, enjambment, caesura, volta, etc.)
 - Generate AI-powered examples using XAI's Grok model
 - Dynamic Sancho Panza quotes from Don Quixote displayed on homepage
 - Beautiful theme system with multiple color schemes (Dark, Paper, Slate)
@@ -16,6 +16,7 @@ Sancho is your faithful guide to poetry, featuring:
 
 ## Recent Changes
 
+- **2025-11-15**: Expanded poetry database to comprehensive coverage: added 13 new forms (Acrostic, Epigram, Epic, Couplet, Quatrain, Tercet, Senryu, Concrete Poetry, Ballade, Rubaiyat, Prose Poetry, Sapphic Stanza, Ekphrastic Poetry), 7 new meters (Iamb, Trochee, Dactyl, Anapest, Catalexis, Acephalous, Feminine Ending), and 18 new devices (Caesura, Anaphora, Imagery, Symbolism, Allusion, Metonymy, Paradox, Refrain, Internal Rhyme, Slant Rhyme, Cacophony, Euphony, Juxtaposition, Volta, Chiasmus, Epistrophe, Repetition, Pun) for a total of 90 poetry elements
 - **2025-11-14**: Implemented Replit Auth authentication system with PostgreSQL session storage
 - **2025-11-14**: Added premium theme restrictions - only logged-in users can access Paper and Slate themes
 - **2025-11-14**: Default theme set to 'dark' (black/white) for all users
