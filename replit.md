@@ -18,8 +18,8 @@ Sancho is your faithful guide to poetry, featuring:
 
 ### Production-Ready Improvements (2025-11-15)
 - **✅ Tailwind CSS v4 Vite Plugin**: Migrated from CDN to proper Tailwind v4 with @tailwindcss/vite (27.5 KB CSS, 5.7 KB gzipped)
-- **✅ Tailwind Config with Class-Based Dark Mode**: Created tailwind.config.ts with `darkMode: 'class'` and CSS variable mappings
-- **✅ Theme System Fixed**: Fixed dark mode toggle and theme switcher with proper CSS variable integration
+- **✅ Tailwind v4 Theme System**: Configured @variant dark for class-based dark mode and @theme for custom color utilities
+- **✅ Dynamic Theme System Fixed**: Renamed runtime CSS variables to --app-* to avoid circular dependencies, properly mapped to Tailwind utilities
 - **✅ Comprehensive SEO**: Added meta tags (title, description, keywords, Open Graph, Twitter cards, JSON-LD structured data)
 - **✅ Custom Favicon**: Used sancho-logo.png as favicon for brand consistency
 - **✅ Rate Limiting**: API endpoints protected (10 req/min for poetry examples, 5 req/min for quotes)
