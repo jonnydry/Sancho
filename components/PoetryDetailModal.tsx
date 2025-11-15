@@ -106,7 +106,7 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
             <XIcon className="w-6 h-6" />
           </button>
 
-          <div className="flex justify-between items-start mb-4">
+          <div className="flex justify-between items-start mb-4 pr-10">
             <h2 id="modal-title" className="text-2xl font-bold text-default flex-1 pr-4">{item.name}</h2>
             <Tag type={item.type} />
           </div>
