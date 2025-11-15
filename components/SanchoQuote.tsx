@@ -14,7 +14,7 @@ export const SanchoQuote: React.FC = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto my-8 p-6 border border-default rounded-lg bg-alt/50 animate-fade-in">
+    <div className="max-w-2xl mx-auto my-8 p-6 border border-default rounded-2xl bg-alt/50 animate-fade-in">
       <div className="flex items-start gap-3">
         <div className="text-3xl text-muted leading-none">"</div>
         <div className="flex-1">

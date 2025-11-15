@@ -37,9 +37,9 @@ export const PoetryCard: React.FC<PoetryCardProps> = ({ item, onSelect, animatio
       style={{ animationDelay: `${animationIndex * 50}ms` }}
     >
       <div className="p-6">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="text-xl font-bold text-default flex-1 pr-2">{item.name}</h3>
-          <div className="flex items-center space-x-3 flex-shrink-0">
+        <div className="flex justify-between items-start mb-4">
+          <h3 className="text-xl font-bold text-default flex-1 pr-4">{item.name}</h3>
+          <div className="flex items-center space-x-2 flex-shrink-0">
             <Tag type={item.type} />
             <ArrowUpRightIcon
               className="w-5 h-5 text-muted/50"
@@ -49,16 +49,16 @@ export const PoetryCard: React.FC<PoetryCardProps> = ({ item, onSelect, animatio
         </div>
         <p className="text-muted mb-4">{item.description}</p>
         
-        <div className="space-y-2 mb-4">
-            <h4 className="font-semibold text-sm text-default">Conventions:</h4>
+        <div className="mb-4">
+            <h4 className="font-semibold text-sm text-default mb-2">Conventions:</h4>
             <ul className="list-disc list-inside space-y-1 text-sm text-muted">
                 {item.structure.map((rule, index) => <li key={index}>{rule}</li>)}
             </ul>
         </div>
         
         <div>
-          <h4 className="font-semibold text-sm text-default">Classic Snippet:</h4>
-          <p className="text-sm text-muted italic mt-1">"{item.exampleSnippet}"</p>
+          <h4 className="font-semibold text-sm text-default mb-2">Classic Snippet:</h4>
+          <p className="text-sm text-muted italic">"{item.exampleSnippet}"</p>
         </div>
       </div>
     </button>
