@@ -115,7 +115,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setMode,
     setColor,
     toggleMode,
-  }), [mode, color, setMode, setColor]);
+  }), [mode, color, setMode, setColor, toggleMode]);
 
   return (
     <ThemeContext.Provider value={value}>

@@ -17,7 +17,6 @@ export const ThemeSwitcher: React.FC = () => {
 
   const handleThemeClick = (themeName: ThemeColor, isPremium: boolean) => {
     if (isPremium && !isAuthenticated) {
-      // Don't allow theme change, redirect to login
       window.location.href = '/api/login';
       return;
     }
