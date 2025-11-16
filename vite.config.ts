@@ -24,6 +24,16 @@ export default defineConfig(({ mode }) => {
           }
         }
       },
+      preview: {
+        port: 5000,
+        host: '0.0.0.0',
+        proxy: {
+          '/api': {
+            target: 'http://localhost:3001',
+            changeOrigin: false, // Keep original host for OAuth callbacks
+          }
+        }
+      },
       plugins: [
         react(),
         tailwindcss()
