@@ -24,21 +24,42 @@ export const findPoetryExample = async (topic: string): Promise<PoetryExampleRes
   }
 };
 
+interface SanchoQuoteError {
+  error: string;
+  retryAfter?: number;
+  fallbackAvailable?: boolean;
+}
+
 export const fetchSanchoQuote = async (): Promise<SanchoQuoteResponse> => {
   try {
     const response = await fetch('/api/sancho-quote');
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || `Server error: ${response.status}`);
+      const errorData: SanchoQuoteError = await response.json().catch(() => ({
+        error: `Server error: ${response.status}`,
+        fallbackAvailable: true
+      }));
+
+      // Add response status to the error for client handling
+      const error = new Error(errorData.error);
+      (error as any).status = response.status;
+      (error as any).retryAfter = errorData.retryAfter;
+      (error as any).fallbackAvailable = errorData.fallbackAvailable;
+      throw error;
     }
 
     const data = await response.json();
+
+    // Validate response structure
+    if (!data || typeof data.quote !== 'string') {
+      throw new Error('Invalid quote response structure');
+    }
+
     return data as SanchoQuoteResponse;
 
   } catch (error) {
     console.error("Error fetching Sancho quote from backend:", error);
-    throw new Error("Failed to fetch quote. Please try again.");
+    throw error; // Re-throw with enhanced error info
   }
 };
 

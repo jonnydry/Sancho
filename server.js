@@ -179,18 +179,28 @@ app.get('/api/sancho-quote', rateLimit(5, 60000), async (req, res) => { // 5 req
   try {
     if (!process.env.XAI_API_KEY) {
       return res.status(503).json({
-        error: 'AI features are currently disabled. Please configure XAI_API_KEY to enable Sancho quotes.'
+        error: 'AI features are temporarily disabled. Sancho quotes are available from our curated collection.',
+        retryAfter: 0,
+        fallbackAvailable: true
       });
     }
 
-    const prompt = `Please provide a single authentic quote from Sancho Panza from the novel "Don Quixote" by Miguel de Cervantes. The quote should be wise, humorous, or insightful - something that reflects Sancho's character. Respond with JSON in this format: { "quote": "the actual quote text", "context": "brief context about when/why Sancho said this" }`;
+    const prompt = `Please provide a single authentic quote from Sancho Panza from the novel "Don Quixote" by Miguel de Cervantes. The quote should be wise, humorous, or insightful - something that reflects Sancho's character.
+
+Key guidelines:
+- Quote must be genuinely from Don Quixote (cite the specific part/chapter if possible)
+- Should showcase Sancho's personality: practical, humorous, loyal, or philosophical
+- Keep quote concise but authentic to Cervantes' writing style
+- Include accurate context when possible (chapter reference, situation)
+
+Respond with JSON in this format: { "quote": "the actual quote text", "context": "brief context about when/why Sancho said this (e.g., Part I, Chapter 5)" }`;
 
     const response = await openai.chat.completions.create({
       model: "grok-2-1212",
       messages: [
         {
           role: "system",
-          content: "You are a literature expert specializing in Don Quixote. Provide authentic quotes from Sancho Panza that capture his wisdom and personality."
+          content: "You are a literature expert specializing in Miguel de Cervantes' Don Quixote. Only provide quotes that are actually from the novel, paraphrasing into proper English when needed while preserving the original meaning. Always include accurate chapter/part references when available."
         },
         {
           role: "user",
@@ -199,17 +209,62 @@ app.get('/api/sancho-quote', rateLimit(5, 60000), async (req, res) => { // 5 req
       ],
       response_format: { type: "json_object" },
       temperature: 0.7,
+      max_tokens: 200
     });
 
-    const jsonText = response.choices[0].message.content || "{}";
-    const parsedJson = JSON.parse(jsonText);
-    
+    if (!response.choices?.[0]?.message?.content) {
+      throw new Error('No response from AI service');
+    }
+
+    const jsonText = response.choices[0].message.content;
+    let parsedJson;
+
+    try {
+      parsedJson = JSON.parse(jsonText);
+    } catch (parseError) {
+      console.error('Failed to parse AI response as JSON:', jsonText);
+      throw new Error('Invalid response format from AI service');
+    }
+
+    // Validate the response structure
+    if (!parsedJson.quote || typeof parsedJson.quote !== 'string') {
+      throw new Error('AI service did not return a valid quote');
+    }
+
+    // Trim whitespace and normalize quote
+    parsedJson.quote = parsedJson.quote.trim();
+    if (parsedJson.context) {
+      parsedJson.context = parsedJson.context.trim();
+    }
+
     res.json(parsedJson);
   } catch (error) {
     console.error("Error fetching Sancho quote from XAI:", error);
-    res.status(500).json({ 
-      error: "Failed to fetch quote",
-      details: error.message 
+
+    // Specific rate limiting error (from express-rate-limit middleware)
+    if (error.message?.includes('Too many requests') || res.statusCode === 429) {
+      return res.status(429).json({
+        error: 'Quote generation limit reached. Please wait a moment before requesting another quote.',
+        retryAfter: 60,
+        fallbackAvailable: true
+      });
+    }
+
+    // AI service errors
+    if (error.message?.includes('API key') || error.status === 401) {
+      return res.status(503).json({
+        error: 'AI quote service is temporarily unavailable.',
+        retryAfter: 300,
+        fallbackAvailable: true
+      });
+    }
+
+    // General server errors
+    res.status(500).json({
+      error: "Quote service temporarily unavailable",
+      retryAfter: 60,
+      fallbackAvailable: true,
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
