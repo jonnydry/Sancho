@@ -12,7 +12,7 @@ const App: React.FC = () => {
   return (
     <ThemeProvider>
       <BrowserRouter>
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col bg-bg text-default">
           <Header />
           <div className="flex-grow">
             <Routes>

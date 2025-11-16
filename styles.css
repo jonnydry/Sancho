@@ -23,24 +23,8 @@
 }
 
 /* --- THEME: Dark (Default) - Runtime CSS Variables --- */
-:root { /* Light Mode - Default Dark Theme */
-  --app-bg: 255 255 255; /* white */
-  --app-bg-alt: 248 250 252; /* slate-50 */
-  --app-text: 15 23 42; /* slate-900 */
-  --app-text-muted: 71 85 105; /* slate-600 */
-  --app-border: 226 232 240; /* slate-200 */
-  --app-accent: 15 23 42; /* slate-900 */
-  --app-accent-hover: 0 0 0; /* black */
-  --app-accent-text: 255 255 255; /* white */
-  --app-tag-form: 244 63 94; /* rose-500 */
-  --app-tag-form-text: 197 48 48; /* rose-600 */
-  --app-tag-meter: 16 185 129; /* emerald-500 */
-  --app-tag-meter-text: 5 122 85; /* emerald-600 */
-  --app-tag-device: 99 102 241; /* indigo-500 */
-  --app-tag-device-text: 67 56 202; /* indigo-700 */
-}
-
-.dark { /* Dark Mode - Default Dark Theme */
+/* Default to dark mode in :root, override with .light class for light mode */
+:root { /* Dark Mode - Default Dark Theme */
   --app-bg: 17 17 17; /* near-black */
   --app-bg-alt: 38 38 38; /* gray-900 */
   --app-text: 229 229 229; /* gray-200 */
@@ -57,8 +41,26 @@
   --app-tag-device-text: 129 140 248; /* indigo-400 */
 }
 
-/* --- THEME: Paper (Light Mode) --- */
-.theme-paper { /* Light Mode - Paper Theme */
+/* Light mode overrides for default dark theme */
+.light { 
+  --app-bg: 255 255 255; /* white */
+  --app-bg-alt: 248 250 252; /* slate-50 */
+  --app-text: 15 23 42; /* slate-900 */
+  --app-text-muted: 71 85 105; /* slate-600 */
+  --app-border: 226 232 240; /* slate-200 */
+  --app-accent: 15 23 42; /* slate-900 */
+  --app-accent-hover: 0 0 0; /* black */
+  --app-accent-text: 255 255 255; /* white */
+  --app-tag-form: 244 63 94; /* rose-500 */
+  --app-tag-form-text: 197 48 48; /* rose-600 */
+  --app-tag-meter: 16 185 129; /* emerald-500 */
+  --app-tag-meter-text: 5 122 85; /* emerald-600 */
+  --app-tag-device: 99 102 241; /* indigo-500 */
+  --app-tag-device-text: 67 56 202; /* indigo-700 */
+}
+
+/* --- THEME: Paper --- */
+.light.theme-paper { /* Light Mode - Paper Theme */
   --app-bg: 244 241 234;
   --app-bg-alt: 253 250 245;
   --app-text: 68 64 60;
@@ -93,8 +95,8 @@
   --app-tag-device-text: 103 232 249; /* cyan-300 */
 }
 
-/* --- THEME: Slate (Light Mode) --- */
-.theme-slate { /* Light Mode - Slate Theme */
+/* --- THEME: Slate --- */
+.light.theme-slate { /* Light Mode - Slate Theme */
   --app-bg: 241 245 249;
   --app-bg-alt: 255 255 255;
   --app-text: 51 65 85;
@@ -127,6 +129,19 @@
   --app-tag-meter-text: 107 235 208; /* teal-300 */
   --app-tag-device: 2 132 199; /* sky-600 */
   --app-tag-device-text: 125 211 252; /* sky-300 */
+}
+
+/* Custom utility classes that reference CSS variables */
+@layer utilities {
+  .bg-bg { background-color: rgb(var(--app-bg)); }
+  .bg-bg-alt { background-color: rgb(var(--app-bg-alt)); }
+  .text-default { color: rgb(var(--app-text)); }
+  .text-muted { color: rgb(var(--app-text-muted)); }
+  .border-default { border-color: rgb(var(--app-border)); }
+  .bg-accent { background-color: rgb(var(--app-accent)); }
+  .text-accent { color: rgb(var(--app-accent)); }
+  .bg-accent-hover { background-color: rgb(var(--app-accent-hover)); }
+  .text-accent-text { color: rgb(var(--app-accent-text)); }
 }
 
 @keyframes fadeIn {

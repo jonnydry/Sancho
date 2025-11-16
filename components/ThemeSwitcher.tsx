@@ -25,7 +25,7 @@ export const ThemeSwitcher: React.FC = () => {
 
   return (
     <div className="flex items-center space-x-4">
-      <div className="flex items-center space-x-2 p-1 bg-white/50 dark:bg-black/20 rounded-full">
+      <div className="flex items-center space-x-2 p-1 bg-[rgb(var(--app-bg-alt)/0.5)] rounded-full">
         {themeColors.map((theme) => {
           const isLocked = theme.premium && !isAuthenticated;
           const isSelected = color === theme.name;
@@ -47,7 +47,7 @@ export const ThemeSwitcher: React.FC = () => {
       </div>
       <button
         onClick={toggleMode}
-        className="p-2 rounded-full text-muted hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+        className="p-2 rounded-full text-muted hover:bg-accent/10 transition-colors"
         aria-label="Toggle dark mode"
       >
         {mode === 'light' ? <MoonIcon className="w-5 h-5" /> : <SunIcon className="w-5 h-5" />}
