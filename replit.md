@@ -51,3 +51,26 @@ The project utilizes a dual-server architecture with a React frontend (Vite, Por
 - **Replit Auth**: Authentication service for user login and management, supporting various OAuth providers (Google, GitHub, email/password, Apple, X).
 - **Tailwind CSS v4**: Utility-first CSS framework for styling.
 - **React Router DOM v6**: For client-side routing and navigation.
+
+## Deployment Status
+
+**Status**: ✅ Published on Replit (Autoscale)  
+**Last Deployed**: November 16, 2025
+
+### Deployment Configuration
+- **Build Command**: `npm run build` (Vite production bundle)
+- **Run Command**: `npm run preview:prod` (Backend + Frontend on port 5000)
+- **Deployment Type**: Autoscale (scales 0→N instances based on traffic)
+- **Port Configuration**: Port 5000 (frontend) exposed to port 80 (public)
+
+### Recent Updates (2025-11-16)
+- **Deployment Fix**: Configured Vite preview server to use port 5000 instead of default 4173
+- **Production Build**: Added `preview:prod` script to run both Express backend and Vite preview
+- **Learn More Feature**: Historical & Cultural Context API integrated with XAI Grok (`/api/poetry-learn-more`)
+- **Mobile Optimization**: Responsive design across all components (cards, modal, header, filters)
+- **Theme System**: Fixed Tailwind v4 compatibility with arbitrary value syntax for CSS variables
+
+### Development vs Production
+- **Development**: Runs on `https://<id>-00-<hash>.worf.replit.dev` with dev database
+- **Production**: Runs on `https://<app-name>.replit.app` with separate production database
+- **Separate Secrets**: Dev and production use different environment variables and database instances
