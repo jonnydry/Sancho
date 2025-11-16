@@ -6,12 +6,12 @@ import { PinIcon } from './icons/PinIcon';
 import { PoetryCard } from './PoetryCard';
 import { PoetryDetailModal } from './PoetryDetailModal';
 
-interface TheBagProps {
+interface NotebookProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export const TheBag: React.FC<TheBagProps> = ({ isOpen, onClose }) => {
+export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
   const { pinnedItems, isLoading, unpinItem } = usePinnedItems();
   const [selectedItem, setSelectedItem] = useState<PoetryItem | null>(null);
 
@@ -60,14 +60,14 @@ export const TheBag: React.FC<TheBagProps> = ({ isOpen, onClose }) => {
         className="fixed top-0 right-0 h-full w-full max-w-md bg-[rgb(var(--app-bg-alt)/0.8)] backdrop-blur-md border-l border-[rgb(var(--app-border)/0.5)] z-50 shadow-2xl flex flex-col animate-slide-in-right"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="the-bag-title"
+        aria-labelledby="notebook-title"
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 sm:p-6 border-b border-[rgb(var(--app-border)/0.5)]">
           <div className="flex items-center gap-2">
             <PinIcon className="w-5 h-5 text-accent" />
-            <h2 id="the-bag-title" className="text-lg sm:text-xl font-bold text-default">
-              The Bag
+            <h2 id="notebook-title" className="text-lg sm:text-xl font-bold text-default">
+              Notebook
             </h2>
             {pinnedItems.length > 0 && (
               <span className="text-xs text-muted bg-bg-alt px-2 py-0.5 rounded-full">
@@ -78,7 +78,7 @@ export const TheBag: React.FC<TheBagProps> = ({ isOpen, onClose }) => {
           <button
             onClick={onClose}
             className="text-muted hover:text-default transition-colors"
-            aria-label="Close The Bag"
+            aria-label="Close Notebook"
           >
             <XIcon className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
@@ -93,7 +93,7 @@ export const TheBag: React.FC<TheBagProps> = ({ isOpen, onClose }) => {
           ) : pinnedItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center py-12">
               <PinIcon className="w-12 h-12 text-muted/30 mb-4" />
-              <h3 className="text-lg font-semibold text-default mb-2">Your bag is empty</h3>
+              <h3 className="text-lg font-semibold text-default mb-2">Your notebook is empty</h3>
               <p className="text-sm text-muted max-w-xs">
                 Pin poetry entries you want to save for later by clicking the pin icon on any card.
               </p>

@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { useAuth } from '../hooks/useAuth.js';
 import { PenIcon } from './icons/PenIcon';
-import { TheBag } from './TheBag';
+import { Notebook } from './Notebook';
 
 export const Header: React.FC = () => {
   const { isAuthenticated, isLoading, user } = useAuth();
-  const [isBagOpen, setIsBagOpen] = useState(false);
+  const [isNotebookOpen, setIsNotebookOpen] = useState(false);
 
   return (
     <>
@@ -26,10 +26,10 @@ export const Header: React.FC = () => {
           <div className="flex items-center gap-2 sm:gap-4">
             {isAuthenticated && (
               <button
-                onClick={() => setIsBagOpen(true)}
+                onClick={() => setIsNotebookOpen(true)}
                 className="flex items-center justify-center p-1.5 sm:p-2 text-muted hover:text-default transition-colors rounded-md hover:bg-hover"
-                aria-label="Open The Bag"
-                title="The Bag"
+                aria-label="Open Notebook"
+                title="Notebook"
               >
                 <PenIcon className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
@@ -62,7 +62,7 @@ export const Header: React.FC = () => {
           </div>
         </div>
       </header>
-      {isAuthenticated && <TheBag isOpen={isBagOpen} onClose={() => setIsBagOpen(false)} />}
+      {isAuthenticated && <Notebook isOpen={isNotebookOpen} onClose={() => setIsNotebookOpen(false)} />}
     </>
   );
 };
