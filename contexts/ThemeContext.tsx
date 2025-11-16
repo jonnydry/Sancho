@@ -36,24 +36,26 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const [color, setColorState] = useState<ThemeColor>(() => getInitialColor());
 
+  // Consolidated effect to manage both mode and color atomically
   useEffect(() => {
     if (!isBrowser) return;
     const root = window.document.documentElement;
-    root.classList.remove('light', 'dark');
+    
+    // Remove all possible theme classes to prevent conflicts
+    root.classList.remove('light', 'dark', 'theme-paper', 'theme-slate', 'theme-parchment', 'theme-veridian');
+    
+    // Apply mode class first (light or dark)
     root.classList.add(mode);
-    window.localStorage.setItem('theme-mode', mode);
-  }, [mode]);
-
-  useEffect(() => {
-    if (!isBrowser) return;
-    const root = window.document.documentElement;
-    // Clean up old and new theme classes before applying the current one
-    root.classList.remove('theme-parchment', 'theme-veridian', 'theme-paper', 'theme-slate');
-    if (color !== 'dark') { // 'dark' is the default and requires no class
+    
+    // Apply color theme class if not 'dark' (dark is default and requires no class)
+    if (color !== 'dark') {
       root.classList.add(`theme-${color}`);
     }
+    
+    // Update localStorage for both values
+    window.localStorage.setItem('theme-mode', mode);
     window.localStorage.setItem('theme-color', color);
-  }, [color]);
+  }, [mode, color]);
 
   const setMode = useCallback((newMode: ThemeMode) => {
     setModeState(newMode);

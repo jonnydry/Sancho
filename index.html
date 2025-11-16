@@ -1,6 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <!-- Blocking script to apply theme before React hydration -->
+    <script>
+      (function() {
+        const root = document.documentElement;
+        
+        // Get initial mode from localStorage or system preference
+        let initialMode = localStorage.getItem('theme-mode');
+        if (initialMode !== 'light' && initialMode !== 'dark') {
+          if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            initialMode = 'dark';
+          } else {
+            initialMode = 'dark'; // default
+          }
+        }
+        
+        // Get initial color from localStorage
+        let initialColor = localStorage.getItem('theme-color');
+        if (initialColor !== 'paper' && initialColor !== 'slate') {
+          initialColor = 'dark'; // default
+        }
+        
+        // Remove all theme classes
+        root.classList.remove('light', 'dark', 'theme-paper', 'theme-slate', 'theme-parchment', 'theme-veridian');
+        
+        // Apply mode class
+        root.classList.add(initialMode);
+        
+        // Apply color theme class if not 'dark'
+        if (initialColor !== 'dark') {
+          root.classList.add('theme-' + initialColor);
+        }
+      })();
+    </script>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/sancho-logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
