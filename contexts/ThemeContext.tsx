@@ -86,21 +86,34 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const checkAuthAndResetTheme = async () => {
       try {
         const response = await fetch('/api/auth/user', { credentials: 'include' });
+        
+        // Check if component is still mounted immediately after fetch
         if (!isActive) {
           return;
         }
+        
         if (response.ok) {
           const data = await response.json();
+          
+          // Check again before accessing state
+          if (!isActive) {
+            return;
+          }
+          
           const isAuthenticated = data.authenticated;
           
           // If not authenticated and using a premium theme, reset to dark
-          if (!isAuthenticated && PREMIUM_THEMES.includes(color)) {
+          // Check isActive one more time before state update
+          if (!isAuthenticated && PREMIUM_THEMES.includes(color) && isActive) {
             setColorState('dark');
             window.localStorage.setItem('theme-color', 'dark');
           }
         }
       } catch (error) {
-        console.error('Failed to check auth status for theme enforcement:', error);
+        // Only log error if component is still mounted
+        if (isActive) {
+          console.error('Failed to check auth status for theme enforcement:', error);
+        }
       }
     };
     

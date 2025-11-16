@@ -33,6 +33,7 @@ function rateLimit(maxRequests, windowMs) {
     // Periodic cleanup: remove entries with no valid requests
     if (validRequests.length === 0) {
       rateLimitStore.delete(key);
+      return next();
     }
 
     next();
@@ -40,20 +41,34 @@ function rateLimit(maxRequests, windowMs) {
 }
 
 // Periodic cleanup of rate limit store to prevent memory leaks
-setInterval(() => {
-  const now = Date.now();
-  const maxAge = 60 * 60 * 1000; // 1 hour
-  const cutoff = now - maxAge;
+const cleanupInterval = setInterval(() => {
+  try {
+    const now = Date.now();
+    const maxAge = 60 * 60 * 1000; // 1 hour
+    const cutoff = now - maxAge;
 
-  for (const [key, requests] of rateLimitStore.entries()) {
-    const validRequests = requests.filter(time => time > cutoff);
-    if (validRequests.length === 0) {
-      rateLimitStore.delete(key);
-    } else {
-      rateLimitStore.set(key, validRequests);
+    for (const [key, requests] of rateLimitStore.entries()) {
+      const validRequests = requests.filter(time => time > cutoff);
+      if (validRequests.length === 0) {
+        rateLimitStore.delete(key);
+      } else {
+        rateLimitStore.set(key, validRequests);
+      }
     }
+  } catch (error) {
+    console.error('Error in rate limiter cleanup:', error);
   }
 }, 30 * 60 * 1000); // Run cleanup every 30 minutes
+
+// Graceful shutdown handler to clear interval
+process.on('SIGTERM', () => {
+  clearInterval(cleanupInterval);
+});
+
+process.on('SIGINT', () => {
+  clearInterval(cleanupInterval);
+  process.exit(0);
+});
 
 // Check for XAI API key but don't exit - allow graceful degradation for local dev
 if (!process.env.XAI_API_KEY) {
@@ -64,9 +79,22 @@ if (!process.env.XAI_API_KEY) {
 const app = express();
 const PORT = 3001;
 
+// Determine frontend origin using same logic as replitAuth.js
+function getFrontendOrigin() {
+  if (process.env.REPLIT_DEV_DOMAIN) {
+    return `https://${process.env.REPLIT_DEV_DOMAIN}`;
+  } else if (process.env.REPLIT_DOMAINS) {
+    return `https://${process.env.REPLIT_DOMAINS}`;
+  } else if (process.env.FRONTEND_URL) {
+    return process.env.FRONTEND_URL;
+  } else {
+    return 'http://localhost:5000';
+  }
+}
+
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
-    ? process.env.FRONTEND_URL || 'https://yourdomain.com'
+    ? getFrontendOrigin()
     : ['http://localhost:5000', 'http://127.0.0.1:5000'],
   credentials: true
 };
@@ -244,8 +272,9 @@ Respond with JSON in this format: { "quote": "the actual quote text", "context":
   } catch (error) {
     console.error("Error fetching Sancho quote from XAI:", error);
 
+    // Check error status before sending response
     // Specific rate limiting error (from express-rate-limit middleware)
-    if (error.message?.includes('Too many requests') || res.statusCode === 429) {
+    if (error.message?.includes('Too many requests') || error.status === 429) {
       return res.status(429).json({
         error: 'Quote generation limit reached. Please wait a moment before requesting another quote.',
         retryAfter: 60,
@@ -355,8 +384,20 @@ app.post('/api/pinned-items', isAuthenticated, async (req, res) => {
     const userId = req.user.claims.sub;
     const { itemData } = req.body;
 
-    if (!itemData || !itemData.name) {
-      return res.status(400).json({ error: "Invalid item data" });
+    // Enhanced validation for itemData structure
+    if (!itemData || typeof itemData !== 'object') {
+      return res.status(400).json({ error: "Invalid item data: must be an object" });
+    }
+
+    if (!itemData.name || typeof itemData.name !== 'string' || itemData.name.trim().length === 0) {
+      return res.status(400).json({ error: "Invalid item data: name is required and must be a non-empty string" });
+    }
+
+    // Validate itemData doesn't contain circular references or invalid types
+    try {
+      JSON.stringify(itemData);
+    } catch (jsonError) {
+      return res.status(400).json({ error: "Invalid item data: contains invalid structure" });
     }
 
     const pinned = await storage.pinItem(userId, itemData);

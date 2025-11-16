@@ -38,11 +38,10 @@ export class DatabaseStorage {
   }
 
   async pinItem(userId, itemData) {
-    // First check if already pinned, if so just return existing
-    const existing = await this.isItemPinned(userId, itemData.name);
-    if (existing) {
-      const items = await this.getPinnedItems(userId);
-      return items.find(item => item.itemName === itemData.name);
+    // First check if already pinned, if so just return existing item directly
+    const existingItem = await this.getPinnedItem(userId, itemData.name);
+    if (existingItem) {
+      return existingItem;
     }
 
     const [pinned] = await db
@@ -56,6 +55,26 @@ export class DatabaseStorage {
     return {
       ...pinned,
       itemData: typeof pinned.itemData === 'string' ? JSON.parse(pinned.itemData) : pinned.itemData,
+    };
+  }
+
+  async getPinnedItem(userId, itemName) {
+    const [item] = await db
+      .select()
+      .from(pinnedItems)
+      .where(and(
+        eq(pinnedItems.userId, userId),
+        eq(pinnedItems.itemName, itemName)
+      ))
+      .limit(1);
+    
+    if (!item) {
+      return null;
+    }
+    
+    return {
+      ...item,
+      itemData: typeof item.itemData === 'string' ? JSON.parse(item.itemData) : item.itemData,
     };
   }
 
