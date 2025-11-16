@@ -51,17 +51,17 @@ export const HomePage: React.FC = () => {
   }, [searchQuery, activeFilter, allData]);
 
   return (
-    <main className="py-8 px-4 md:px-6">
+    <main className="py-4 sm:py-6 md:py-8 px-3 sm:px-4 md:px-6">
       <div className="max-w-4xl mx-auto">
         <div className="text-center">
-           <div className="w-72 h-72 mx-auto mb-4 animate-fade-in">
+           <div className="w-40 h-40 sm:w-56 sm:h-56 md:w-72 md:h-72 mx-auto mb-3 sm:mb-4 animate-fade-in">
             <img 
               src="/sancho-logo.png" 
               alt="Sancho Logo - A faithful guide reading poetry" 
               className="w-full h-full object-contain" 
             />
           </div>
-          <p className="text-muted text-sm uppercase tracking-wider mb-6 animate-fade-in" style={{animationDelay: '0.2s'}}>
+          <p className="text-muted text-xs sm:text-sm uppercase tracking-wider mb-4 sm:mb-6 animate-fade-in" style={{animationDelay: '0.2s'}}>
             A Poetic Reference Squire
           </p>
         </div>

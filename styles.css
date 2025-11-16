@@ -131,18 +131,16 @@
   --app-tag-device-text: 125 211 252; /* sky-300 */
 }
 
-/* Custom utility classes that reference CSS variables */
-@layer utilities {
-  .bg-bg { background-color: rgb(var(--app-bg)); }
-  .bg-bg-alt { background-color: rgb(var(--app-bg-alt)); }
-  .text-default { color: rgb(var(--app-text)); }
-  .text-muted { color: rgb(var(--app-text-muted)); }
-  .border-default { border-color: rgb(var(--app-border)); }
-  .bg-accent { background-color: rgb(var(--app-accent)); }
-  .text-accent { color: rgb(var(--app-accent)); }
-  .bg-accent-hover { background-color: rgb(var(--app-accent-hover)); }
-  .text-accent-text { color: rgb(var(--app-accent-text)); }
-}
+/* Custom utility classes that reference CSS variables - using CSS classes directly */
+.bg-bg { background-color: rgb(var(--app-bg)); }
+.bg-bg-alt { background-color: rgb(var(--app-bg-alt)); }
+.text-default { color: rgb(var(--app-text)); }
+.text-muted { color: rgb(var(--app-text-muted)); }
+.border-default { border-color: rgb(var(--app-border)); }
+.bg-accent { background-color: rgb(var(--app-accent)); }
+.text-accent { color: rgb(var(--app-accent)); }
+.bg-accent-hover { background-color: rgb(var(--app-accent-hover)); }
+.text-accent-text { color: rgb(var(--app-accent-text)); }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }

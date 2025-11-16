@@ -22,7 +22,7 @@ const Tag: React.FC<{ type: PoetryItem['type'] }> = ({ type }) => {
       break;
   }
   return (
-    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${colorClass}`}>
+    <span className={`px-1.5 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold rounded-full ${colorClass}`}>
       {type}
     </span>
   );
@@ -33,32 +33,32 @@ export const PoetryCard: React.FC<PoetryCardProps> = ({ item, onSelect, animatio
   return (
     <button
       onClick={() => onSelect(item)}
-      className="w-full text-left bg-bg-alt rounded-2xl shadow-md overflow-hidden transition-all duration-300 ease-in-out animate-fade-in hover:shadow-xl hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-accent border border-default"
+      className="w-full text-left bg-bg-alt rounded-lg sm:rounded-xl md:rounded-2xl shadow-md overflow-hidden transition-all duration-300 ease-in-out animate-fade-in hover:shadow-xl hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-accent border border-default"
       style={{ animationDelay: `${animationIndex * 50}ms` }}
     >
-      <div className="p-6 flex flex-col h-full">
-        <div className="flex justify-between items-start mb-3">
-          <h3 className="text-xl font-bold text-default flex-1 pr-4 m-0">{item.name}</h3>
-          <div className="flex items-center space-x-2 flex-shrink-0">
+      <div className="p-4 sm:p-5 md:p-6 flex flex-col h-full">
+        <div className="flex justify-between items-start mb-2 sm:mb-3">
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-default flex-1 pr-2 sm:pr-4 m-0">{item.name}</h3>
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
             <Tag type={item.type} />
             <ArrowUpRightIcon
-              className="w-5 h-5 text-muted/50"
+              className="w-3.5 sm:w-4 md:w-5 h-3.5 sm:h-4 md:h-5 text-muted/50"
               aria-hidden="true"
             />
           </div>
         </div>
-        <p className="text-muted mb-4 mt-0 min-h-[3rem]">{item.description}</p>
+        <p className="text-muted text-sm sm:text-base mb-3 sm:mb-4 mt-0 min-h-[2rem] sm:min-h-[3rem]">{item.description}</p>
         
-        <div className="mb-4">
-            <h4 className="font-semibold text-sm text-default mb-2 mt-0">Conventions:</h4>
-            <ul className="list-disc list-inside space-y-1 text-sm text-muted">
+        <div className="mb-3 sm:mb-4">
+            <h4 className="font-semibold text-xs sm:text-sm text-default mb-1.5 sm:mb-2 mt-0">Conventions:</h4>
+            <ul className="list-disc list-inside space-y-0.5 sm:space-y-1 text-xs sm:text-sm text-muted">
                 {item.structure.map((rule, index) => <li key={index}>{rule}</li>)}
             </ul>
         </div>
         
         <div className="mt-auto">
-          <h4 className="font-semibold text-sm text-default mb-2 mt-0">Classic Snippet:</h4>
-          <p className="text-sm text-muted italic mt-0">"{item.exampleSnippet}"</p>
+          <h4 className="font-semibold text-xs sm:text-sm text-default mb-1.5 sm:mb-2 mt-0">Classic Snippet:</h4>
+          <p className="text-xs sm:text-sm text-muted italic mt-0">"{item.exampleSnippet}"</p>
         </div>
       </div>
     </button>

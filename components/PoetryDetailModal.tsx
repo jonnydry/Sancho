@@ -23,7 +23,7 @@ const Tag: React.FC<{ type: PoetryItem['type'] }> = ({ type }) => {
       break;
   }
   return (
-    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${colorClass}`}>
+    <span className={`px-1.5 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold rounded-full ${colorClass}`}>
       {type}
     </span>
   );
@@ -94,23 +94,23 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
       aria-labelledby="modal-title"
     >
       <div
-        className="relative bg-bg rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto m-4 animate-modal-in border border-default"
+        className="relative bg-bg rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] sm:max-h-[90vh] overflow-y-auto m-3 sm:m-4 animate-modal-in border border-default"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-muted/50 hover:text-muted transition-colors"
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 text-muted/50 hover:text-muted transition-colors"
             aria-label="Close"
           >
-            <XIcon className="w-6 h-6" />
+            <XIcon className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
 
-          <div className="flex justify-between items-start mb-4 pr-10">
-            <h2 id="modal-title" className="text-2xl font-bold text-default flex-1 pr-4">{item.name}</h2>
+          <div className="flex justify-between items-start mb-3 sm:mb-4 pr-8 sm:pr-10">
+            <h2 id="modal-title" className="text-lg sm:text-xl md:text-2xl font-bold text-default flex-1 pr-2 sm:pr-4">{item.name}</h2>
             <Tag type={item.type} />
           </div>
-          <p className="text-default mb-4">{item.description}</p>
+          <p className="text-default text-sm sm:text-base mb-3 sm:mb-4">{item.description}</p>
 
           {item.origin && (
             <div className="mb-4">
