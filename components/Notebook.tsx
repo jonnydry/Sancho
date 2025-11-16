@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { usePinnedItems } from '../contexts/PinnedItemsContext';
 import { PoetryItem } from '../types';
 import { XIcon } from './icons/XIcon';
-import { PinIcon } from './icons/PinIcon';
+import { BookPenIcon } from './icons/BookPenIcon';
 import { PoetryCard } from './PoetryCard';
 import { PoetryDetailModal } from './PoetryDetailModal';
 
@@ -65,7 +65,7 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
         {/* Header */}
         <div className="flex items-center justify-between p-4 sm:p-6 border-b border-[rgb(var(--app-border)/0.5)]">
           <div className="flex items-center gap-2">
-            <PinIcon className="w-5 h-5 text-accent" />
+            <BookPenIcon className="w-5 h-5 text-accent" />
             <h2 id="notebook-title" className="text-lg sm:text-xl font-bold text-default">
               Notebook
             </h2>
@@ -92,7 +92,7 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
             </div>
           ) : pinnedItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center py-12">
-              <PinIcon className="w-12 h-12 text-muted/30 mb-4" />
+              <BookPenIcon className="w-12 h-12 text-muted/30 mb-4" />
               <h3 className="text-lg font-semibold text-default mb-2">Your notebook is empty</h3>
               <p className="text-sm text-muted max-w-xs">
                 Pin poetry entries you want to save for later by clicking the pin icon on any card.

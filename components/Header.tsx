@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { useAuth } from '../hooks/useAuth.js';
-import { PenIcon } from './icons/PenIcon';
+import { BookPenIcon } from './icons/BookPenIcon';
 import { Notebook } from './Notebook';
 
 export const Header: React.FC = () => {
@@ -31,7 +31,7 @@ export const Header: React.FC = () => {
                 aria-label="Open Notebook"
                 title="Notebook"
               >
-                <PenIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                <BookPenIcon className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             )}
             <ThemeSwitcher />
