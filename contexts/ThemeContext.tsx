@@ -55,6 +55,15 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // Update localStorage for both values
     window.localStorage.setItem('theme-mode', mode);
     window.localStorage.setItem('theme-color', color);
+    
+    // Verification: Log applied classes and verify CSS variables are set
+    if (process.env.NODE_ENV === 'development') {
+      const appliedClasses = Array.from(root.classList).filter(cls => 
+        cls === 'light' || cls === 'dark' || cls.startsWith('theme-')
+      );
+      const bgColor = getComputedStyle(root).getPropertyValue('--app-bg');
+      console.log('[Theme] Applied classes:', appliedClasses.join(' '), '| Mode:', mode, '| Color:', color, '| CSS var --app-bg:', bgColor.trim() || 'not set');
+    }
   }, [mode, color]);
 
   const setMode = useCallback((newMode: ThemeMode) => {

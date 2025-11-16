@@ -23,7 +23,7 @@
 }
 
 /* --- THEME: Dark (Default) - Runtime CSS Variables --- */
-:root { /* Light Mode */
+:root { /* Light Mode - Default Dark Theme */
   --app-bg: 255 255 255; /* white */
   --app-bg-alt: 248 250 252; /* slate-50 */
   --app-text: 15 23 42; /* slate-900 */
@@ -40,7 +40,7 @@
   --app-tag-device-text: 67 56 202; /* indigo-700 */
 }
 
-.dark { /* Dark Mode */
+.dark { /* Dark Mode - Default Dark Theme */
   --app-bg: 17 17 17; /* near-black */
   --app-bg-alt: 38 38 38; /* gray-900 */
   --app-text: 229 229 229; /* gray-200 */
@@ -49,13 +49,16 @@
   --app-accent: 245 245 245; /* gray-100 */
   --app-accent-hover: 255 255 255; /* white */
   --app-accent-text: 17 17 17; /* near-black */
+  --app-tag-form: 244 63 94; /* rose-500 */
   --app-tag-form-text: 251 113 133; /* rose-400 */
+  --app-tag-meter: 16 185 129; /* emerald-500 */
   --app-tag-meter-text: 52 211 153; /* emerald-400 */
+  --app-tag-device: 99 102 241; /* indigo-500 */
   --app-tag-device-text: 129 140 248; /* indigo-400 */
 }
 
-/* --- THEME: Paper --- */
-.theme-paper { /* Light Mode */
+/* --- THEME: Paper (Light Mode) --- */
+.theme-paper { /* Light Mode - Paper Theme */
   --app-bg: 244 241 234;
   --app-bg-alt: 253 250 245;
   --app-text: 68 64 60;
@@ -72,7 +75,8 @@
   --app-tag-device-text: 8 145 178; /* cyan-700 */
 }
 
-.dark.theme-paper { /* Dark Mode */
+/* --- THEME: Paper (Dark Mode) - Must come after .theme-paper --- */
+.dark.theme-paper { /* Dark Mode - Paper Theme */
   --app-bg: 41 37 36;
   --app-bg-alt: 68 64 60;
   --app-text: 231 229 228;
@@ -81,13 +85,16 @@
   --app-accent: 252 211 77;
   --app-accent-hover: 253 224 71;
   --app-accent-text: 41 37 36;
+  --app-tag-form: 185 28 28; /* red-700 */
   --app-tag-form-text: 248 113 113; /* red-400 */
+  --app-tag-meter: 3 105 161; /* sky-700 */
   --app-tag-meter-text: 125 211 252; /* sky-300 */
+  --app-tag-device: 6 182 212; /* cyan-500 */
   --app-tag-device-text: 103 232 249; /* cyan-300 */
 }
 
-/* --- THEME: Slate --- */
-.theme-slate { /* Light Mode */
+/* --- THEME: Slate (Light Mode) --- */
+.theme-slate { /* Light Mode - Slate Theme */
   --app-bg: 241 245 249;
   --app-bg-alt: 255 255 255;
   --app-text: 51 65 85;
@@ -104,7 +111,8 @@
   --app-tag-device-text: 3 105 161; /* sky-700 */
 }
 
-.dark.theme-slate { /* Dark Mode */
+/* --- THEME: Slate (Dark Mode) - Must come after .theme-slate --- */
+.dark.theme-slate { /* Dark Mode - Slate Theme */
   --app-bg: 30 41 59;
   --app-bg-alt: 51 65 85;
   --app-text: 203 213 225;
@@ -113,8 +121,11 @@
   --app-accent: 100 116 139;
   --app-accent-hover: 148 163 184;
   --app-accent-text: 30 41 59;
+  --app-tag-form: 126 34 206; /* purple-700 */
   --app-tag-form-text: 192 132 252; /* purple-400 */
+  --app-tag-meter: 13 116 128; /* teal-700 */
   --app-tag-meter-text: 107 235 208; /* teal-300 */
+  --app-tag-device: 2 132 199; /* sky-600 */
   --app-tag-device-text: 125 211 252; /* sky-300 */
 }
 
