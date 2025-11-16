@@ -185,13 +185,16 @@ app.get('/api/sancho-quote', rateLimit(5, 60000), async (req, res) => { // 5 req
       });
     }
 
-    const prompt = `Please provide a single authentic quote from Sancho Panza from the novel "Don Quixote" by Miguel de Cervantes. The quote should be wise, humorous, or insightful - something that reflects Sancho's character.
+    // Add variety by requesting a different quote each time
+    const varietyHint = `Please provide a DIFFERENT quote than you may have given recently. `;
+    const prompt = `${varietyHint}Please provide a single authentic quote from Sancho Panza from the novel "Don Quixote" by Miguel de Cervantes. The quote should be wise, humorous, or insightful - something that reflects Sancho's character.
 
 Key guidelines:
 - Quote must be genuinely from Don Quixote (cite the specific part/chapter if possible)
 - Should showcase Sancho's personality: practical, humorous, loyal, or philosophical
 - Keep quote concise but authentic to Cervantes' writing style
 - Include accurate context when possible (chapter reference, situation)
+- Choose a quote that differs from common or frequently cited ones
 
 Respond with JSON in this format: { "quote": "the actual quote text", "context": "brief context about when/why Sancho said this (e.g., Part I, Chapter 5)" }`;
 
@@ -208,7 +211,7 @@ Respond with JSON in this format: { "quote": "the actual quote text", "context":
         }
       ],
       response_format: { type: "json_object" },
-      temperature: 0.7,
+      temperature: 0.8, // Slightly higher temperature for more variety
       max_tokens: 200
     });
 

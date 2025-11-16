@@ -4,8 +4,9 @@ import { fetchSanchoQuote } from '../services/apiService';
 import { SpinnerIcon } from './icons/SpinnerIcon';
 import { SparklesIcon } from './icons/SparklesIcon';
 
-// Client-side cache for quotes - persists for 5 minutes
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+// Client-side cache for quotes - persists for 1 minute
+const CACHE_DURATION = 1 * 60 * 1000; // 1 minute
+const FALLBACK_CACHE_DURATION = 10 * 1000; // 10 seconds for fallback quotes
 interface CachedQuote {
   quote: SanchoQuoteType;
   timestamp: number;
@@ -34,7 +35,8 @@ export const SanchoQuote: React.FC = () => {
     // Check cache first (unless forcing refresh)
     if (!forceRefresh && cacheRef.current) {
       const { quote: cachedQuote, timestamp, isAI } = cacheRef.current;
-      if (Date.now() - timestamp < CACHE_DURATION) {
+      const cacheDuration = isAI ? CACHE_DURATION : FALLBACK_CACHE_DURATION;
+      if (Date.now() - timestamp < cacheDuration) {
         setQuote(cachedQuote);
         setUsedFallback(!isAI);
         return;
@@ -69,16 +71,22 @@ export const SanchoQuote: React.FC = () => {
 
     } catch (error) {
       console.error('Failed to fetch Sancho quote:', error);
+      // Always get a new fallback quote (don't cache fallbacks to ensure rotation)
       const fallbackQuote = getRotatingFallbackQuote();
       setQuote(fallbackQuote);
       setUsedFallback(true);
 
-      // Cache the fallback quote (shorter duration)
-      cacheRef.current = {
-        quote: fallbackQuote,
-        timestamp: Date.now(),
-        isAI: false,
-      };
+      // Don't cache fallback quotes when manually refreshing to ensure variety
+      if (!forceRefresh) {
+        cacheRef.current = {
+          quote: fallbackQuote,
+          timestamp: Date.now(),
+          isAI: false,
+        };
+      } else {
+        // Clear cache on manual refresh to ensure new quote
+        cacheRef.current = null;
+      }
     } finally {
       setIsLoading(false);
     }
