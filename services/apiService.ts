@@ -1,4 +1,4 @@
-import { PoetryExampleResponse, SanchoQuoteResponse } from '../types';
+import { PoetryExampleResponse, SanchoQuoteResponse, LearnMoreResponse } from '../types';
 
 export const findPoetryExample = async (topic: string): Promise<PoetryExampleResponse> => {
   try {
@@ -39,5 +39,29 @@ export const fetchSanchoQuote = async (): Promise<SanchoQuoteResponse> => {
   } catch (error) {
     console.error("Error fetching Sancho quote from backend:", error);
     throw new Error("Failed to fetch quote. Please try again.");
+  }
+};
+
+export const fetchLearnMoreContext = async (topic: string): Promise<LearnMoreResponse> => {
+  try {
+    const response = await fetch('/api/poetry-learn-more', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ topic }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Server error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data as LearnMoreResponse;
+
+  } catch (error) {
+    console.error("Error fetching learn more context from backend:", error);
+    throw new Error("Failed to generate context. Please try again.");
   }
 };

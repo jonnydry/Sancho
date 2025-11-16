@@ -33,3 +33,7 @@ export interface SanchoQuoteResponse {
   quote: string;
   context: string;
 }
+
+export interface LearnMoreResponse {
+  context: string;
+}

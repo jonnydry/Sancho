@@ -214,6 +214,51 @@ app.get('/api/sancho-quote', rateLimit(5, 60000), async (req, res) => { // 5 req
   }
 });
 
+app.post('/api/poetry-learn-more', rateLimit(10, 60000), async (req, res) => { // 10 requests per minute
+  try {
+    const { topic } = req.body;
+
+    if (!topic) {
+      return res.status(400).json({ error: 'Topic is required' });
+    }
+
+    if (!process.env.XAI_API_KEY) {
+      return res.status(503).json({
+        error: 'AI features are currently disabled. Please configure XAI_API_KEY to enable learn more context.'
+      });
+    }
+
+    const prompt = `Provide a concise historical and cultural context paragraph about ${topic} in poetry. The paragraph should be 2-4 sentences and cover: (1) historical origins and evolution of this poetic form/device/meter, (2) its cultural and literary significance, and (3) key historical periods or movements associated with it. Use a scholarly but accessible tone. Respond with JSON in this format: { "context": "the paragraph text" }`;
+
+    const response = await openai.chat.completions.create({
+      model: "grok-2-1212",
+      messages: [
+        {
+          role: "system",
+          content: "You are a poetry and literature expert specializing in historical and cultural context. Provide accurate, scholarly information about poetic forms, devices, and meters, focusing on their historical origins, evolution, and cultural significance. Always respond with a well-structured paragraph of 2-4 sentences."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.35,
+    });
+
+    const jsonText = response.choices[0].message.content || "{}";
+    const parsedJson = JSON.parse(jsonText);
+    
+    res.json(parsedJson);
+  } catch (error) {
+    console.error("Error fetching learn more context from XAI:", error);
+    res.status(500).json({ 
+      error: "Failed to generate context. The model may be unavailable or the request could not be fulfilled.",
+      details: error.message 
+    });
+  }
+});
+
 // Auth route to get current user - publicly accessible for auth status polling
 app.get('/api/auth/user', async (req, res) => {
   try {

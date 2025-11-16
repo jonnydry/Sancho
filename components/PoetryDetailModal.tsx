@@ -1,8 +1,11 @@
 
-import React, { useEffect } from 'react';
-import { PoetryItem } from '../types';
+import React, { useEffect, useState, useCallback } from 'react';
+import { PoetryItem, LearnMoreResponse } from '../types';
 import { ExampleFinder } from './ExampleFinder';
 import { XIcon } from './icons/XIcon';
+import { fetchLearnMoreContext } from '../services/apiService';
+import { SparklesIcon } from './icons/SparklesIcon';
+import { SpinnerIcon } from './icons/SpinnerIcon';
 
 interface PoetryDetailModalProps {
   item: PoetryItem;
@@ -30,6 +33,24 @@ const Tag: React.FC<{ type: PoetryItem['type'] }> = ({ type }) => {
 };
 
 export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onClose }) => {
+  const [learnMoreContext, setLearnMoreContext] = useState<string | null>(null);
+  const [isLoadingLearnMore, setIsLoadingLearnMore] = useState(false);
+  const [learnMoreError, setLearnMoreError] = useState<string | null>(null);
+
+  const handleLearnMore = useCallback(async () => {
+    setIsLoadingLearnMore(true);
+    setLearnMoreError(null);
+    setLearnMoreContext(null);
+    try {
+      const result = await fetchLearnMoreContext(item.name);
+      setLearnMoreContext(result.context);
+    } catch (err) {
+      setLearnMoreError(err instanceof Error ? err.message : 'An unknown error occurred.');
+    } finally {
+      setIsLoadingLearnMore(false);
+    }
+  }, [item.name]);
+
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -129,6 +150,36 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
           <div className="mb-4">
             <h4 className="font-semibold text-default mb-2">Classic Snippet:</h4>
             <p className="text-default italic">"{item.exampleSnippet}"</p>
+          </div>
+
+          <div className="mt-4 mb-4 p-4 border-t border-default">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="font-semibold text-default">Historical & Cultural Context</h4>
+              <button
+                onClick={handleLearnMore}
+                disabled={isLoadingLearnMore || learnMoreContext !== null}
+                className="flex items-center space-x-2 px-4 py-2 text-sm font-semibold text-accent-text bg-accent rounded-lg hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent dark:focus:ring-offset-bg-alt"
+              >
+                {isLoadingLearnMore ? (
+                  <SpinnerIcon className="w-5 h-5 animate-spin" />
+                ) : (
+                  <SparklesIcon className="w-5 h-5" />
+                )}
+                <span>{isLoadingLearnMore ? 'Generating...' : 'Learn More'}</span>
+              </button>
+            </div>
+            
+            {learnMoreError && (
+              <div className="mt-4 p-3 text-sm text-red-700 bg-red-100 dark:bg-red-900/50 dark:text-red-300 rounded-lg">
+                {learnMoreError}
+              </div>
+            )}
+
+            {learnMoreContext && (
+              <div className="mt-4 p-4 border-l-4 border-accent bg-bg-alt/50 rounded-r-lg animate-fade-in">
+                <p className="text-default whitespace-pre-wrap">{learnMoreContext}</p>
+              </div>
+            )}
           </div>
         </div>
         
