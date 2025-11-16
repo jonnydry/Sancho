@@ -338,6 +338,52 @@ app.get('/api/auth/user', async (req, res) => {
   }
 });
 
+// Pinned items routes - require authentication
+app.get('/api/pinned-items', isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.user.claims.sub;
+    const items = await storage.getPinnedItems(userId);
+    res.json({ items: items.map(item => item.itemData) });
+  } catch (error) {
+    console.error("Error fetching pinned items:", error);
+    res.status(500).json({ error: "Failed to fetch pinned items" });
+  }
+});
+
+app.post('/api/pinned-items', isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.user.claims.sub;
+    const { itemData } = req.body;
+
+    if (!itemData || !itemData.name) {
+      return res.status(400).json({ error: "Invalid item data" });
+    }
+
+    const pinned = await storage.pinItem(userId, itemData);
+    res.json({ item: pinned.itemData });
+  } catch (error) {
+    console.error("Error pinning item:", error);
+    res.status(500).json({ error: "Failed to pin item" });
+  }
+});
+
+app.delete('/api/pinned-items/:itemName', isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.user.claims.sub;
+    const { itemName } = req.params;
+
+    if (!itemName) {
+      return res.status(400).json({ error: "Item name is required" });
+    }
+
+    await storage.unpinItem(userId, decodeURIComponent(itemName));
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error unpinning item:", error);
+    res.status(500).json({ error: "Failed to unpin item" });
+  }
+});
+
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Backend server is running' });
 });

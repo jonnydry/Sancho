@@ -4,6 +4,7 @@ import {
   jsonb,
   pgTable,
   timestamp,
+  unique,
   varchar,
 } from "drizzle-orm/pg-core";
 
@@ -28,3 +29,19 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+// Pinned items table - stores user's pinned poetry entries
+export const pinnedItems = pgTable(
+  "pinned_items",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: varchar("user_id").notNull(),
+    itemName: varchar("item_name").notNull(),
+    itemData: jsonb("item_data").notNull(),
+    createdAt: timestamp("created_at").defaultNow(),
+  },
+  (table) => [
+    index("IDX_pinned_items_user_id").on(table.userId),
+    unique("unique_user_item").on(table.userId, table.itemName),
+  ]
+);

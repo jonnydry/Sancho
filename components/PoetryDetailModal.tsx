@@ -6,6 +6,8 @@ import { XIcon } from './icons/XIcon';
 import { fetchLearnMoreContext } from '../services/apiService';
 import { SparklesIcon } from './icons/SparklesIcon';
 import { SpinnerIcon } from './icons/SpinnerIcon';
+import { PinButton } from './PinButton';
+import { useAuth } from '../hooks/useAuth.js';
 
 interface PoetryDetailModalProps {
   item: PoetryItem;
@@ -36,6 +38,7 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
   const [learnMoreContext, setLearnMoreContext] = useState<string | null>(null);
   const [isLoadingLearnMore, setIsLoadingLearnMore] = useState(false);
   const [learnMoreError, setLearnMoreError] = useState<string | null>(null);
+  const { isAuthenticated } = useAuth();
 
   const handleLearnMore = useCallback(async () => {
     setIsLoadingLearnMore(true);
@@ -129,7 +132,10 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
 
           <div className="flex justify-between items-start mb-3 sm:mb-4 pr-8 sm:pr-10">
             <h2 id="modal-title" className="text-lg sm:text-xl md:text-2xl font-bold text-default flex-1 pr-2 sm:pr-4">{item.name}</h2>
-            <Tag type={item.type} />
+            <div className="flex items-center gap-2">
+              {isAuthenticated && <PinButton item={item} size="md" />}
+              <Tag type={item.type} />
+            </div>
           </div>
           <p className="text-default text-sm sm:text-base mb-3 sm:mb-4">{item.description}</p>
 
