@@ -131,9 +131,11 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
           </button>
 
           <div className="flex justify-between items-start mb-3 sm:mb-4 pr-8 sm:pr-10">
-            <h2 id="modal-title" className="text-lg sm:text-xl md:text-2xl font-bold text-default flex-1 pr-2 sm:pr-4">{item.name}</h2>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-1 pr-2 sm:pr-4">
+              <h2 id="modal-title" className="text-lg sm:text-xl md:text-2xl font-bold text-default m-0">{item.name}</h2>
               {isAuthenticated && <PinButton item={item} size="md" />}
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
               <Tag type={item.type} />
             </div>
           </div>
