@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { Header } from './components/Header';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { PinnedItemsProvider } from './contexts/PinnedItemsContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import { HomePage } from './pages/HomePage';
 import { AboutPage } from './pages/AboutPage';
 import { PrivacyPage } from './pages/PrivacyPage';
@@ -12,8 +13,9 @@ import { NotFoundPage } from './pages/NotFoundPage';
 const App: React.FC = () => {
   return (
     <ThemeProvider>
-      <PinnedItemsProvider>
-        <BrowserRouter>
+      <NotificationProvider>
+        <PinnedItemsProvider>
+          <BrowserRouter>
           <div className="min-h-screen flex flex-col bg-bg text-default">
             <Header />
             <div className="flex-grow">
@@ -38,6 +40,7 @@ const App: React.FC = () => {
           </div>
         </BrowserRouter>
       </PinnedItemsProvider>
+      </NotificationProvider>
     </ThemeProvider>
   );
 };

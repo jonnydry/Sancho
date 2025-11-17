@@ -54,11 +54,7 @@ export const PoetryCard: React.FC<PoetryCardProps> = ({ item, onSelect, animatio
           <div className="flex justify-between items-start mb-2 sm:mb-3 relative">
             <div className="flex items-center gap-1 sm:gap-2 flex-1 pr-2 sm:pr-4">
               <h3 className="text-base sm:text-lg md:text-xl font-bold text-default m-0">{item.name}</h3>
-              {isAuthenticated && (
-                <div onClick={(e) => e.stopPropagation()}>
-                  <PinButton item={item} size="sm" />
-                </div>
-              )}
+              {isAuthenticated && <PinButton item={item} size="sm" />}
             </div>
             <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
               <Tag type={item.type} />

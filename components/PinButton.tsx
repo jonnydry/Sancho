@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PoetryItem } from '../types';
 import { usePinnedItems } from '../contexts/PinnedItemsContext';
+import { useNotification } from '../contexts/NotificationContext';
 import { PenIcon } from './icons/PenIcon';
 import { SpinnerIcon } from './icons/SpinnerIcon';
 
@@ -12,6 +13,7 @@ interface PinButtonProps {
 
 export const PinButton: React.FC<PinButtonProps> = ({ item, className = '', size = 'md' }) => {
   const { isPinned, pinItem, unpinItem } = usePinnedItems();
+  const { showNotification } = useNotification();
   const [isLoading, setIsLoading] = useState(false);
   const pinned = isPinned(item.name);
 
@@ -29,11 +31,14 @@ export const PinButton: React.FC<PinButtonProps> = ({ item, className = '', size
     try {
       if (pinned) {
         await unpinItem(item.name);
+        showNotification('Removed from Notebook', 'success');
       } else {
         await pinItem(item);
+        showNotification('Added to Notebook', 'success');
       }
     } catch (error) {
       console.error('Error toggling pin:', error);
+      showNotification('Failed to update notebook', 'error');
     } finally {
       setIsLoading(false);
     }
