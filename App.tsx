@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { Header } from './components/Header';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { AuthProvider } from './contexts/AuthContext';
 import { PinnedItemsProvider } from './contexts/PinnedItemsContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { HomePage } from './pages/HomePage';
@@ -13,9 +14,10 @@ import { NotFoundPage } from './pages/NotFoundPage';
 const App: React.FC = () => {
   return (
     <ThemeProvider>
-      <NotificationProvider>
-        <PinnedItemsProvider>
-          <BrowserRouter>
+      <AuthProvider>
+        <NotificationProvider>
+          <PinnedItemsProvider>
+            <BrowserRouter>
           <div className="min-h-screen flex flex-col bg-bg text-default">
             <Header />
             <div className="flex-grow">
@@ -41,6 +43,7 @@ const App: React.FC = () => {
         </BrowserRouter>
       </PinnedItemsProvider>
       </NotificationProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 };
