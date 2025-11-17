@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { PoetryItem } from '../types';
 import { usePinnedItems } from '../contexts/PinnedItemsContext';
-import { PinIcon } from './icons/PinIcon';
+import { PenIcon } from './icons/PenIcon';
 import { SpinnerIcon } from './icons/SpinnerIcon';
 
 interface PinButtonProps {
@@ -54,7 +54,7 @@ export const PinButton: React.FC<PinButtonProps> = ({ item, className = '', size
       {isLoading ? (
         <SpinnerIcon className={`${sizeClasses[size]} animate-spin`} />
       ) : (
-        <PinIcon className={sizeClasses[size]} />
+        <PenIcon className={sizeClasses[size]} />
       )}
     </button>
   );

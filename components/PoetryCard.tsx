@@ -35,10 +35,10 @@ export const PoetryCard: React.FC<PoetryCardProps> = ({ item, onSelect, animatio
   const { isAuthenticated } = useAuth();
 
   return (
-    <div className="relative">
+    <div className="relative h-full">
       <button
         onClick={() => onSelect(item)}
-        className="w-full text-left bg-bg-alt rounded-lg sm:rounded-xl md:rounded-2xl shadow-md overflow-hidden transition-all duration-300 ease-in-out animate-fade-in hover:shadow-xl hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-accent border border-default"
+        className="w-full h-full text-left bg-bg-alt rounded-lg sm:rounded-xl md:rounded-2xl shadow-md overflow-hidden transition-all duration-300 ease-in-out animate-fade-in hover:shadow-xl hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-accent border border-default"
         style={{ animationDelay: `${animationIndex * 50}ms` }}
       >
         <div className="p-4 sm:p-5 md:p-6 flex flex-col h-full">

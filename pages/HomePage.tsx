@@ -80,7 +80,7 @@ export const HomePage: React.FC = () => {
             <p className="text-muted">Loading poetry database...</p>
           </div>
         ) : filteredData.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 items-stretch">
             {filteredData.map((item, index) => (
               <PoetryCard
                 key={item.name}
