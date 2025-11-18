@@ -57,7 +57,10 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const pinItem = useCallback(async (item: PoetryItem) => {
     // Wait for auth to finish loading and ensure user is authenticated
     if (isAuthLoading || !isAuthenticated) {
-      throw new Error('Please log in to save items to your notebook');
+      const authError: any = new Error('Please log in to save items to your notebook');
+      authError.requiresLogin = true;
+      authError.code = 'NOT_AUTHENTICATED';
+      throw authError;
     }
 
     // Validate PoetryItem structure before sending
@@ -132,7 +135,10 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const unpinItem = useCallback(async (itemName: string) => {
     // Wait for auth to finish loading and ensure user is authenticated
     if (isAuthLoading || !isAuthenticated) {
-      throw new Error('Please log in to remove items from your notebook');
+      const authError: any = new Error('Please log in to remove items from your notebook');
+      authError.requiresLogin = true;
+      authError.code = 'NOT_AUTHENTICATED';
+      throw authError;
     }
 
     if (!itemName || typeof itemName !== 'string' || itemName.trim().length === 0) {
