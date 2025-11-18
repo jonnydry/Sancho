@@ -65,6 +65,12 @@ The project utilizes a dual-server architecture with a React frontend (Vite, Por
 
 ### Recent Updates
 
+#### 2025-11-18 - Pin Button Visual Feedback
+- **Red Heart Fill Animation**: When users pin an item, the heart in the book icon fills with the accent color (red) using a smooth 300ms transition
+- **Button Press Animation**: Added tactile feedback with a scale-down animation (90%) for 200ms when clicking the pin button
+- **Enhanced Icon**: BookPenIcon now supports a `heartFilled` prop to toggle the heart fill state, maintaining backward compatibility
+- **Improved User Experience**: Visual feedback makes pinning actions feel more responsive and satisfying
+
 #### 2025-11-18 - Notebook Feature Error Handling Improvements
 - **Better Error Messages**: Authentication errors now show clear, user-friendly messages (e.g., "Your session has expired. Please log in again" instead of "Unauthorized")
 - **Automatic Re-authentication**: When session expires or authentication fails, users are automatically redirected to login page after seeing error notification

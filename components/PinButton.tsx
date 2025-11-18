@@ -17,6 +17,7 @@ export const PinButton: React.FC<PinButtonProps> = ({ item, className = '', size
   const { showNotification } = useNotification();
   const { isLoading: isAuthLoading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
   const pinned = isPinned(item.name);
 
   const sizeClasses = {
@@ -28,6 +29,9 @@ export const PinButton: React.FC<PinButtonProps> = ({ item, className = '', size
   const handleClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (isLoading || isAuthLoading) return;
+
+    setIsPressed(true);
+    setTimeout(() => setIsPressed(false), 200);
 
     setIsLoading(true);
     try {
@@ -80,7 +84,9 @@ export const PinButton: React.FC<PinButtonProps> = ({ item, className = '', size
     <button
       onClick={handleClick}
       disabled={isLoading || isAuthLoading}
-      className={`flex items-center justify-center transition-colors ${
+      className={`flex items-center justify-center transition-all duration-200 ${
+        isPressed ? 'scale-90' : 'scale-100'
+      } ${
         pinned
           ? 'text-accent hover:text-accent-hover'
           : 'text-muted hover:text-default'
@@ -91,7 +97,7 @@ export const PinButton: React.FC<PinButtonProps> = ({ item, className = '', size
       {isLoading ? (
         <SpinnerIcon className={`${sizeClasses[size]} animate-spin`} />
       ) : (
-        <BookPenIcon className={sizeClasses[size]} />
+        <BookPenIcon className={sizeClasses[size]} heartFilled={pinned} />
       )}
     </button>
   );
