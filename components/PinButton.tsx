@@ -3,7 +3,7 @@ import { PoetryItem } from '../types';
 import { usePinnedItems } from '../contexts/PinnedItemsContext';
 import { useNotification } from '../contexts/NotificationContext';
 import { useAuth } from '../hooks/useAuth.js';
-import { PenIcon } from './icons/PenIcon';
+import { BookPenIcon } from './icons/BookPenIcon';
 import { SpinnerIcon } from './icons/SpinnerIcon';
 
 interface PinButtonProps {
@@ -91,7 +91,7 @@ export const PinButton: React.FC<PinButtonProps> = ({ item, className = '', size
       {isLoading ? (
         <SpinnerIcon className={`${sizeClasses[size]} animate-spin`} />
       ) : (
-        <PenIcon className={sizeClasses[size]} />
+        <BookPenIcon className={sizeClasses[size]} />
       )}
     </button>
   );
