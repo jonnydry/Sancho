@@ -63,7 +63,16 @@ The project utilizes a dual-server architecture with a React frontend (Vite, Por
 - **Deployment Type**: Autoscale (scales 0→N instances based on traffic)
 - **Port Configuration**: Port 5000 (frontend) exposed to port 80 (public)
 
-### Recent Updates (2025-11-16)
+### Recent Updates
+
+#### 2025-11-18 - Notebook Feature Error Handling Improvements
+- **Better Error Messages**: Authentication errors now show clear, user-friendly messages (e.g., "Your session has expired. Please log in again" instead of "Unauthorized")
+- **Automatic Re-authentication**: When session expires or authentication fails, users are automatically redirected to login page after seeing error notification
+- **Enhanced Backend Errors**: Backend middleware now returns structured error responses with error codes (NOT_AUTHENTICATED, SESSION_EXPIRED, TOKEN_REFRESH_FAILED)
+- **Improved UX**: Pin/unpin errors are now categorized and handled appropriately with specific error messages for each scenario
+- **Icon Update**: Changed notebook icon from pen to book-with-pen (BookPenIcon) for better visual clarity
+
+#### 2025-11-16 - Initial Deployment
 - **Deployment Fix**: Configured Vite preview server to use port 5000 instead of default 4173
 - **Production Build**: Added `preview:prod` script to run both Express backend and Vite preview
 - **Learn More Feature**: Historical & Cultural Context API integrated with XAI Grok (`/api/poetry-learn-more`)
