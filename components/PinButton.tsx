@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { PoetryItem } from '../types';
 import { usePinnedItems } from '../contexts/PinnedItemsContext';
 import { useNotification } from '../contexts/NotificationContext';
+import { useAuth } from '../hooks/useAuth.js';
 import { PenIcon } from './icons/PenIcon';
 import { SpinnerIcon } from './icons/SpinnerIcon';
 
@@ -14,6 +15,7 @@ interface PinButtonProps {
 export const PinButton: React.FC<PinButtonProps> = ({ item, className = '', size = 'md' }) => {
   const { isPinned, pinItem, unpinItem } = usePinnedItems();
   const { showNotification } = useNotification();
+  const { isLoading: isAuthLoading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const pinned = isPinned(item.name);
 
@@ -25,7 +27,7 @@ export const PinButton: React.FC<PinButtonProps> = ({ item, className = '', size
 
   const handleClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isLoading) return;
+    if (isLoading || isAuthLoading) return;
 
     setIsLoading(true);
     try {
@@ -38,7 +40,8 @@ export const PinButton: React.FC<PinButtonProps> = ({ item, className = '', size
       }
     } catch (error) {
       console.error('Error toggling pin:', error);
-      showNotification('Failed to update notebook', 'error');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update notebook';
+      showNotification(errorMessage, 'error');
     } finally {
       setIsLoading(false);
     }
@@ -47,7 +50,7 @@ export const PinButton: React.FC<PinButtonProps> = ({ item, className = '', size
   return (
     <button
       onClick={handleClick}
-      disabled={isLoading}
+      disabled={isLoading || isAuthLoading}
       className={`flex items-center justify-center transition-colors ${
         pinned
           ? 'text-accent hover:text-accent-hover'

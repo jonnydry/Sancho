@@ -16,9 +16,14 @@ const PinnedItemsContext = createContext<PinnedItemsContextType | undefined>(und
 export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [pinnedItems, setPinnedItems] = useState<PoetryItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
 
   const fetchPinnedItems = useCallback(async () => {
+    // Wait for auth to finish loading before fetching pinned items
+    if (isAuthLoading) {
+      return;
+    }
+    
     if (!isAuthenticated) {
       setPinnedItems([]);
       return;
@@ -43,14 +48,17 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
     } finally {
       setIsLoading(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isAuthLoading]);
 
   useEffect(() => {
     fetchPinnedItems();
   }, [fetchPinnedItems]);
 
   const pinItem = useCallback(async (item: PoetryItem) => {
-    if (!isAuthenticated) return;
+    // Wait for auth to finish loading and ensure user is authenticated
+    if (isAuthLoading || !isAuthenticated) {
+      throw new Error('Authentication required to pin items');
+    }
 
     try {
       const response = await fetch('/api/pinned-items', {
@@ -72,10 +80,13 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
       console.error('Error pinning item:', error);
       throw error;
     }
-  }, [isAuthenticated, fetchPinnedItems]);
+  }, [isAuthenticated, isAuthLoading, fetchPinnedItems]);
 
   const unpinItem = useCallback(async (itemName: string) => {
-    if (!isAuthenticated) return;
+    // Wait for auth to finish loading and ensure user is authenticated
+    if (isAuthLoading || !isAuthenticated) {
+      throw new Error('Authentication required to unpin items');
+    }
 
     try {
       const response = await fetch(`/api/pinned-items/${encodeURIComponent(itemName)}`, {
@@ -93,7 +104,7 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
       console.error('Error unpinning item:', error);
       throw error;
     }
-  }, [isAuthenticated, fetchPinnedItems]);
+  }, [isAuthenticated, isAuthLoading, fetchPinnedItems]);
 
   const isPinned = useCallback((itemName: string) => {
     return pinnedItems.some(item => item.name === itemName);
