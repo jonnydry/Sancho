@@ -57,7 +57,7 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const pinItem = useCallback(async (item: PoetryItem) => {
     // Wait for auth to finish loading and ensure user is authenticated
     if (isAuthLoading || !isAuthenticated) {
-      throw new Error('Authentication required to pin items');
+      throw new Error('Please log in to save items to your notebook');
     }
 
     // Validate PoetryItem structure before sending
@@ -85,8 +85,22 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
       if (response.ok) {
         console.log('Successfully pinned item:', item.name);
         await fetchPinnedItems();
+      } else if (response.status === 401) {
+        let errorData: any = {};
+        try {
+          errorData = await response.json();
+        } catch (parseError) {
+          console.error('Failed to parse 401 error response:', parseError);
+        }
+        
+        const message = errorData.message || errorData.error || 'Your session has expired. Please log in again';
+        console.error('Authentication error:', message);
+        
+        const authError: any = new Error(message);
+        authError.requiresLogin = true;
+        authError.code = errorData.code || 'SESSION_EXPIRED';
+        throw authError;
       } else {
-        // Try to get error details from response
         let errorData: any = {};
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
@@ -107,7 +121,6 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
       }
     } catch (error) {
       console.error('Error pinning item:', error);
-      // Re-throw with better error message if it's not already an Error
       if (error instanceof Error) {
         throw error;
       } else {
@@ -119,7 +132,7 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const unpinItem = useCallback(async (itemName: string) => {
     // Wait for auth to finish loading and ensure user is authenticated
     if (isAuthLoading || !isAuthenticated) {
-      throw new Error('Authentication required to unpin items');
+      throw new Error('Please log in to remove items from your notebook');
     }
 
     if (!itemName || typeof itemName !== 'string' || itemName.trim().length === 0) {
@@ -136,8 +149,22 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
       if (response.ok) {
         console.log('Successfully unpinned item:', itemName);
         await fetchPinnedItems();
+      } else if (response.status === 401) {
+        let errorData: any = {};
+        try {
+          errorData = await response.json();
+        } catch (parseError) {
+          console.error('Failed to parse 401 error response:', parseError);
+        }
+        
+        const message = errorData.message || errorData.error || 'Your session has expired. Please log in again';
+        console.error('Authentication error:', message);
+        
+        const authError: any = new Error(message);
+        authError.requiresLogin = true;
+        authError.code = errorData.code || 'SESSION_EXPIRED';
+        throw authError;
       } else {
-        // Try to get error details from response
         let errorData: any = {};
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
@@ -158,7 +185,6 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
       }
     } catch (error) {
       console.error('Error unpinning item:', error);
-      // Re-throw with better error message if it's not already an Error
       if (error instanceof Error) {
         throw error;
       } else {
