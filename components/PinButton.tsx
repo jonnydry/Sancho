@@ -40,11 +40,25 @@ export const PinButton: React.FC<PinButtonProps> = ({ item, className = '', size
         await pinItem(item);
         showNotification('Added to Notebook', 'success');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error toggling pin:', error);
       let errorMessage = 'Failed to update notebook';
+      
       if (error instanceof Error) {
         errorMessage = error.message;
+        
+        // Check if this is an authentication error that requires re-login
+        if (error.hasOwnProperty('requiresLogin') && (error as any).requiresLogin) {
+          console.log('Authentication required - redirecting to login');
+          showNotification(errorMessage, 'error');
+          
+          // Redirect to login after a short delay to show the notification
+          setTimeout(() => {
+            window.location.href = '/api/login';
+          }, 2000);
+          return;
+        }
+        
         // Log additional details for debugging
         console.error('Error details:', {
           message: error.message,
@@ -55,6 +69,7 @@ export const PinButton: React.FC<PinButtonProps> = ({ item, className = '', size
         console.error('Non-Error exception:', error);
         errorMessage = `Failed to update notebook: ${String(error)}`;
       }
+      
       showNotification(errorMessage, 'error');
     } finally {
       setIsLoading(false);
