@@ -404,7 +404,15 @@ app.post('/api/pinned-items', isAuthenticated, async (req, res) => {
     res.json({ item: pinned.itemData });
   } catch (error) {
     console.error("Error pinning item:", error);
-    res.status(500).json({ error: "Failed to pin item" });
+    // Provide more detailed error information
+    const errorMessage = error?.message || error?.toString() || "Unknown error occurred";
+    const statusCode = error?.code === '23505' ? 409 : 500; // 409 Conflict for unique constraint violations
+    res.status(statusCode).json({ 
+      error: statusCode === 409 
+        ? "This item is already in your notebook" 
+        : `Failed to pin item: ${errorMessage}`,
+      details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+    });
   }
 });
 
@@ -421,7 +429,11 @@ app.delete('/api/pinned-items/:itemName', isAuthenticated, async (req, res) => {
     res.json({ success: true });
   } catch (error) {
     console.error("Error unpinning item:", error);
-    res.status(500).json({ error: "Failed to unpin item" });
+    const errorMessage = error?.message || error?.toString() || "Unknown error occurred";
+    res.status(500).json({ 
+      error: `Failed to unpin item: ${errorMessage}`,
+      details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+    });
   }
 });
 

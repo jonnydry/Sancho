@@ -44,18 +44,38 @@ export class DatabaseStorage {
       return existingItem;
     }
 
-    const [pinned] = await db
-      .insert(pinnedItems)
-      .values({
-        userId,
-        itemName: itemData.name,
-        itemData: itemData,
-      })
-      .returning();
-    return {
-      ...pinned,
-      itemData: typeof pinned.itemData === 'string' ? JSON.parse(pinned.itemData) : pinned.itemData,
-    };
+    try {
+      const [pinned] = await db
+        .insert(pinnedItems)
+        .values({
+          userId,
+          itemName: itemData.name,
+          itemData: itemData,
+        })
+        .returning();
+      
+      if (!pinned) {
+        throw new Error('Failed to insert pinned item: no item returned from database');
+      }
+      
+      return {
+        ...pinned,
+        itemData: typeof pinned.itemData === 'string' ? JSON.parse(pinned.itemData) : pinned.itemData,
+      };
+    } catch (error) {
+      // Handle unique constraint violations (item already exists)
+      if (error?.code === '23505') {
+        // Race condition: item was pinned between check and insert
+        const existingItem = await this.getPinnedItem(userId, itemData.name);
+        if (existingItem) {
+          return existingItem;
+        }
+        throw new Error('Item is already pinned');
+      }
+      // Re-throw other errors with more context
+      console.error('Database error in pinItem:', error);
+      throw error;
+    }
   }
 
   async getPinnedItem(userId, itemName) {

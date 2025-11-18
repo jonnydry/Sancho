@@ -32,15 +32,29 @@ export const PinButton: React.FC<PinButtonProps> = ({ item, className = '', size
     setIsLoading(true);
     try {
       if (pinned) {
+        console.log('Unpinning item:', item.name);
         await unpinItem(item.name);
         showNotification('Removed from Notebook', 'success');
       } else {
+        console.log('Pinning item:', item.name);
         await pinItem(item);
         showNotification('Added to Notebook', 'success');
       }
     } catch (error) {
       console.error('Error toggling pin:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to update notebook';
+      let errorMessage = 'Failed to update notebook';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        // Log additional details for debugging
+        console.error('Error details:', {
+          message: error.message,
+          name: error.name,
+          stack: error.stack,
+        });
+      } else {
+        console.error('Non-Error exception:', error);
+        errorMessage = `Failed to update notebook: ${String(error)}`;
+      }
       showNotification(errorMessage, 'error');
     } finally {
       setIsLoading(false);

@@ -60,7 +60,19 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
       throw new Error('Authentication required to pin items');
     }
 
+    // Validate PoetryItem structure before sending
+    if (!item || typeof item !== 'object') {
+      throw new Error('Invalid item: item must be an object');
+    }
+    if (!item.name || typeof item.name !== 'string' || item.name.trim().length === 0) {
+      throw new Error('Invalid item: name is required and must be a non-empty string');
+    }
+    if (!item.type || !['Form', 'Meter', 'Device'].includes(item.type)) {
+      throw new Error('Invalid item: type must be Form, Meter, or Device');
+    }
+
     try {
+      console.log('Attempting to pin item:', { name: item.name, type: item.type });
       const response = await fetch('/api/pinned-items', {
         method: 'POST',
         headers: {
@@ -71,14 +83,36 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
       });
 
       if (response.ok) {
+        console.log('Successfully pinned item:', item.name);
         await fetchPinnedItems();
       } else {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(error.error || 'Failed to pin item');
+        // Try to get error details from response
+        let errorData: any = {};
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          try {
+            errorData = await response.json();
+          } catch (parseError) {
+            console.error('Failed to parse error response as JSON:', parseError);
+          }
+        } else {
+          const text = await response.text().catch(() => '');
+          console.error('Non-JSON error response:', text);
+          errorData = { error: text || `Server error: ${response.status} ${response.statusText}` };
+        }
+        
+        console.error('Failed to pin item. Status:', response.status, 'Error:', errorData);
+        const errorMessage = errorData.error || errorData.message || `Failed to pin item (${response.status})`;
+        throw new Error(errorMessage);
       }
     } catch (error) {
       console.error('Error pinning item:', error);
-      throw error;
+      // Re-throw with better error message if it's not already an Error
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error(`Failed to pin item: ${String(error)}`);
+      }
     }
   }, [isAuthenticated, isAuthLoading, fetchPinnedItems]);
 
@@ -88,21 +122,48 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
       throw new Error('Authentication required to unpin items');
     }
 
+    if (!itemName || typeof itemName !== 'string' || itemName.trim().length === 0) {
+      throw new Error('Invalid item name: name is required and must be a non-empty string');
+    }
+
     try {
+      console.log('Attempting to unpin item:', itemName);
       const response = await fetch(`/api/pinned-items/${encodeURIComponent(itemName)}`, {
         method: 'DELETE',
         credentials: 'include',
       });
 
       if (response.ok) {
+        console.log('Successfully unpinned item:', itemName);
         await fetchPinnedItems();
       } else {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(error.error || 'Failed to unpin item');
+        // Try to get error details from response
+        let errorData: any = {};
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          try {
+            errorData = await response.json();
+          } catch (parseError) {
+            console.error('Failed to parse error response as JSON:', parseError);
+          }
+        } else {
+          const text = await response.text().catch(() => '');
+          console.error('Non-JSON error response:', text);
+          errorData = { error: text || `Server error: ${response.status} ${response.statusText}` };
+        }
+        
+        console.error('Failed to unpin item. Status:', response.status, 'Error:', errorData);
+        const errorMessage = errorData.error || errorData.message || `Failed to unpin item (${response.status})`;
+        throw new Error(errorMessage);
       }
     } catch (error) {
       console.error('Error unpinning item:', error);
-      throw error;
+      // Re-throw with better error message if it's not already an Error
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error(`Failed to unpin item: ${String(error)}`);
+      }
     }
   }, [isAuthenticated, isAuthLoading, fetchPinnedItems]);
 
