@@ -153,8 +153,12 @@ export async function setupAuth(app) {
 export const isAuthenticated = async (req, res, next) => {
   const user = req.user;
 
-  if (!req.isAuthenticated() || !user.expires_at) {
-    return res.status(401).json({ message: "Unauthorized" });
+  if (!req.isAuthenticated() || !user || !user.expires_at) {
+    return res.status(401).json({ 
+      error: "Authentication required",
+      message: "Please log in to continue",
+      code: "NOT_AUTHENTICATED"
+    });
   }
 
   const now = Math.floor(Date.now() / 1000);
@@ -164,8 +168,11 @@ export const isAuthenticated = async (req, res, next) => {
 
   const refreshToken = user.refresh_token;
   if (!refreshToken) {
-    res.status(401).json({ message: "Unauthorized" });
-    return;
+    return res.status(401).json({ 
+      error: "Session expired",
+      message: "Your session has expired. Please log in again",
+      code: "SESSION_EXPIRED"
+    });
   }
 
   try {
@@ -174,7 +181,11 @@ export const isAuthenticated = async (req, res, next) => {
     updateUserSession(user, tokenResponse);
     return next();
   } catch (error) {
-    res.status(401).json({ message: "Unauthorized" });
-    return;
+    console.error("Token refresh failed:", error.message);
+    return res.status(401).json({ 
+      error: "Session expired",
+      message: "Your session has expired. Please log in again",
+      code: "TOKEN_REFRESH_FAILED"
+    });
   }
 };
