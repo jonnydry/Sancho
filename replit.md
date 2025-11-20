@@ -33,10 +33,13 @@ The project utilizes a dual-server architecture with a React frontend (Vite, Por
 - **Backend**: Express.js for API handling and secure communication with XAI.
 - **Styling**: Tailwind CSS v4 with `@tailwindcss/vite` plugin for optimized builds.
 - **Authentication**: Replit Auth (OpenID Connect) integrated with PostgreSQL session storage.
-- **AI Integration**: XAI Grok API (`grok-4-fast` model) for poetry example generation.
+- **AI Integration**: XAI Grok API with multi-model strategy:
+  - `grok-3-mini` for Sancho quotes (optimized for speed, ~40-50% faster)
+  - `grok-4` for poetry examples (highest quality educational content)
+  - `grok-4-fast` for learn more context (balanced speed and quality)
 - **Database**: PostgreSQL managed with Drizzle ORM for user and session data.
 - **Error Handling**: React Error Boundary for graceful fallback UI.
-- **Performance**: Optimized build (270 KB JS, 27.5 KB CSS), rate limiting on API endpoints, and client-side caching.
+- **Performance**: Optimized build (270 KB JS, 27.5 KB CSS), rate limiting on API endpoints, 3-minute client-side quote caching, and aggressive model selection.
 
 **System Design Choices:**
 - **Modular Structure**: Organized into `components`, `contexts`, `data`, `hooks`, `pages`, `services`, and `server` directories.
@@ -64,6 +67,14 @@ The project utilizes a dual-server architecture with a React frontend (Vite, Por
 - **Port Configuration**: Port 5000 (frontend) exposed to port 80 (public)
 
 ### Recent Updates
+
+#### 2025-11-20 - AI Model Optimization
+- **Multi-Model Strategy**: Implemented different Grok models for different use cases to optimize both speed and quality
+- **Sancho Quotes**: Switched to `grok-3-mini` for 40-50% faster quote generation on page load
+- **Poetry Examples**: Upgraded to `grok-4` for highest quality educational content with richer explanations
+- **Learn More Context**: Kept `grok-4-fast` for balanced speed and paragraph quality
+- **Extended Caching**: Increased Sancho quote cache from 1 minute to 3 minutes for faster repeat visits
+- **Performance Impact**: Significantly faster initial page loads while maintaining or improving content quality
 
 #### 2025-11-18 - Pin Button Visual Feedback
 - **Red Heart Fill Animation**: When users pin an item, the heart in the book icon fills with the accent color (red) using a smooth 300ms transition

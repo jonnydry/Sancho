@@ -175,7 +175,7 @@ app.post('/api/poetry-example', rateLimit(10, 60000), async (req, res) => { // 1
     const prompt = `Please provide a famous, concise example of a ${topic} in poetry. Include the author, the title, and a brief explanation of how it fits the conventions. Respond with JSON in this format: { "example": "string", "author": "string", "title": "string", "explanation": "string" }`;
 
     const response = await openai.chat.completions.create({
-      model: "grok-4-fast",
+      model: "grok-4",
       messages: [
         {
           role: "system",
@@ -227,7 +227,7 @@ Key guidelines:
 Respond with JSON in this format: { "quote": "the actual quote text", "context": "brief context about when/why Sancho said this (e.g., Part I, Chapter 5)" }`;
 
     const response = await openai.chat.completions.create({
-      model: "grok-4-fast",
+      model: "grok-3-mini",
       messages: [
         {
           role: "system",
@@ -240,7 +240,7 @@ Respond with JSON in this format: { "quote": "the actual quote text", "context":
       ],
       response_format: { type: "json_object" },
       temperature: 0.8, // Slightly higher temperature for more variety
-      max_tokens: 200
+      max_tokens: 150
     });
 
     if (!response.choices?.[0]?.message?.content) {

@@ -4,8 +4,8 @@ import { fetchSanchoQuote } from '../services/apiService';
 import { SpinnerIcon } from './icons/SpinnerIcon';
 import { SparklesIcon } from './icons/SparklesIcon';
 
-// Client-side cache for quotes - persists for 1 minute
-const CACHE_DURATION = 1 * 60 * 1000; // 1 minute
+// Client-side cache for quotes - persists for 3 minutes
+const CACHE_DURATION = 3 * 60 * 1000; // 3 minutes
 const FALLBACK_CACHE_DURATION = 10 * 1000; // 10 seconds for fallback quotes
 interface CachedQuote {
   quote: SanchoQuoteType;
