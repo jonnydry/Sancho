@@ -33,7 +33,7 @@ The project utilizes a dual-server architecture with a React frontend (Vite, Por
 - **Backend**: Express.js for API handling and secure communication with XAI.
 - **Styling**: Tailwind CSS v4 with `@tailwindcss/vite` plugin for optimized builds.
 - **Authentication**: Replit Auth (OpenID Connect) integrated with PostgreSQL session storage.
-- **AI Integration**: XAI Grok API (`grok-2-1212` model) for poetry example generation.
+- **AI Integration**: XAI Grok API (`grok-4-fast` model) for poetry example generation.
 - **Database**: PostgreSQL managed with Drizzle ORM for user and session data.
 - **Error Handling**: React Error Boundary for graceful fallback UI.
 - **Performance**: Optimized build (270 KB JS, 27.5 KB CSS), rate limiting on API endpoints, and client-side caching.
