@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { getRandomSanchoQuote, SanchoQuote as SanchoQuoteType } from '../data/sanchoQuotes';
+import { getRandomSanchoQuote, SanchoQuote as SanchoQuoteType, sanchoQuotes } from '../data/sanchoQuotes';
 import { fetchSanchoQuote } from '../services/apiService';
 import { SpinnerIcon } from './icons/SpinnerIcon';
 import { SparklesIcon } from './icons/SparklesIcon';
@@ -23,8 +23,6 @@ export const SanchoQuote: React.FC = () => {
 
   // Get a rotating fallback quote instead of random
   const getRotatingFallbackQuote = useCallback((): SanchoQuoteType => {
-    // Import the array to get total count
-    const { sanchoQuotes } = require('../data/sanchoQuotes');
     const index = sessionFallbackIndex % sanchoQuotes.length;
     setSessionFallbackIndex(prev => prev + 1);
     return sanchoQuotes[index];
@@ -154,20 +152,7 @@ export const SanchoQuote: React.FC = () => {
 
   return (
     <div className="max-w-2xl mx-auto my-8 p-6 border border-default rounded-2xl bg-alt/50 animate-fade-in">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2">
-          {usedFallback ? (
-            <div className="flex items-center space-x-1">
-              <div className="w-2 h-2 bg-yellow-500 rounded-full" />
-              <span className="text-xs text-muted">Stored quote</span>
-            </div>
-          ) : (
-            <div className="flex items-center space-x-1">
-              <SparklesIcon className="w-3 h-3 text-blue-500" />
-              <span className="text-xs text-muted">AI generated</span>
-            </div>
-          )}
-        </div>
+      <div className="flex items-center justify-end mb-4">
         <button
           onClick={handleRefresh}
           disabled={isRefreshing || isLoading}
