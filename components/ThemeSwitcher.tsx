@@ -16,33 +16,43 @@ export const ThemeSwitcher: React.FC = () => {
   const { isAuthenticated } = useAuth();
 
   const handleThemeClick = (themeName: ThemeColor) => {
+    if (themeColors.find(theme => theme.name === themeName)?.premium && !isAuthenticated) {
+      // Could trigger login modal or just log
+      return;
+    }
     setColor(themeName);
   };
 
-  const visibleThemes = themeColors.filter(theme => !theme.premium || isAuthenticated);
-
   return (
     <div className="flex items-center space-x-4">
-      {isAuthenticated && (
-        <div className="flex items-center space-x-2 p-1 bg-[rgb(var(--app-bg-alt)/0.5)] rounded-full">
-          {visibleThemes.map((theme) => {
-            const isSelected = color === theme.name;
-            return (
-              <button
-                key={theme.name}
-                onClick={() => handleThemeClick(theme.name)}
-                className={`w-5 h-5 rounded-full transition-transform duration-200 ${theme.class} ${
-                  isSelected
-                    ? 'ring-2 ring-offset-2 ring-accent dark:ring-offset-bg-alt'
-                    : 'scale-90 hover:scale-100'
-                }`}
-                aria-label={`${isSelected ? 'Current theme:' : 'Switch to'} ${theme.name.charAt(0).toUpperCase() + theme.name.slice(1)} theme`}
-                aria-pressed={isSelected}
-              />
-            );
-          })}
-        </div>
-      )}
+      <div className="flex items-center space-x-2 p-1 bg-[rgb(var(--app-bg-alt)/0.5)] rounded-full">
+        {themeColors.map((theme) => {
+          const isSelected = color === theme.name;
+          const isPremium = theme.premium;
+          const isDisabled = isPremium && !isAuthenticated;
+          const tooltip = isDisabled 
+            ? 'Log in to unlock premium themes' 
+            : `${isSelected ? 'Current theme:' : 'Switch to'} ${theme.name.charAt(0).toUpperCase() + theme.name.slice(1)} theme`;
+          
+          return (
+            <button
+              key={theme.name}
+              onClick={() => handleThemeClick(theme.name)}
+              disabled={isDisabled}
+              className={`w-5 h-5 rounded-full transition-transform duration-200 ${theme.class} ${
+                isSelected
+                  ? 'ring-2 ring-offset-2 ring-accent dark:ring-offset-bg-alt'
+                  : isDisabled
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'scale-90 hover:scale-100'
+              } ${isDisabled ? 'cursor-not-allowed' : ''}`}
+              title={tooltip}
+              aria-label={tooltip}
+              aria-pressed={isSelected}
+            />
+          );
+        })}
+      </div>
       <button
         onClick={toggleMode}
         className="p-2 rounded-full text-muted hover:bg-accent/10 transition-colors"

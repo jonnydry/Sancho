@@ -74,6 +74,12 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
       throw new Error('Invalid item: type must be Form, Meter, or Device');
     }
 
+    // Optimistic update: add item to local state if not already pinned
+    const isAlreadyPinned = pinnedItems.some(pinned => pinned.name === item.name);
+    if (!isAlreadyPinned) {
+      setPinnedItems(prev => [...prev, item]);
+    }
+
     try {
       console.log('Attempting to pin item:', { name: item.name, type: item.type });
       const response = await fetch('/api/pinned-items', {
@@ -87,42 +93,20 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
       if (response.ok) {
         console.log('Successfully pinned item:', item.name);
+        // Refresh to ensure server state matches (handles race conditions)
         await fetchPinnedItems();
-      } else if (response.status === 401) {
-        let errorData: any = {};
-        try {
-          errorData = await response.json();
-        } catch (parseError) {
-          console.error('Failed to parse 401 error response:', parseError);
-        }
-        
-        const message = errorData.message || errorData.error || 'Your session has expired. Please log in again';
-        console.error('Authentication error:', message);
-        
-        const authError: any = new Error(message);
-        authError.requiresLogin = true;
-        authError.code = errorData.code || 'SESSION_EXPIRED';
-        throw authError;
       } else {
-        let errorData: any = {};
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-          try {
-            errorData = await response.json();
-          } catch (parseError) {
-            console.error('Failed to parse error response as JSON:', parseError);
-          }
-        } else {
-          const text = await response.text().catch(() => '');
-          console.error('Non-JSON error response:', text);
-          errorData = { error: text || `Server error: ${response.status} ${response.statusText}` };
+        // Revert optimistic update on failure
+        if (!isAlreadyPinned) {
+          setPinnedItems(prev => prev.filter(pinned => pinned.name !== item.name));
         }
-        
-        console.error('Failed to pin item. Status:', response.status, 'Error:', errorData);
-        const errorMessage = errorData.error || errorData.message || `Failed to pin item (${response.status})`;
-        throw new Error(errorMessage);
+        throw new Error('Server error pinning item');
       }
     } catch (error) {
+      // Revert optimistic update on any error
+      if (!isAlreadyPinned) {
+        setPinnedItems(prev => prev.filter(pinned => pinned.name !== item.name));
+      }
       console.error('Error pinning item:', error);
       if (error instanceof Error) {
         throw error;
@@ -130,7 +114,7 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
         throw new Error(`Failed to pin item: ${String(error)}`);
       }
     }
-  }, [isAuthenticated, isAuthLoading, fetchPinnedItems]);
+  }, [isAuthenticated, isAuthLoading, fetchPinnedItems, pinnedItems]);
 
   const unpinItem = useCallback(async (itemName: string) => {
     // Wait for auth to finish loading and ensure user is authenticated
@@ -145,6 +129,12 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
       throw new Error('Invalid item name: name is required and must be a non-empty string');
     }
 
+    // Optimistic update: remove item from local state
+    const wasPinned = pinnedItems.some(item => item.name === itemName);
+    if (wasPinned) {
+      setPinnedItems(prev => prev.filter(item => item.name !== itemName));
+    }
+
     try {
       console.log('Attempting to unpin item:', itemName);
       const response = await fetch(`/api/pinned-items/${encodeURIComponent(itemName)}`, {
@@ -154,42 +144,20 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
       if (response.ok) {
         console.log('Successfully unpinned item:', itemName);
+        // Refresh to ensure server state matches
         await fetchPinnedItems();
-      } else if (response.status === 401) {
-        let errorData: any = {};
-        try {
-          errorData = await response.json();
-        } catch (parseError) {
-          console.error('Failed to parse 401 error response:', parseError);
-        }
-        
-        const message = errorData.message || errorData.error || 'Your session has expired. Please log in again';
-        console.error('Authentication error:', message);
-        
-        const authError: any = new Error(message);
-        authError.requiresLogin = true;
-        authError.code = errorData.code || 'SESSION_EXPIRED';
-        throw authError;
       } else {
-        let errorData: any = {};
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-          try {
-            errorData = await response.json();
-          } catch (parseError) {
-            console.error('Failed to parse error response as JSON:', parseError);
-          }
-        } else {
-          const text = await response.text().catch(() => '');
-          console.error('Non-JSON error response:', text);
-          errorData = { error: text || `Server error: ${response.status} ${response.statusText}` };
+        // Revert optimistic update on failure
+        if (wasPinned) {
+          // Note: To revert, we'd need the full item data, which we don't have here
+          // So instead, just refresh to restore from server
+          await fetchPinnedItems();
         }
-        
-        console.error('Failed to unpin item. Status:', response.status, 'Error:', errorData);
-        const errorMessage = errorData.error || errorData.message || `Failed to unpin item (${response.status})`;
-        throw new Error(errorMessage);
+        throw new Error('Server error unpinning item');
       }
     } catch (error) {
+      // Revert by refreshing from server on error
+      await fetchPinnedItems();
       console.error('Error unpinning item:', error);
       if (error instanceof Error) {
         throw error;
@@ -197,7 +165,7 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
         throw new Error(`Failed to unpin item: ${String(error)}`);
       }
     }
-  }, [isAuthenticated, isAuthLoading, fetchPinnedItems]);
+  }, [isAuthenticated, isAuthLoading, fetchPinnedItems, pinnedItems]);
 
   const isPinned = useCallback((itemName: string) => {
     return pinnedItems.some(item => item.name === itemName);

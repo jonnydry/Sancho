@@ -11,5 +11,22 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
+// Create Neon serverless pool
+// Note: Neon serverless Pool manages connections automatically and efficiently
+// for serverless/autoscale environments. It handles connection pooling internally.
 export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 export const db = drizzle({ client: pool, schema });
+
+// Handle pool errors to prevent crashes
+// Note: Neon serverless Pool may not emit all standard pg-pool events,
+// but error handling is still important for resilience
+try {
+  if (typeof pool.on === 'function') {
+    pool.on('error', (err) => {
+      console.error('Unexpected database pool error:', err);
+    });
+  }
+} catch (error) {
+  // Pool event handling not available, which is fine for Neon serverless
+  // The pool will still handle errors internally
+}

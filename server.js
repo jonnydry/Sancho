@@ -1,11 +1,17 @@
 import express from 'express';
 import cors from 'cors';
 import OpenAI from 'openai';
-import { setupAuth, isAuthenticated } from './server/replitAuth.js';
+import { setupAuth, isAuthenticated, getFrontendOrigin } from './server/replitAuth.js';
 import { storage } from './server/storage.js';
+import { pool } from './server/db.js';
+import { logger } from '../utils/logger.ts';
 
-// Simple in-memory rate limiter (for production, use Redis or similar)
+// In-memory rate limiter
+// NOTE: In Autoscale deployments, each instance maintains its own rate limit store.
+// Rate limits are per-instance, not shared across instances. For shared rate limiting
+// across all instances, consider implementing database-backed rate limiting.
 const rateLimitStore = new Map();
+const MAX_STORE_SIZE = 10000; // Prevent unbounded memory growth
 
 function rateLimit(maxRequests, windowMs) {
   return (req, res, next) => {
@@ -14,6 +20,12 @@ function rateLimit(maxRequests, windowMs) {
     const windowStart = now - windowMs;
 
     if (!rateLimitStore.has(key)) {
+      // Prevent memory exhaustion by limiting store size
+      if (rateLimitStore.size >= MAX_STORE_SIZE) {
+        // Remove oldest entry (simple FIFO eviction)
+        const firstKey = rateLimitStore.keys().next().value;
+        rateLimitStore.delete(firstKey);
+      }
       rateLimitStore.set(key, []);
     }
 
@@ -30,12 +42,8 @@ function rateLimit(maxRequests, windowMs) {
     validRequests.push(now);
     rateLimitStore.set(key, validRequests);
 
-    // Periodic cleanup: remove entries with no valid requests
-    if (validRequests.length === 0) {
-      rateLimitStore.delete(key);
-      return next();
-    }
-
+    // Note: Entries with empty validRequests will be cleaned up by the periodic cleanup interval
+    // This ensures memory efficiency without per-request cleanup
     next();
   };
 }
@@ -56,44 +64,68 @@ const cleanupInterval = setInterval(() => {
       }
     }
   } catch (error) {
-    console.error('Error in rate limiter cleanup:', error);
+    logger.error('Error in rate limiter cleanup', error);
   }
-}, 30 * 60 * 1000); // Run cleanup every 30 minutes
+}, 15 * 60 * 1000); // Run cleanup every 15 minutes (more frequent for Autoscale)
 
-// Graceful shutdown handler to clear interval
+// Cleanup function for graceful shutdown
+function cleanupRateLimiter() {
+  if (cleanupInterval) {
+    clearInterval(cleanupInterval);
+  }
+  rateLimitStore.clear();
+}
+
+// Graceful shutdown handlers - ensure cleanup runs in all scenarios
 process.on('SIGTERM', () => {
-  clearInterval(cleanupInterval);
+  cleanupRateLimiter();
+  process.exit(0);
 });
 
 process.on('SIGINT', () => {
-  clearInterval(cleanupInterval);
+  cleanupRateLimiter();
   process.exit(0);
+});
+
+process.on('exit', () => {
+  cleanupRateLimiter();
+});
+
+// Handle uncaught exceptions and unhandled rejections
+process.on('uncaughtException', (error) => {
+  logger.error('Uncaught Exception', error);
+  cleanupRateLimiter();
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('Unhandled Rejection', { promise, reason });
+  // Don't exit on unhandled rejection, but log it
 });
 
 // Check for XAI API key but don't exit - allow graceful degradation for local dev
 if (!process.env.XAI_API_KEY) {
-  console.warn('WARNING: XAI_API_KEY environment variable is not set.');
-  console.warn('AI features will be disabled. Set XAI_API_KEY to enable poetry examples and quotes.');
+  logger.warn('XAI_API_KEY environment variable is not set. AI features will be disabled.');
 }
 
 const app = express();
 const PORT = 3001;
 
-// Determine frontend origin using same logic as replitAuth.js
-function getFrontendOrigin() {
-  if (process.env.REPLIT_DEV_DOMAIN) {
-    return `https://${process.env.REPLIT_DEV_DOMAIN}`;
-  } else if (process.env.REPLIT_DOMAINS) {
-    return `https://${process.env.REPLIT_DOMAINS}`;
-  } else if (process.env.FRONTEND_URL) {
-    return process.env.FRONTEND_URL;
-  } else {
-    return 'http://localhost:5000';
+// Determine if we're in production (Replit production or explicit NODE_ENV)
+function isProductionEnvironment() {
+  // Check for Replit production domain (published apps)
+  if (process.env.REPLIT_DOMAINS && !process.env.REPLIT_DEV_DOMAIN) {
+    return true;
   }
+  // Check explicit NODE_ENV
+  if (process.env.NODE_ENV === 'production') {
+    return true;
+  }
+  return false;
 }
 
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
+  origin: isProductionEnvironment()
     ? getFrontendOrigin()
     : ['http://localhost:5000', 'http://127.0.0.1:5000'],
   credentials: true
@@ -131,17 +163,28 @@ function validateInput(req, res, next) {
       if (typeof obj[key] === 'string') {
         for (const pattern of suspiciousPatterns) {
           if (pattern.test(obj[key])) {
-            return res.status(400).json({ error: 'Invalid input detected' });
+            // Send response and return true to indicate response was sent
+            res.status(400).json({ error: 'Invalid input detected' });
+            return true;
           }
         }
       } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-        checkForSuspiciousContent(obj[key]);
+        // Recursively check nested objects and propagate result
+        const recursiveResult = checkForSuspiciousContent(obj[key]);
+        if (recursiveResult) {
+          return recursiveResult;
+        }
       }
     }
+    return false; // No suspicious content found
   };
 
   if (req.body) {
-    checkForSuspiciousContent(req.body);
+    const checkResult = checkForSuspiciousContent(req.body);
+    // If suspicious content was found, response was already sent - don't call next()
+    if (checkResult) {
+      return; // Short-circuit: response already sent, don't call next()
+    }
   }
 
   next();
@@ -195,7 +238,7 @@ app.post('/api/poetry-example', rateLimit(10, 60000), async (req, res) => { // 1
     
     res.json(parsedJson);
   } catch (error) {
-    console.error("Error fetching poetry example from XAI:", error);
+    logger.error("Error fetching poetry example from XAI", error);
     res.status(500).json({ 
       error: "Failed to generate example. The model may be unavailable or the request could not be fulfilled.",
       details: error.message 
@@ -253,12 +296,13 @@ Respond with JSON in this format: { "quote": "the actual quote text", "context":
     try {
       parsedJson = JSON.parse(jsonText);
     } catch (parseError) {
-      console.error('Failed to parse AI response as JSON:', jsonText);
+      logger.error('Failed to parse AI response as JSON', { jsonText, parseError });
       throw new Error('Invalid response format from AI service');
     }
 
     // Validate the response structure
     if (!parsedJson.quote || typeof parsedJson.quote !== 'string') {
+      logger.error('AI service did not return a valid quote', { response: parsedJson });
       throw new Error('AI service did not return a valid quote');
     }
 
@@ -270,7 +314,7 @@ Respond with JSON in this format: { "quote": "the actual quote text", "context":
 
     res.json(parsedJson);
   } catch (error) {
-    console.error("Error fetching Sancho quote from XAI:", error);
+    logger.error("Error fetching Sancho quote from XAI", error);
 
     // Check error status before sending response
     // Specific rate limiting error (from express-rate-limit middleware)
@@ -338,7 +382,7 @@ app.post('/api/poetry-learn-more', rateLimit(10, 60000), async (req, res) => { /
     
     res.json(parsedJson);
   } catch (error) {
-    console.error("Error fetching learn more context from XAI:", error);
+    logger.error("Error fetching learn more context from XAI", error);
     res.status(500).json({ 
       error: "Failed to generate context. The model may be unavailable or the request could not be fulfilled.",
       details: error.message 
@@ -362,7 +406,7 @@ app.get('/api/auth/user', async (req, res) => {
     // Not authenticated
     return res.json({ authenticated: false, user: null });
   } catch (error) {
-    console.error("Error fetching user:", error);
+    logger.error("Error fetching user", error);
     return res.status(500).json({ authenticated: false, error: "Failed to fetch user" });
   }
 });
@@ -374,7 +418,7 @@ app.get('/api/pinned-items', isAuthenticated, async (req, res) => {
     const items = await storage.getPinnedItems(userId);
     res.json({ items: items.map(item => item.itemData) });
   } catch (error) {
-    console.error("Error fetching pinned items:", error);
+    logger.error("Error fetching pinned items", error);
     res.status(500).json({ error: "Failed to fetch pinned items" });
   }
 });
@@ -403,7 +447,7 @@ app.post('/api/pinned-items', isAuthenticated, async (req, res) => {
     const pinned = await storage.pinItem(userId, itemData);
     res.json({ item: pinned.itemData });
   } catch (error) {
-    console.error("Error pinning item:", error);
+    logger.error("Error pinning item", error);
     // Provide more detailed error information
     const errorMessage = error?.message || error?.toString() || "Unknown error occurred";
     const statusCode = error?.code === '23505' ? 409 : 500; // 409 Conflict for unique constraint violations
@@ -428,7 +472,7 @@ app.delete('/api/pinned-items/:itemName', isAuthenticated, async (req, res) => {
     await storage.unpinItem(userId, decodeURIComponent(itemName));
     res.json({ success: true });
   } catch (error) {
-    console.error("Error unpinning item:", error);
+    logger.error("Error unpinning item", error);
     const errorMessage = error?.message || error?.toString() || "Unknown error occurred";
     res.status(500).json({ 
       error: `Failed to unpin item: ${errorMessage}`,
@@ -437,22 +481,96 @@ app.delete('/api/pinned-items/:itemName', isAuthenticated, async (req, res) => {
   }
 });
 
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Backend server is running' });
+app.get('/health', async (req, res) => {
+  const health = {
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    database: 'unknown'
+  };
+
+  // Check database connectivity using Neon serverless pool
+  try {
+    // Use pool.query() for Neon serverless (no need for connect/release)
+    await pool.query('SELECT 1');
+    health.database = 'connected';
+  } catch (dbError) {
+    health.database = 'error';
+    health.databaseError = process.env.NODE_ENV === 'development' ? dbError.message : undefined;
+    
+    // Check for specific error types
+    if (dbError.code === 'ECONNREFUSED' || dbError.code === 'ETIMEDOUT') {
+      health.database = 'unavailable';
+    }
+  }
+
+  // Return appropriate status code based on health
+  const statusCode = health.database === 'connected' ? 200 : 503;
+  res.status(statusCode).json(health);
+});
+
+// Global error handling middleware - must be after all routes
+app.use((err, req, res, next) => {
+  logger.error('Unhandled error', err, { path: req.path, method: req.method });
+  
+  // Don't leak error details in production
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  
+  // Handle specific error types
+  if (err.status) {
+    return res.status(err.status).json({
+      error: err.message || 'An error occurred',
+      ...(isDevelopment && { stack: err.stack, details: err })
+    });
+  }
+  
+  // Handle database errors
+  if (err.code && err.code.startsWith('23')) {
+    // PostgreSQL constraint violations
+    return res.status(400).json({
+      error: 'Database constraint violation',
+      ...(isDevelopment && { details: err.message })
+    });
+  }
+  
+  // Handle connection errors
+  if (err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT') {
+    return res.status(503).json({
+      error: 'Service temporarily unavailable',
+      message: 'Database connection failed. Please try again later.'
+    });
+  }
+  
+  // Default error response
+  res.status(500).json({
+    error: 'Internal server error',
+    message: 'An unexpected error occurred',
+    ...(isDevelopment && { 
+      message: err.message,
+      stack: err.stack,
+      details: err 
+    })
+  });
 });
 
 // Serve static files from the dist directory in production
+// NOTE: In normal production deployment, Vite preview (port 5000) handles static file serving
+// and proxies API requests to this Express server (port 3001). This static file serving
+// is a fallback for direct access to port 3001, which shouldn't happen in production but
+// provides resilience. In development, Vite dev server handles static files.
 if (process.env.NODE_ENV === 'production') {
   const path = await import('path');
   const { fileURLToPath } = await import('url');
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
   
+  // Serve static assets
   app.use(express.static(path.join(__dirname, 'dist')));
   
   // SPA catchall - serve index.html for all non-API routes
+  // This ensures React Router works when accessing Express directly
   app.get('*', (req, res, next) => {
-    // Skip API routes
+    // Skip API routes - let them fall through to 404 handler
     if (req.path.startsWith('/api')) {
       return next();
     }
@@ -460,11 +578,19 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+// 404 handler for undefined routes (must be after static file serving)
+app.use((req, res) => {
+  res.status(404).json({
+    error: 'Not found',
+    message: `Route ${req.method} ${req.path} not found`
+  });
+});
+
 const HOST = '0.0.0.0';
 app.listen(PORT, HOST, () => {
-  console.log(`Backend server running on http://${HOST}:${PORT}`);
-  console.log(`Accessible at http://localhost:${PORT} in development`);
+  logger.info(`Backend server running on http://${HOST}:${PORT}`);
+  logger.info(`Accessible at http://localhost:${PORT} in development`);
   if (process.env.NODE_ENV === 'production') {
-    console.log('Serving production build from dist/');
+    logger.info('Serving production build from dist/');
   }
 });

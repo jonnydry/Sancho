@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
         port: 5000,
         host: '0.0.0.0',
         allowedHosts: true,
-        hmr: false,
+        hmr: { clientPort: 5000 },
         proxy: {
           '/api': {
             target: 'http://localhost:3001',

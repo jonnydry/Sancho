@@ -2,39 +2,75 @@ import { users, pinnedItems } from "../shared/schema.js";
 import { db } from "./db.js";
 import { eq, and, desc } from "drizzle-orm";
 
+// Helper function to handle database errors
+function handleDatabaseError(error, operation) {
+  console.error(`Database error in ${operation}:`, error);
+  
+  // Connection errors
+  if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+    const dbError = new Error('Database connection failed');
+    dbError.code = 'DB_CONNECTION_ERROR';
+    dbError.originalError = error;
+    throw dbError;
+  }
+  
+  // Query timeout
+  if (error.code === 'ETIMEDOUT' || error.message?.includes('timeout')) {
+    const dbError = new Error('Database query timeout');
+    dbError.code = 'DB_TIMEOUT';
+    dbError.originalError = error;
+    throw dbError;
+  }
+  
+  // Re-throw with original error for other cases
+  throw error;
+}
+
 export class DatabaseStorage {
   // User operations - required for Replit Auth
   async getUser(id) {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user;
+    try {
+      const [user] = await db.select().from(users).where(eq(users.id, id));
+      return user;
+    } catch (error) {
+      handleDatabaseError(error, 'getUser');
+    }
   }
 
   async upsertUser(userData) {
-    const [user] = await db
-      .insert(users)
-      .values(userData)
-      .onConflictDoUpdate({
-        target: users.id,
-        set: {
-          ...userData,
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
-    return user;
+    try {
+      const [user] = await db
+        .insert(users)
+        .values(userData)
+        .onConflictDoUpdate({
+          target: users.id,
+          set: {
+            ...userData,
+            updatedAt: new Date(),
+          },
+        })
+        .returning();
+      return user;
+    } catch (error) {
+      handleDatabaseError(error, 'upsertUser');
+    }
   }
 
   // Pinned items operations
   async getPinnedItems(userId) {
-    const items = await db
-      .select()
-      .from(pinnedItems)
-      .where(eq(pinnedItems.userId, userId))
-      .orderBy(desc(pinnedItems.createdAt));
-    return items.map(item => ({
-      ...item,
-      itemData: typeof item.itemData === 'string' ? JSON.parse(item.itemData) : item.itemData,
-    }));
+    try {
+      const items = await db
+        .select()
+        .from(pinnedItems)
+        .where(eq(pinnedItems.userId, userId))
+        .orderBy(desc(pinnedItems.createdAt));
+      return items.map(item => ({
+        ...item,
+        itemData: typeof item.itemData === 'string' ? JSON.parse(item.itemData) : item.itemData,
+      }));
+    } catch (error) {
+      handleDatabaseError(error, 'getPinnedItems');
+    }
   }
 
   async pinItem(userId, itemData) {
@@ -79,46 +115,58 @@ export class DatabaseStorage {
   }
 
   async getPinnedItem(userId, itemName) {
-    const [item] = await db
-      .select()
-      .from(pinnedItems)
-      .where(and(
-        eq(pinnedItems.userId, userId),
-        eq(pinnedItems.itemName, itemName)
-      ))
-      .limit(1);
-    
-    if (!item) {
-      return null;
+    try {
+      const [item] = await db
+        .select()
+        .from(pinnedItems)
+        .where(and(
+          eq(pinnedItems.userId, userId),
+          eq(pinnedItems.itemName, itemName)
+        ))
+        .limit(1);
+      
+      if (!item) {
+        return null;
+      }
+      
+      return {
+        ...item,
+        itemData: typeof item.itemData === 'string' ? JSON.parse(item.itemData) : item.itemData,
+      };
+    } catch (error) {
+      handleDatabaseError(error, 'getPinnedItem');
     }
-    
-    return {
-      ...item,
-      itemData: typeof item.itemData === 'string' ? JSON.parse(item.itemData) : item.itemData,
-    };
   }
 
   async unpinItem(userId, itemName) {
-    const [unpinned] = await db
-      .delete(pinnedItems)
-      .where(and(
-        eq(pinnedItems.userId, userId),
-        eq(pinnedItems.itemName, itemName)
-      ))
-      .returning();
-    return unpinned;
+    try {
+      const [unpinned] = await db
+        .delete(pinnedItems)
+        .where(and(
+          eq(pinnedItems.userId, userId),
+          eq(pinnedItems.itemName, itemName)
+        ))
+        .returning();
+      return unpinned;
+    } catch (error) {
+      handleDatabaseError(error, 'unpinItem');
+    }
   }
 
   async isItemPinned(userId, itemName) {
-    const [item] = await db
-      .select()
-      .from(pinnedItems)
-      .where(and(
-        eq(pinnedItems.userId, userId),
-        eq(pinnedItems.itemName, itemName)
-      ))
-      .limit(1);
-    return !!item;
+    try {
+      const [item] = await db
+        .select()
+        .from(pinnedItems)
+        .where(and(
+          eq(pinnedItems.userId, userId),
+          eq(pinnedItems.itemName, itemName)
+        ))
+        .limit(1);
+      return !!item;
+    } catch (error) {
+      handleDatabaseError(error, 'isItemPinned');
+    }
   }
 }
 

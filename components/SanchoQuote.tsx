@@ -121,29 +121,25 @@ export const SanchoQuote: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="max-w-2xl mx-auto my-8 p-6 border border-default rounded-lg bg-alt/50 animate-fade-in flex items-center justify-center">
-        <div className="flex items-center space-x-3">
-          <SpinnerIcon className="w-5 h-5 animate-spin text-muted" />
-          <span className="text-muted">
-            {isRefreshing ? 'Generating new wisdom...' : 'Loading wisdom...'}
-          </span>
-        </div>
+      <div className="w-full py-6 text-center animate-fade-in">
+        <span className="text-xs font-mono text-muted uppercase tracking-widest animate-pulse">
+          {isRefreshing ? 'CONSULTING SANCHO...' : 'AWAITING WISDOM...'}
+        </span>
       </div>
     );
   }
 
   if (!quote) {
     return (
-      <div className="max-w-2xl mx-auto my-8 p-6 border border-default rounded-lg bg-alt/50 animate-fade-in flex items-center justify-center">
-        <div className="flex flex-col items-center space-y-3">
-          <div className="text-muted">No wisdom available at the moment</div>
+      <div className="w-full py-6 text-center animate-fade-in">
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-xs font-mono text-muted uppercase tracking-widest">SILENCE...</span>
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="flex items-center space-x-2 px-3 py-1 text-sm text-muted hover:text-default transition-colors disabled:opacity-50"
+            className="text-xs text-accent hover:underline disabled:opacity-50"
           >
-            <RefreshIcon className="w-4 h-4" />
-            <span>Retry</span>
+            TRY AGAIN
           </button>
         </div>
       </div>
@@ -151,37 +147,30 @@ export const SanchoQuote: React.FC = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto my-8 p-6 border border-default rounded-2xl bg-alt/50 animate-fade-in flex flex-col">
-      <div className="flex items-start gap-3 flex-1">
-        <div className="text-3xl text-muted leading-none">"</div>
-        <div className="flex-1">
-          <p className="text-default italic leading-relaxed">
-            {quote.quote}
+    <div className="relative w-full py-6 px-8 border-y border-default/10 animate-fade-in group">
+      <div className="text-center relative">
+        <span className="absolute -top-4 left-0 text-4xl text-default/10 font-serif leading-none select-none">“</span>
+        <p className="text-lg md:text-xl text-default font-serif italic leading-relaxed px-6">
+          {quote.quote}
+        </p>
+        <span className="absolute -bottom-8 right-0 text-4xl text-default/10 font-serif leading-none select-none transform rotate-180">“</span>
+        
+        {quote.context && (
+          <p className="text-xs font-mono text-muted mt-4 uppercase tracking-wider">
+            — Sancho Panza <span className="text-default/30">|</span> {quote.context}
           </p>
-          {quote.context && (
-            <p className="text-sm text-muted mt-3">
-              — Sancho Panza, <span className="italic">Don Quixote</span> ({quote.context})
-            </p>
-          )}
-        </div>
-        <div className="text-3xl text-muted leading-none self-start">"</div>
+        )}
       </div>
 
-      <div className="flex items-center justify-end mt-4">
+      <div className="absolute right-2 bottom-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <button
           onClick={handleRefresh}
           disabled={isRefreshing || isLoading}
-          className="flex items-center space-x-1 px-2 py-1 text-sm text-muted hover:text-default hover:bg-hover rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          title="Get a new quote"
+          className="p-1.5 text-muted hover:text-accent transition-colors disabled:opacity-50"
+          title="New Wisdom"
+          aria-label="Get a new quote"
         >
-          {isRefreshing ? (
-            <SpinnerIcon className="w-4 h-4 animate-spin" />
-          ) : (
-            <RefreshIcon className="w-4 h-4" />
-          )}
-          <span className="hidden sm:inline">
-            {isRefreshing ? 'Refreshing...' : 'New Quote'}
-          </span>
+          <RefreshIcon className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
         </button>
       </div>
     </div>

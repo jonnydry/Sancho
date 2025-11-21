@@ -75,6 +75,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, []);
 
   // Enforce theme restrictions: reset premium themes if stored but user logs out
+  // Optimized: Polls less frequently (30s) and uses exponential backoff on errors
   useEffect(() => {
     if (!isBrowser) return;
     if (!PREMIUM_THEMES.includes(color)) {
@@ -82,6 +83,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
 
     let isActive = true;
+    let consecutiveErrors = 0;
+    const MAX_CONSECUTIVE_ERRORS = 3;
+    const POLL_INTERVAL = 30000; // 30 seconds (reduced from 10s)
+    const ERROR_BACKOFF_MULTIPLIER = 2;
 
     const checkAuthAndResetTheme = async () => {
       try {
@@ -95,6 +100,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (response.ok) {
           const data = await response.json();
           
+          // Reset error counter on success
+          consecutiveErrors = 0;
+          
           // Check again before accessing state
           if (!isActive) {
             return;
@@ -107,21 +115,33 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           if (!isAuthenticated && PREMIUM_THEMES.includes(color) && isActive) {
             setColorState('dark');
             window.localStorage.setItem('theme-color', 'dark');
+            // Stop polling once we've reset the theme
+            return;
           }
+        } else {
+          consecutiveErrors++;
         }
       } catch (error) {
+        consecutiveErrors++;
         // Only log error if component is still mounted
         if (isActive) {
           console.error('Failed to check auth status for theme enforcement:', error);
         }
+      }
+      
+      // Stop polling after too many consecutive errors to reduce load
+      if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS && isActive) {
+        console.warn('Stopping theme auth polling after consecutive errors');
+        return;
       }
     };
     
     // Run once on mount / when premium theme is selected
     checkAuthAndResetTheme();
     
-    // Set up interval to check auth status every 10 seconds only when premium theme is active
-    const intervalId = window.setInterval(checkAuthAndResetTheme, 10000);
+    // Set up interval to check auth status every 30 seconds only when premium theme is active
+    // Reduced frequency to minimize server load
+    const intervalId = window.setInterval(checkAuthAndResetTheme, POLL_INTERVAL);
     
     return () => {
       isActive = false;

@@ -25,37 +25,40 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
   setActiveFilter,
 }) => {
   return (
-    <div className="space-y-3 sm:space-y-4">
-      <div className="relative flex items-center w-full bg-bg-alt border border-default rounded-xl sm:rounded-2xl focus-within:ring-2 focus-within:ring-accent transition-all">
+    <div className="space-y-6 mb-8">
+      {/* Minimal Input */}
+      <div className="relative w-full group">
         <input
           type="text"
-          placeholder="Search by name..."
+          placeholder="Search database..."
           value={searchQuery}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-          className="w-full pl-3 sm:pl-4 pr-10 py-2 sm:py-2.5 bg-transparent text-default text-sm sm:text-base focus:outline-none"
+          className="w-full py-2 bg-transparent text-default text-base border-b border-default focus:border-accent focus:outline-none transition-colors placeholder-muted/50"
         />
         {searchQuery && (
           <button
             onClick={() => setSearchQuery('')}
-            className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted/50 hover:text-muted transition-colors"
+            className="absolute inset-y-0 right-0 flex items-center text-muted hover:text-default transition-colors"
             aria-label="Clear search"
           >
-            <XIcon className="w-4 sm:w-5 h-4 sm:h-5" />
+            <XIcon className="w-4 h-4" />
           </button>
         )}
       </div>
-      <div className="flex items-center justify-center gap-1 sm:gap-2 p-1 bg-bg-alt rounded-xl sm:rounded-2xl overflow-x-auto">
+
+      {/* Text-only Tabs */}
+      <div className="flex items-center gap-6 border-b border-default/30 pb-px">
         {filters.map(({ label, value }) => (
           <button
             key={value}
             onClick={() => setActiveFilter(value)}
-            className={`flex-1 sm:w-full px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold rounded-md transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 dark:focus-visible:ring-offset-bg-alt whitespace-nowrap ${
+            className={`pb-2 text-sm transition-all duration-200 focus:outline-none ${
               activeFilter === value
-                ? 'bg-white dark:bg-white/10 text-accent shadow'
-                : 'text-muted hover:bg-black/5 dark:hover:bg-white/5'
+                ? 'text-default font-bold border-b-2 border-accent'
+                : 'text-muted hover:text-default font-normal border-b-2 border-transparent hover:border-default/30'
             }`}
           >
-            {label}
+            {label.toUpperCase()}
           </button>
         ))}
       </div>

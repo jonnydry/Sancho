@@ -18,17 +18,17 @@ const Tag: React.FC<{ type: PoetryItem['type'] }> = ({ type }) => {
   let colorClass = '';
   switch (type) {
     case 'Form':
-      colorClass = 'bg-tag-form/10 text-tag-form-text dark:bg-tag-form/20';
+      colorClass = 'text-tag-form-text';
       break;
     case 'Meter':
-      colorClass = 'bg-tag-meter/10 text-tag-meter-text dark:bg-tag-meter/20';
+      colorClass = 'text-tag-meter-text';
       break;
     case 'Device':
-      colorClass = 'bg-tag-device/10 text-tag-device-text dark:bg-tag-device/20';
+      colorClass = 'text-tag-device-text';
       break;
   }
   return (
-    <span className={`px-1.5 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold rounded-full ${colorClass}`}>
+    <span className={`text-xs uppercase tracking-widest font-bold ${colorClass}`}>
       {type}
     </span>
   );
@@ -63,7 +63,6 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
 
     const handleTab = (event: KeyboardEvent) => {
       if (event.key === 'Tab') {
-        // Get all focusable elements within the modal
         const modal = document.querySelector('[role="dialog"]') as HTMLElement;
         if (!modal) return;
 
@@ -74,13 +73,11 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
         const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
 
         if (event.shiftKey) {
-          // Shift + Tab
           if (document.activeElement === firstElement) {
             event.preventDefault();
             lastElement.focus();
           }
         } else {
-          // Tab
           if (document.activeElement === lastElement) {
             event.preventDefault();
             firstElement.focus();
@@ -92,7 +89,6 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
     window.addEventListener('keydown', handleEsc);
     window.addEventListener('keydown', handleTab);
 
-    // Focus trap: focus the first focusable element when modal opens
     const modal = document.querySelector('[role="dialog"]') as HTMLElement;
     if (modal) {
       const firstFocusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])') as HTMLElement;
@@ -118,74 +114,75 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
       aria-labelledby="modal-title"
     >
       <div
-        className="relative bg-bg rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] sm:max-h-[90vh] overflow-y-auto m-3 sm:m-4 animate-modal-in border border-default"
+        className="relative bg-bg rounded-sm w-full max-w-2xl max-h-[85vh] sm:max-h-[90vh] overflow-y-auto m-4 animate-modal-in border border-default shadow-lg"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-4 sm:p-6">
+        <div className="p-6 sm:p-8">
           <button
             onClick={onClose}
-            className="absolute top-3 right-3 sm:top-4 sm:right-4 text-muted/50 hover:text-muted transition-colors"
+            className="absolute top-4 right-4 text-muted hover:text-default transition-colors"
             aria-label="Close"
           >
-            <XIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+            <XIcon className="w-5 h-5" />
           </button>
 
-          <div className="flex justify-between items-start mb-3 sm:mb-4 pr-8 sm:pr-10">
-            <div className="flex items-center gap-2 flex-1 pr-2 sm:pr-4">
-              <h2 id="modal-title" className="text-lg sm:text-xl md:text-2xl font-bold text-default m-0">{item.name}</h2>
-              {isAuthenticated && <PinButton item={item} size="md" />}
-            </div>
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <Tag type={item.type} />
-            </div>
+          <div className="flex flex-col gap-2 mb-6 pr-8">
+             <div className="flex items-center gap-3">
+                <h2 id="modal-title" className="text-2xl sm:text-3xl font-bold text-default m-0 tracking-tight">{item.name}</h2>
+                {isAuthenticated && <PinButton item={item} size="md" />}
+             </div>
+             <Tag type={item.type} />
           </div>
-          <p className="text-default text-sm sm:text-base mb-3 sm:mb-4">{item.description}</p>
+
+          <p className="text-default text-base leading-relaxed mb-6 border-l-2 border-default/20 pl-4">{item.description}</p>
 
           {item.origin && (
-            <div className="mb-4">
-              <h4 className="font-semibold text-default mb-2">Origin:</h4>
-              <p className="text-default">{item.origin}</p>
+            <div className="mb-6">
+              <h4 className="font-bold text-sm text-default uppercase tracking-wider mb-2">Origin</h4>
+              <p className="text-muted">{item.origin}</p>
             </div>
           )}
           
-          <div className="mb-4">
-              <h4 className="font-semibold text-default mb-2">Conventions:</h4>
-              <ul className="list-disc list-inside space-y-1 text-default">
+          <div className="mb-6">
+              <h4 className="font-bold text-sm text-default uppercase tracking-wider mb-2">Conventions</h4>
+              <ul className="list-disc list-inside space-y-1 text-muted ml-2">
                   {item.structure.map((rule, index) => <li key={index}>{rule}</li>)}
               </ul>
           </div>
 
-          <div className="mb-4">
-            <h4 className="font-semibold text-default mb-2">Classic Snippet:</h4>
-            <p className="text-default italic">"{item.exampleSnippet}"</p>
+          <div className="mb-8">
+            <h4 className="font-bold text-sm text-default uppercase tracking-wider mb-2">Classic Snippet</h4>
+            <div className="bg-bg-alt/30 p-4 border border-default/20 rounded-sm">
+              <p className="text-default font-mono text-sm italic">"{item.exampleSnippet}"</p>
+            </div>
           </div>
 
-          <div className="mt-4 mb-4 p-4 border-t border-default">
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="font-semibold text-default">Historical & Cultural Context</h4>
+          <div className="pt-6 border-t border-default">
+            <div className="flex items-center justify-between mb-6">
+              <h4 className="font-bold text-default text-lg">Historical Context</h4>
               <button
                 onClick={handleLearnMore}
                 disabled={isLoadingLearnMore || learnMoreContext !== null}
-                className="flex items-center space-x-2 px-4 py-2 text-sm font-semibold text-accent-text bg-accent rounded-lg hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent dark:focus:ring-offset-bg-alt"
+                className="flex items-center space-x-2 px-4 py-2 text-sm font-semibold text-accent-text bg-accent rounded-sm hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
               >
                 {isLoadingLearnMore ? (
-                  <SpinnerIcon className="w-5 h-5 animate-spin" />
+                  <SpinnerIcon className="w-4 h-4 animate-spin" />
                 ) : (
-                  <SparklesIcon className="w-5 h-5" />
+                  <SparklesIcon className="w-4 h-4" />
                 )}
-                <span>{isLoadingLearnMore ? 'Generating...' : 'Learn More'}</span>
+                <span>{isLoadingLearnMore ? 'ANALYZING...' : 'LEARN MORE'}</span>
               </button>
             </div>
             
             {learnMoreError && (
-              <div className="mt-4 p-3 text-sm text-red-700 bg-red-100 dark:bg-red-900/50 dark:text-red-300 rounded-lg">
+              <div className="p-4 text-sm text-red-600 border border-red-200 bg-red-50 dark:bg-red-900/10 dark:border-red-900 dark:text-red-400 rounded-sm">
                 {learnMoreError}
               </div>
             )}
 
             {learnMoreContext && (
-              <div className="mt-4 p-4 border-l-4 border-accent bg-bg-alt/50 rounded-r-lg animate-fade-in">
-                <p className="text-default whitespace-pre-wrap">{learnMoreContext}</p>
+              <div className="p-5 border border-accent/30 bg-accent/5 rounded-sm animate-fade-in">
+                <p className="text-default leading-relaxed whitespace-pre-wrap">{learnMoreContext}</p>
               </div>
             )}
           </div>

@@ -64,37 +64,42 @@ export const HomePage: React.FC = () => {
   }, [filteredData, itemsToShow]);
 
   return (
-    <main className="py-4 sm:py-6 md:py-8 px-3 sm:px-4 md:px-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center">
-           <div className="w-40 h-40 sm:w-56 sm:h-56 md:w-72 md:h-72 mx-auto mb-3 sm:mb-4 animate-fade-in">
+    <main className="py-8 sm:py-12 md:py-16 px-4 sm:px-6 md:px-8 min-h-screen">
+      <div className="max-w-5xl mx-auto">
+        <div className="flex flex-col items-center mb-16">
+           <div className="w-32 h-32 sm:w-40 sm:h-40 mb-6 animate-fade-in opacity-90 grayscale hover:grayscale-0 transition-all duration-500">
             <img 
               src="/sancho-logo.png" 
-              alt="Sancho Logo - A faithful guide reading poetry" 
+              alt="Sancho Logo" 
               className="w-full h-full object-contain" 
             />
           </div>
-          <p className="text-muted text-xs sm:text-sm uppercase tracking-wider mb-4 sm:mb-6 animate-fade-in" style={{animationDelay: '0.2s'}}>
-            A Poetic Reference Squire
+          <h1 className="text-2xl sm:text-3xl font-bold text-default mb-2 tracking-tight">Sancho.ref</h1>
+          <p className="text-muted text-xs uppercase tracking-[0.2em] mb-8">
+            Poetic Reference Squire
           </p>
+          
+          <div className="w-full max-w-2xl">
+            <SanchoQuote />
+          </div>
         </div>
 
-        <SanchoQuote />
-
-        <SearchFilter
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          activeFilter={activeFilter}
-          setActiveFilter={setActiveFilter}
-        />
+        <div className="mb-12">
+          <SearchFilter
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            activeFilter={activeFilter}
+            setActiveFilter={setActiveFilter}
+          />
+        </div>
 
         {isLoadingData ? (
-          <div className="text-center mt-16">
-            <p className="text-muted">Loading poetry database...</p>
+          <div className="text-center mt-20">
+            <p className="text-muted font-mono text-sm animate-pulse">Initializing database...</p>
           </div>
         ) : displayedData.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 items-stretch">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
               {displayedData.map((item, index) => (
                 <PoetryCard
                   key={item.name}
@@ -105,21 +110,21 @@ export const HomePage: React.FC = () => {
               ))}
             </div>
             {itemsToShow < filteredData.length && (
-              <div className="text-center mt-8">
+              <div className="text-center mt-16">
                 <button
                   onClick={handleShowMore}
-                  className="px-6 py-3 bg-accent text-accent-text dark:bg-white/15 dark:text-white font-semibold rounded-lg hover:bg-accent-hover dark:hover:bg-white/25 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 dark:focus-visible:ring-offset-bg-alt"
+                  className="px-8 py-3 border border-default text-default text-sm font-semibold hover:bg-accent hover:text-accent-text hover:border-accent transition-all duration-300"
                   aria-label="Show more poetry items"
                 >
-                  Show More
+                  LOAD MORE
                 </button>
               </div>
             )}
           </>
         ) : (
-          <div className="text-center mt-16">
-            <h3 className="text-xl font-semibold text-default">No Results Found</h3>
-            <p className="text-muted mt-2">Try adjusting your search or filter settings.</p>
+          <div className="text-center mt-20 border border-dashed border-default/30 rounded-sm p-12">
+            <h3 className="text-lg font-bold text-default mb-2">No Entries Found</h3>
+            <p className="text-muted text-sm">Refine your query to locate specific forms or devices.</p>
           </div>
         )}
       </div>
