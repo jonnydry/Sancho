@@ -147,7 +147,7 @@ export const SanchoQuote: React.FC = () => {
   }
 
   return (
-    <div className="relative w-full py-6 px-8 border-y border-default/10 animate-fade-in group">
+    <div className="relative w-full py-6 px-4 sm:px-8 border-y border-default/10 animate-fade-in group">
       <div className="text-center relative">
         <span className="absolute -top-4 left-0 text-4xl text-default/10 font-serif leading-none select-none">“</span>
         <p className="text-lg md:text-xl text-default font-serif italic leading-relaxed px-6">

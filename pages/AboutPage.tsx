@@ -3,21 +3,21 @@ import { Link } from 'react-router-dom';
 
 export const AboutPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-default py-12 px-4">
+    <div className="min-h-screen bg-default py-8 sm:py-12 px-4 sm:px-6">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12">
-          <div className="w-48 h-48 mx-auto mb-6">
+        <div className="text-center mb-8 sm:mb-12">
+          <div className="w-40 h-40 sm:w-48 sm:h-48 mx-auto mb-6">
             <img 
               src="/sancho-logo.png" 
               alt="Sancho Logo" 
               className="w-full h-full object-contain" 
             />
           </div>
-          <h1 className="text-4xl font-bold text-default mb-4">About Sancho</h1>
-          <p className="text-xl text-muted">Your Faithful Poetic Reference Squire</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-default mb-3 sm:mb-4">About Sancho</h1>
+          <p className="text-lg sm:text-xl text-muted">Your Faithful Poetic Reference Squire</p>
         </div>
 
-        <div className="bg-bg-alt rounded-2xl p-8 mb-8 border border-default">
+        <div className="bg-bg-alt rounded-2xl p-5 sm:p-8 mb-6 sm:mb-8 border border-default">
           <h2 className="text-2xl font-bold text-default mb-4">What is Sancho?</h2>
           <p className="text-default mb-4">
             Sancho is a comprehensive poetry education platform named after Sancho Panza, the faithful squire from Miguel de Cervantes' "Don Quixote". Just as Sancho loyally served Don Quixote on his adventures, this application serves as your faithful companion on your journey through the world of poetry.
@@ -27,9 +27,9 @@ export const AboutPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="bg-bg-alt rounded-2xl p-8 mb-8 border border-default">
-          <h2 className="text-2xl font-bold text-default mb-4">Features</h2>
-          <div className="grid md:grid-cols-2 gap-6">
+        <div className="bg-bg-alt rounded-2xl p-5 sm:p-8 mb-6 sm:mb-8 border border-default">
+          <h2 className="text-xl sm:text-2xl font-bold text-default mb-4">Features</h2>
+          <div className="grid md:grid-cols-2 gap-5 sm:gap-6">
             <div>
               <h3 className="text-lg font-semibold text-default mb-2">📝 37 Poetic Forms</h3>
               <p className="text-muted text-sm">
@@ -69,8 +69,8 @@ export const AboutPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-bg-alt rounded-2xl p-8 border border-default">
-          <h2 className="text-2xl font-bold text-default mb-4">Technology</h2>
+        <div className="bg-bg-alt rounded-2xl p-5 sm:p-8 border border-default">
+          <h2 className="text-xl sm:text-2xl font-bold text-default mb-4">Technology</h2>
           <p className="text-default mb-4">
             Sancho is built with modern web technologies and hosted on Replit:
           </p>
@@ -86,10 +86,10 @@ export const AboutPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="text-center mt-12">
+        <div className="text-center mt-8 sm:mt-12">
           <Link
             to="/"
-            className="inline-block px-6 py-3 bg-accent hover:bg-accent-hover text-accent-text font-semibold rounded-lg transition-colors"
+            className="inline-block px-6 py-3 bg-accent hover:bg-accent-hover text-accent-text font-semibold rounded-lg transition-colors text-sm sm:text-base"
           >
             Explore Poetry
           </Link>

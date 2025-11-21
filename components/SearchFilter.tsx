@@ -47,12 +47,12 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
       </div>
 
       {/* Text-only Tabs */}
-      <div className="flex items-center gap-6 border-b border-default/30 pb-px">
+      <div className="flex items-center gap-3 sm:gap-6 border-b border-default/30 pb-px">
         {filters.map(({ label, value }) => (
           <button
             key={value}
             onClick={() => setActiveFilter(value)}
-            className={`pb-2 text-sm transition-all duration-200 focus:outline-none ${
+            className={`pb-2 text-xs sm:text-sm whitespace-nowrap transition-all duration-200 focus:outline-none ${
               activeFilter === value
                 ? 'text-default font-bold border-b-2 border-accent'
                 : 'text-muted hover:text-default font-normal border-b-2 border-transparent hover:border-default/30'

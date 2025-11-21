@@ -117,7 +117,7 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
         className="relative bg-bg rounded-sm w-full max-w-2xl max-h-[85vh] sm:max-h-[90vh] overflow-y-auto m-4 animate-modal-in border border-default shadow-lg"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6 sm:p-8">
+        <div className="p-5 sm:p-6 md:p-8">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 text-muted hover:text-default transition-colors"
