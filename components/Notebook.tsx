@@ -65,7 +65,7 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
         {/* Header */}
         <div className="flex items-center justify-between p-4 sm:p-6 border-b border-[rgb(var(--app-border)/0.5)]">
           <div className="flex items-center gap-2">
-            <BookPenIcon className="w-5 h-5 text-accent" />
+            <BookPenIcon className="w-5 h-5 text-default" />
             <h2 id="notebook-title" className="text-lg sm:text-xl font-bold text-default">
               Notebook
             </h2>
