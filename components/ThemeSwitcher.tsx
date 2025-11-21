@@ -23,24 +23,26 @@ export const ThemeSwitcher: React.FC = () => {
 
   return (
     <div className="flex items-center space-x-4">
-      <div className="flex items-center space-x-2 p-1 bg-[rgb(var(--app-bg-alt)/0.5)] rounded-full">
-        {visibleThemes.map((theme) => {
-          const isSelected = color === theme.name;
-          return (
-            <button
-              key={theme.name}
-              onClick={() => handleThemeClick(theme.name)}
-              className={`w-5 h-5 rounded-full transition-transform duration-200 ${theme.class} ${
-                isSelected
-                  ? 'ring-2 ring-offset-2 ring-accent dark:ring-offset-bg-alt'
-                  : 'scale-90 hover:scale-100'
-              }`}
-              aria-label={`${isSelected ? 'Current theme:' : 'Switch to'} ${theme.name.charAt(0).toUpperCase() + theme.name.slice(1)} theme`}
-              aria-pressed={isSelected}
-            />
-          );
-        })}
-      </div>
+      {isAuthenticated && (
+        <div className="flex items-center space-x-2 p-1 bg-[rgb(var(--app-bg-alt)/0.5)] rounded-full">
+          {visibleThemes.map((theme) => {
+            const isSelected = color === theme.name;
+            return (
+              <button
+                key={theme.name}
+                onClick={() => handleThemeClick(theme.name)}
+                className={`w-5 h-5 rounded-full transition-transform duration-200 ${theme.class} ${
+                  isSelected
+                    ? 'ring-2 ring-offset-2 ring-accent dark:ring-offset-bg-alt'
+                    : 'scale-90 hover:scale-100'
+                }`}
+                aria-label={`${isSelected ? 'Current theme:' : 'Switch to'} ${theme.name.charAt(0).toUpperCase() + theme.name.slice(1)} theme`}
+                aria-pressed={isSelected}
+              />
+            );
+          })}
+        </div>
+      )}
       <button
         onClick={toggleMode}
         className="p-2 rounded-full text-muted hover:bg-accent/10 transition-colors"
