@@ -15,32 +15,28 @@ export const ThemeSwitcher: React.FC = () => {
   const { mode, toggleMode, color, setColor } = useTheme();
   const { isAuthenticated } = useAuth();
 
-  const handleThemeClick = (themeName: ThemeColor, isPremium: boolean) => {
-    if (isPremium && !isAuthenticated) {
-      window.location.href = '/api/login';
-      return;
-    }
+  const handleThemeClick = (themeName: ThemeColor) => {
     setColor(themeName);
   };
+
+  const visibleThemes = themeColors.filter(theme => !theme.premium || isAuthenticated);
 
   return (
     <div className="flex items-center space-x-4">
       <div className="flex items-center space-x-2 p-1 bg-[rgb(var(--app-bg-alt)/0.5)] rounded-full">
-        {themeColors.map((theme) => {
-          const isLocked = theme.premium && !isAuthenticated;
+        {visibleThemes.map((theme) => {
           const isSelected = color === theme.name;
           return (
             <button
               key={theme.name}
-              onClick={() => handleThemeClick(theme.name, theme.premium)}
+              onClick={() => handleThemeClick(theme.name)}
               className={`w-5 h-5 rounded-full transition-transform duration-200 ${theme.class} ${
                 isSelected
                   ? 'ring-2 ring-offset-2 ring-accent dark:ring-offset-bg-alt'
                   : 'scale-90 hover:scale-100'
-              } ${isLocked ? 'opacity-40 cursor-pointer' : ''}`}
-              aria-label={`${isLocked ? 'Log in to unlock' : isSelected ? 'Current theme:' : 'Switch to'} ${theme.name.charAt(0).toUpperCase() + theme.name.slice(1)} theme`}
+              }`}
+              aria-label={`${isSelected ? 'Current theme:' : 'Switch to'} ${theme.name.charAt(0).toUpperCase() + theme.name.slice(1)} theme`}
               aria-pressed={isSelected}
-              title={isLocked ? 'Log in to unlock premium themes' : undefined}
             />
           );
         })}
