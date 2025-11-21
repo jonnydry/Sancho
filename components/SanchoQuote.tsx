@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { getRandomSanchoQuote, SanchoQuote as SanchoQuoteType, sanchoQuotes } from '../data/sanchoQuotes';
 import { fetchSanchoQuote } from '../services/apiService';
 import { SpinnerIcon } from './icons/SpinnerIcon';
-import { SparklesIcon } from './icons/SparklesIcon';
+import { RefreshIcon } from './icons/RefreshIcon';
 
 // Client-side cache for quotes - persists for 3 minutes
 const CACHE_DURATION = 3 * 60 * 1000; // 3 minutes
@@ -142,7 +142,7 @@ export const SanchoQuote: React.FC = () => {
             disabled={isRefreshing}
             className="flex items-center space-x-2 px-3 py-1 text-sm text-muted hover:text-default transition-colors disabled:opacity-50"
           >
-            <SparklesIcon className="w-4 h-4" />
+            <RefreshIcon className="w-4 h-4" />
             <span>Retry</span>
           </button>
         </div>
@@ -177,7 +177,7 @@ export const SanchoQuote: React.FC = () => {
           {isRefreshing ? (
             <SpinnerIcon className="w-4 h-4 animate-spin" />
           ) : (
-            <SparklesIcon className="w-4 h-4" />
+            <RefreshIcon className="w-4 h-4" />
           )}
           <span className="hidden sm:inline">
             {isRefreshing ? 'Refreshing...' : 'New Quote'}
