@@ -67,7 +67,7 @@ export const HomePage: React.FC = () => {
     <main className="py-8 sm:py-12 md:py-16 px-4 sm:px-6 md:px-8 min-h-screen">
       <div className="max-w-5xl mx-auto">
         <div className="flex flex-col items-center mb-16">
-           <div className="w-40 h-40 sm:w-48 sm:h-48 mb-6 animate-fade-in opacity-90 grayscale hover:grayscale-0 transition-all duration-500">
+           <div className="w-56 h-56 sm:w-72 sm:h-72 mb-6 animate-fade-in opacity-90 grayscale hover:grayscale-0 transition-all duration-500">
             <img 
               src="/sancho-logo.png" 
               alt="Sancho Logo" 
