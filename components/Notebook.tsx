@@ -57,13 +57,13 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
 
       {/* Sidebar */}
       <div
-        className="fixed top-0 right-0 h-full w-full max-w-md bg-[rgb(var(--app-bg-alt)/0.8)] backdrop-blur-md border-l border-[rgb(var(--app-border)/0.5)] z-50 shadow-2xl flex flex-col animate-slide-in-right"
+        className="fixed top-0 right-0 h-full w-full max-w-md bg-bg/80 backdrop-blur-md border-l border-default/50 z-50 shadow-2xl flex flex-col animate-slide-in-right"
         role="dialog"
         aria-modal="true"
         aria-labelledby="notebook-title"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-[rgb(var(--app-border)/0.5)]">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-default/50">
           <div className="flex items-center gap-2">
             <BookPenIcon className="w-5 h-5 text-default" />
             <h2 id="notebook-title" className="text-lg sm:text-xl font-bold text-default">
