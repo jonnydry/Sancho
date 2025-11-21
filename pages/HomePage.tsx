@@ -32,6 +32,10 @@ export const HomePage: React.FC = () => {
     loadData();
   }, []);
 
+  useEffect(() => {
+    setItemsToShow(10);
+  }, [searchQuery, activeFilter]);
+
   const handleCardClick = (item: PoetryItem) => {
     setModalItem(item);
   };
