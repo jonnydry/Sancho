@@ -4,7 +4,7 @@ import OpenAI from 'openai';
 import { setupAuth, isAuthenticated, getFrontendOrigin } from './server/replitAuth.js';
 import { storage } from './server/storage.js';
 import { pool } from './server/db.js';
-import { logger } from '../utils/logger.ts';
+import { logger } from './utils/logger.js';
 
 // In-memory rate limiter
 // NOTE: In Autoscale deployments, each instance maintains its own rate limit store.

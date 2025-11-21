@@ -113,7 +113,7 @@ export const HomePage: React.FC = () => {
               <div className="text-center mt-16">
                 <button
                   onClick={handleShowMore}
-                  className="px-8 py-3 border border-default text-default text-sm font-semibold hover:bg-accent hover:text-accent-text hover:border-accent transition-all duration-300"
+                  className="px-8 py-3 border border-white text-white text-sm font-semibold bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 hover:border-white/80 transition-all duration-300"
                   aria-label="Show more poetry items"
                 >
                   LOAD MORE
