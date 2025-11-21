@@ -40,9 +40,18 @@ export const Header: React.FC = () => {
                 <span className="text-xs text-muted">...</span>
               ) : isAuthenticated && user ? (
                 <>
-                  <span className="hidden sm:inline text-xs text-muted truncate max-w-[100px]">
-                    {user.email || 'User'}
-                  </span>
+                  {user.profileImageUrl ? (
+                    <img 
+                      src={user.profileImageUrl} 
+                      alt={user.email || 'User profile'}
+                      className="w-6 h-6 rounded-full object-cover"
+                      title={user.email || 'User'}
+                    />
+                  ) : (
+                    <div className="w-6 h-6 rounded-full bg-accent/20 flex items-center justify-center text-xs text-default">
+                      {user.firstName?.charAt(0) || user.email?.charAt(0) || 'U'}
+                    </div>
+                  )}
                   <a
                     href="/api/logout"
                     className="text-xs text-default hover:text-accent hover:underline underline-offset-4 transition-all"
