@@ -68,6 +68,14 @@ The project utilizes a dual-server architecture with a React frontend (Vite, Por
 
 ### Recent Updates
 
+#### 2025-11-21 - Mobile Formatting Enhancements
+- **Header Optimization**: Reduced spacing gaps on mobile (gap-4 → gap-8 on larger screens) for better header layout
+- **Search Filter**: Adjusted tab gaps and font sizes for optimal mobile readability (text-xs → text-sm responsive scaling)
+- **About Page**: Improved mobile padding (p-5 → p-8 responsive), scaled logo and titles appropriately for small screens
+- **Sancho Quote**: Optimized horizontal padding for mobile devices (px-4 → px-8 responsive)
+- **Modal**: Enhanced padding hierarchy (p-5 sm:p-6 md:p-8) for better content display on all screen sizes
+- **Layout Stability**: Removed potential scroll jitter from filter tabs, maintaining clean bottom borders
+
 #### 2025-11-20 - AI Model Optimization
 - **Multi-Model Strategy**: Implemented different Grok models for different use cases to optimize both speed and quality
 - **Sancho Quotes**: Switched to `grok-3-mini` for 40-50% faster quote generation on page load
