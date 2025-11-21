@@ -108,7 +108,7 @@ export const HomePage: React.FC = () => {
               <div className="text-center mt-8">
                 <button
                   onClick={handleShowMore}
-                  className="px-6 py-3 bg-accent dark:bg-accent/80 text-white font-semibold rounded-lg hover:bg-accent/90 dark:hover:bg-accent/70 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 dark:focus-visible:ring-offset-bg-alt"
+                  className="px-6 py-3 bg-accent text-accent-text dark:bg-white/15 dark:text-white font-semibold rounded-lg hover:bg-accent-hover dark:hover:bg-white/25 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 dark:focus-visible:ring-offset-bg-alt"
                   aria-label="Show more poetry items"
                 >
                   Show More
