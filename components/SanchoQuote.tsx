@@ -151,8 +151,23 @@ export const SanchoQuote: React.FC = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto my-8 p-6 border border-default rounded-2xl bg-alt/50 animate-fade-in">
-      <div className="flex items-center justify-end mb-4">
+    <div className="max-w-2xl mx-auto my-8 p-6 border border-default rounded-2xl bg-alt/50 animate-fade-in flex flex-col">
+      <div className="flex items-start gap-3 flex-1">
+        <div className="text-3xl text-muted leading-none">"</div>
+        <div className="flex-1">
+          <p className="text-default italic leading-relaxed">
+            {quote.quote}
+          </p>
+          {quote.context && (
+            <p className="text-sm text-muted mt-3">
+              — Sancho Panza, <span className="italic">Don Quixote</span> ({quote.context})
+            </p>
+          )}
+        </div>
+        <div className="text-3xl text-muted leading-none self-start">"</div>
+      </div>
+
+      <div className="flex items-center justify-end mt-4">
         <button
           onClick={handleRefresh}
           disabled={isRefreshing || isLoading}
@@ -168,21 +183,6 @@ export const SanchoQuote: React.FC = () => {
             {isRefreshing ? 'Refreshing...' : 'New Quote'}
           </span>
         </button>
-      </div>
-
-      <div className="flex items-start gap-3">
-        <div className="text-3xl text-muted leading-none">"</div>
-        <div className="flex-1">
-          <p className="text-default italic leading-relaxed">
-            {quote.quote}
-          </p>
-          {quote.context && (
-            <p className="text-sm text-muted mt-3">
-              — Sancho Panza, <span className="italic">Don Quixote</span> ({quote.context})
-            </p>
-          )}
-        </div>
-        <div className="text-3xl text-muted leading-none self-end">"</div>
       </div>
     </div>
   );

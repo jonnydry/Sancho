@@ -15,7 +15,9 @@ export default defineConfig(({ mode }) => {
         host: '0.0.0.0',
         allowedHosts: true,
         hmr: {
-          clientPort: 5000,
+          protocol: 'wss',
+          host: 'localhost',
+          port: 5000,
         },
         proxy: {
           '/api': {
