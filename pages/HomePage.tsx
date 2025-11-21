@@ -11,6 +11,7 @@ export const HomePage: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<'all' | 'Form' | 'Meter' | 'Device'>('all');
   const [allData, setAllData] = useState<PoetryItem[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
+  const [itemsToShow, setItemsToShow] = useState(10);
 
   useEffect(() => {
     const loadData = async () => {
@@ -38,7 +39,11 @@ export const HomePage: React.FC = () => {
   const handleCloseModal = () => {
     setModalItem(null);
   };
-  
+
+  const handleShowMore = () => {
+    setItemsToShow(prev => prev + 10);
+  };
+
   const filteredData = useMemo(() => {
     return allData
       .filter(item => {
@@ -49,6 +54,10 @@ export const HomePage: React.FC = () => {
         item.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
   }, [searchQuery, activeFilter, allData]);
+
+  const displayedData = useMemo(() => {
+    return filteredData.slice(0, itemsToShow);
+  }, [filteredData, itemsToShow]);
 
   return (
     <main className="py-4 sm:py-6 md:py-8 px-3 sm:px-4 md:px-6">
@@ -79,17 +88,30 @@ export const HomePage: React.FC = () => {
           <div className="text-center mt-16">
             <p className="text-muted">Loading poetry database...</p>
           </div>
-        ) : filteredData.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 items-stretch">
-            {filteredData.map((item, index) => (
-              <PoetryCard
-                key={item.name}
-                item={item}
-                onSelect={handleCardClick}
-                animationIndex={index}
-              />
-            ))}
-          </div>
+        ) : displayedData.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 items-stretch">
+              {displayedData.map((item, index) => (
+                <PoetryCard
+                  key={item.name}
+                  item={item}
+                  onSelect={handleCardClick}
+                  animationIndex={index}
+                />
+              ))}
+            </div>
+            {itemsToShow < filteredData.length && (
+              <div className="text-center mt-8">
+                <button
+                  onClick={handleShowMore}
+                  className="px-6 py-3 bg-accent text-white font-semibold rounded-lg hover:bg-accent/90 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 dark:focus-visible:ring-offset-bg-alt"
+                  aria-label="Show more poetry items"
+                >
+                  Show More
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center mt-16">
             <h3 className="text-xl font-semibold text-default">No Results Found</h3>
