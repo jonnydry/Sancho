@@ -11,8 +11,8 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      <header className="sticky top-0 w-full bg-bg border-b border-default z-50">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="sticky top-0 w-full bg-bg border-b border-default z-50 px-4 sm:px-6 md:px-8">
+        <div className="max-w-5xl mx-auto py-4 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link to="/" className="text-lg font-bold text-default hover:text-accent transition-colors tracking-tight">
               Sancho.ref
