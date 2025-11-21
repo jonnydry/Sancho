@@ -13,12 +13,12 @@ export const Header: React.FC = () => {
     <>
       <header className="sticky top-0 w-full bg-bg border-b border-default z-50 px-4 sm:px-6 md:px-8">
         <div className="max-w-5xl mx-auto py-4 flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <Link to="/" className="text-lg font-bold text-default hover:text-accent transition-colors tracking-tight">
+          <div className="flex items-baseline gap-8">
+            <Link to="/" className="text-lg font-bold text-default hover:text-accent transition-colors tracking-tight leading-none">
               Sancho.ref
             </Link>
             <nav className="flex gap-6">
-              <Link to="/about" className="text-sm text-muted hover:text-default hover:underline underline-offset-4 transition-all">
+              <Link to="/about" className="text-sm text-muted hover:text-default hover:underline underline-offset-4 transition-all leading-none">
                 About
               </Link>
             </nav>
