@@ -106,6 +106,7 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
                     item={item}
                     onSelect={handleCardClick}
                     animationIndex={index}
+                    variant="matte"
                   />
                 </div>
               ))}

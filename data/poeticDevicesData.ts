@@ -10,7 +10,10 @@ export const poeticDevicesData: PoetryItem[] = [
       'States one thing IS another',
       'Creates a powerful image or connection'
     ],
-    exampleSnippet: 'All the world\'s a stage, / And all the men and women merely players;'
+    exampleSnippet: 'All the world\'s a stage, / And all the men and women merely players;',
+    tags: ['figurative language', 'comparison'],
+    seeAlso: ['Simile', 'Extended Metaphor', 'Conceit', 'Symbolism'],
+    notes: ['Metaphors create deeper meaning than similes by asserting identity rather than similarity. They can be simple (one comparison) or extended (developed throughout a work).']
   },
   {
     name: 'Simile',
@@ -32,7 +35,10 @@ export const poeticDevicesData: PoetryItem[] = [
       'Creates musicality and rhythm',
       'Can emphasize certain words'
     ],
-    exampleSnippet: 'From forth the fatal loins of these two foes; / A pair of star-cross\'d lovers take their life.'
+    exampleSnippet: 'From forth the fatal loins of these two foes; / A pair of star-cross\'d lovers take their life.',
+    tags: ['sound device', 'repetition'],
+    seeAlso: ['Assonance', 'Consonance', 'Onomatopoeia', 'Euphony'],
+    notes: ['Alliteration creates rhythm and can make phrases memorable. Overuse can sound sing-songy. It\'s most effective when it enhances meaning rather than just decoration.']
   },
   {
     name: 'Personification',
@@ -87,7 +93,10 @@ export const poeticDevicesData: PoetryItem[] = [
       'Creates a sense of flow or urgency',
       'Contrasts with end-stopped lines'
     ],
-    exampleSnippet: 'so much depends / upon / a red wheel / barrow / glazed with rain / water / beside the white / chickens.'
+    exampleSnippet: 'so much depends / upon / a red wheel / barrow / glazed with rain / water / beside the white / chickens.',
+    tags: ['structural device', 'line break'],
+    seeAlso: ['End-Stopped Line', 'Caesura', 'Caesura Variation'],
+    notes: ['Enjambment creates forward momentum and can create surprise by delaying important words. Too much can make a poem feel rushed; too little can feel choppy.']
   },
   {
     name: 'Hyperbole',
@@ -142,7 +151,10 @@ export const poeticDevicesData: PoetryItem[] = [
       'The whole stands for a part (e.g., "the law" for police officers)',
       'Often used to create a more vivid image'
     ],
-    exampleSnippet: 'Friends, Romans, countrymen, lend me your ears;'
+    exampleSnippet: 'Friends, Romans, countrymen, lend me your ears;',
+    tags: ['figurative language', 'metonymy-related'],
+    seeAlso: ['Metonymy', 'Metaphor', 'Symbolism'],
+    notes: ['Synecdoche involves a part-whole relationship. Metonymy involves association (like "crown" for royalty). Both are types of substitution, but synecdoche is more specific.']
   },
   {
     name: 'Caesura',
@@ -154,7 +166,10 @@ export const poeticDevicesData: PoetryItem[] = [
       'Creates rhythm and emphasis',
       'Masculine caesura: after a stressed syllable; Feminine: after unstressed'
     ],
-    exampleSnippet: 'To be, or not to be: || that is the question' // || marks the caesura
+    exampleSnippet: 'To be, or not to be: || that is the question', // || marks the caesura
+    tags: ['structural device', 'rhythm'],
+    seeAlso: ['Enjambment', 'End-Stopped Line', 'Caesura Variation'],
+    notes: ['Caesurae create natural pauses and can emphasize words on either side. They break up the rhythm and can create dramatic tension or reflection.']
   },
   {
     name: 'Anaphora',
@@ -166,7 +181,10 @@ export const poeticDevicesData: PoetryItem[] = [
       'Builds emotional intensity',
       'Common in speeches and persuasive writing'
     ],
-    exampleSnippet: 'We shall fight on the beaches, we shall fight on the landing grounds, we shall fight in the fields...'
+    exampleSnippet: 'We shall fight on the beaches, we shall fight on the landing grounds, we shall fight in the fields...',
+    tags: ['repetition', 'structural device'],
+    seeAlso: ['Epistrophe', 'Repetition', 'Refrain', 'Anadiplosis'],
+    notes: ['Anaphora creates powerful emphasis and builds momentum. It\'s the opposite of epistrophe (repetition at the end). Both can be used together for even greater effect.']
   },
   {
     name: 'Imagery',
@@ -214,7 +232,10 @@ export const poeticDevicesData: PoetryItem[] = [
       'Examples: "the crown" for royalty, "the White House" for U.S. presidency',
       'Creates concise, vivid expression'
     ],
-    exampleSnippet: 'The pen is mightier than the sword' // Pen = writing; sword = military force
+    exampleSnippet: 'The pen is mightier than the sword', // Pen = writing; sword = military force
+    tags: ['figurative language', 'metonymy-related'],
+    seeAlso: ['Synecdoche', 'Metaphor', 'Symbolism'],
+    notes: ['Metonymy uses association (crown = royalty), while synecdoche uses part-whole relationships (wheels = car). Both create concise, vivid expression through substitution.']
   },
   {
     name: 'Paradox',
@@ -362,5 +383,306 @@ export const poeticDevicesData: PoetryItem[] = [
       'Can create double meanings'
     ],
     exampleSnippet: 'Ask for me tomorrow, and you shall find me a grave man' // Mercutio in Romeo & Juliet (grave = serious/tomb)
+  },
+  {
+    name: 'Allegory',
+    type: 'Device',
+    description: 'A narrative in which characters, events, and settings represent abstract ideas or moral qualities, creating a second level of meaning beneath the surface story.',
+    structure: [
+      'Characters and events symbolize abstract concepts',
+      'Two levels of meaning: literal and symbolic',
+      'Extended metaphor throughout the work',
+      'Often used to teach moral or political lessons',
+      'Examples: The Pilgrim\'s Progress, Animal Farm'
+    ],
+    exampleSnippet: 'All animals are equal, but some animals are more equal than others.' // Animal Farm allegory
+  },
+  {
+    name: 'Litotes',
+    type: 'Device',
+    description: 'A figure of speech that uses understatement by negating the opposite, often for ironic or emphatic effect. A form of understatement.',
+    structure: [
+      'Expresses a positive by negating its opposite',
+      'Creates understatement and emphasis',
+      'Often used for modesty or irony',
+      'Examples: "not bad" (meaning good), "not uncommon"',
+      'Common in formal and academic writing'
+    ],
+    exampleSnippet: 'He was not unfamiliar with the works of Shakespeare.' // Meaning: he was very familiar
+  },
+  {
+    name: 'Understatement',
+    type: 'Device',
+    description: 'A figure of speech that deliberately represents something as less than it is, often for humorous, ironic, or emphatic effect.',
+    structure: [
+      'Deliberately minimizes the importance or magnitude',
+      'Creates irony or emphasis through restraint',
+      'Opposite of hyperbole',
+      'Can be humorous or serious',
+      'Common in British humor and satire'
+    ],
+    exampleSnippet: 'It\'s just a flesh wound.' // When a limb has been cut off (Monty Python)
+  },
+  {
+    name: 'Rhetorical Question',
+    type: 'Device',
+    description: 'A question asked not to receive an answer but to make a point, create emphasis, or provoke thought. The answer is implied or obvious.',
+    structure: [
+      'Question that doesn\'t require an answer',
+      'Used for emphasis or to make a point',
+      'Answer is implied or obvious',
+      'Common in speeches and persuasive writing',
+      'Engages the reader or listener'
+    ],
+    exampleSnippet: 'Shall I compare thee to a summer\'s day? / Thou art more lovely and more temperate.'
+  },
+  {
+    name: 'Synesthesia',
+    type: 'Device',
+    description: 'A figure of speech in which one sense is described using terms from another sense, blending sensory experiences.',
+    structure: [
+      'Mixing of different senses',
+      'Describes one sense with another',
+      'Creates vivid, unusual imagery',
+      'Examples: "loud colors," "sweet sound," "cold silence"',
+      'Common in Symbolist and Modernist poetry'
+    ],
+    exampleSnippet: 'The sound of colors, the taste of music, the feel of scents'
+  },
+  {
+    name: 'Polysyndeton',
+    type: 'Device',
+    description: 'The deliberate use of multiple conjunctions (especially "and") in close succession, creating a sense of accumulation and rhythm.',
+    structure: [
+      'Multiple conjunctions in succession',
+      'Creates a sense of accumulation',
+      'Slows the pace and adds emphasis',
+      'Opposite of asyndeton',
+      'Common in lists and descriptions'
+    ],
+    exampleSnippet: 'We have ships and men and money and stores.'
+  },
+  {
+    name: 'Asyndeton',
+    type: 'Device',
+    description: 'The deliberate omission of conjunctions between words, phrases, or clauses, creating a faster pace and sense of urgency or accumulation.',
+    structure: [
+      'Omission of conjunctions (and, or, but)',
+      'Creates a faster, more urgent pace',
+      'Opposite of polysyndeton',
+      'Common in lists and parallel structures',
+      'Adds emphasis through brevity'
+    ],
+    exampleSnippet: 'I came, I saw, I conquered.' // Instead of "I came, and I saw, and I conquered"
+  },
+  {
+    name: 'Pathetic Fallacy',
+    type: 'Device',
+    description: 'The attribution of human emotions and characteristics to nature or inanimate objects, often reflecting the mood of the characters or narrator.',
+    structure: [
+      'Nature reflects human emotions',
+      'Weather, landscape mirror feelings',
+      'Common in Romantic poetry',
+      'Different from personification (which is more general)',
+      'Creates atmosphere and mood'
+    ],
+    exampleSnippet: 'The sullen wind was soon awake, / It tore the elm-tops down for spite'
+  },
+  {
+    name: 'Motif',
+    type: 'Device',
+    description: 'A recurring element—such as an image, symbol, word, phrase, or idea—that appears throughout a work and helps develop its themes.',
+    structure: [
+      'Recurring element throughout the work',
+      'Can be an image, symbol, word, or idea',
+      'Helps develop themes and create unity',
+      'Different from symbol (motif is repeated, symbol may appear once)',
+      'Creates patterns and connections'
+    ],
+    exampleSnippet: '[A recurring image like "darkness" or "water" appearing throughout a poem or collection]'
+  },
+  {
+    name: 'Conceit',
+    type: 'Device',
+    description: 'An extended metaphor that compares two very dissimilar things in a surprising or elaborate way, often throughout an entire poem.',
+    structure: [
+      'Extended, elaborate metaphor',
+      'Compares very dissimilar things',
+      'Often surprising or unconventional',
+      'Developed throughout a poem or section',
+      'Common in Metaphysical poetry'
+    ],
+    exampleSnippet: 'If they be two, they are two so / As stiff twin compasses are two; / Thy soul, the fixed foot, makes no show / To move, but doth, if the other do.'
+  },
+  {
+    name: 'Catalog',
+    type: 'Device',
+    description: 'A list of people, things, or attributes, often used to create emphasis, build rhythm, or provide comprehensive description.',
+    structure: [
+      'A list or enumeration of items',
+      'Creates emphasis through accumulation',
+      'Builds rhythm and momentum',
+      'Can be used for description or emphasis',
+      'Common in epic poetry and free verse'
+    ],
+    exampleSnippet: 'I am the poet of the Body and I am the poet of the Soul, / The pleasures of heaven are with me and the pains of hell are with me'
+  },
+  {
+    name: 'Extended Metaphor',
+    type: 'Device',
+    description: 'A metaphor that is developed over several lines or throughout an entire poem, creating a sustained comparison.',
+    structure: [
+      'Metaphor developed over multiple lines',
+      'Sustained comparison throughout',
+      'More elaborate than a simple metaphor',
+      'Creates deeper meaning and imagery',
+      'Common in longer poems'
+    ],
+    exampleSnippet: 'Hope is the thing with feathers / That perches in the soul, / And sings the tune without the words, / And never stops at all'
+  },
+  {
+    name: 'Zeugma',
+    type: 'Device',
+    description: 'A figure of speech in which a word (usually a verb or adjective) applies to two or more nouns in different senses, often creating a surprising or humorous effect.',
+    structure: [
+      'One word applies to multiple nouns',
+      'Word has different meanings for each noun',
+      'Creates surprise or humor',
+      'Common in witty or clever writing',
+      'Examples: "She broke his car and his heart"'
+    ],
+    exampleSnippet: 'She opened her door and her heart to the homeless boy.'
+  },
+  {
+    name: 'Antithesis',
+    type: 'Device',
+    description: 'A figure of speech in which contrasting ideas are placed in parallel grammatical structures, creating a balanced opposition.',
+    structure: [
+      'Contrasting ideas in parallel structure',
+      'Creates balance and emphasis',
+      'Highlights the contrast',
+      'Common in speeches and persuasive writing',
+      'Memorable and quotable'
+    ],
+    exampleSnippet: 'It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness'
+  },
+  {
+    name: 'Epanalepsis',
+    type: 'Device',
+    description: 'A figure of speech in which the beginning of a clause or sentence is repeated at the end of that same clause or sentence.',
+    structure: [
+      'Repetition of word(s) at beginning and end',
+      'Creates emphasis and circularity',
+      'Can create a sense of completion',
+      'Common in speeches and poetry',
+      'Examples: "The king is dead, long live the king"'
+    ],
+    exampleSnippet: 'Blood hath bought blood, and blows have answered blows'
+  },
+  {
+    name: 'Anadiplosis',
+    type: 'Device',
+    description: 'A figure of speech in which the last word of one clause or sentence is repeated at the beginning of the next, creating a linking effect.',
+    structure: [
+      'Last word of one phrase repeated at start of next',
+      'Creates linking and progression',
+      'Builds momentum and emphasis',
+      'Common in speeches and poetry',
+      'Creates a chain-like effect'
+    ],
+    exampleSnippet: 'Fear leads to anger. Anger leads to hate. Hate leads to suffering.'
+  },
+  {
+    name: 'Epanorthosis',
+    type: 'Device',
+    description: 'A figure of speech in which a speaker corrects or qualifies a previous statement, often for emphasis or clarification.',
+    structure: [
+      'Correction or qualification of previous statement',
+      'Creates emphasis through self-correction',
+      'Shows thought process or uncertainty',
+      'Common in dramatic monologues',
+      'Adds realism and nuance'
+    ],
+    exampleSnippet: 'I saw him—no, I thought I saw him—in the crowd.'
+  },
+  {
+    name: 'Metaphysical Conceit',
+    type: 'Device',
+    description: 'A type of conceit characteristic of Metaphysical poetry, featuring elaborate, intellectual comparisons between seemingly dissimilar things.',
+    origin: 'Developed by 17th-century Metaphysical poets like John Donne, Andrew Marvell, and George Herbert.',
+    structure: [
+      'Elaborate, intellectual comparison',
+      'Compares very dissimilar things',
+      'Often uses scientific or philosophical concepts',
+      'Surprising and unconventional',
+      'Requires intellectual engagement'
+    ],
+    exampleSnippet: 'Our two souls therefore, which are one, / Though I must go, endure not yet / A breach, but an expansion, / Like gold to airy thinness beat.'
+  },
+  {
+    name: 'Tone',
+    type: 'Device',
+    description: 'The attitude or emotional stance of the speaker or narrator toward the subject matter, conveyed through word choice, imagery, and style.',
+    structure: [
+      'Author\'s attitude toward subject',
+      'Conveyed through diction, imagery, syntax',
+      'Can be formal, informal, serious, humorous, etc.',
+      'Different from mood (which is the reader\'s feeling)',
+      'Essential element of poetic voice'
+    ],
+    exampleSnippet: '[The overall emotional quality of a poem, such as melancholic, joyful, ironic, or contemplative]'
+  },
+  {
+    name: 'Voice',
+    type: 'Device',
+    description: 'The distinctive style or personality of the speaker in a poem, created through word choice, syntax, tone, and point of view.',
+    structure: [
+      'Distinctive style of the speaker',
+      'Created through diction, syntax, tone',
+      'Can be the poet\'s voice or a persona',
+      'Gives the poem its unique character',
+      'Essential for establishing point of view'
+    ],
+    exampleSnippet: '[The unique way a poem "sounds" - formal, conversational, dramatic, etc.]'
+  },
+  {
+    name: 'In Medias Res',
+    type: 'Device',
+    description: 'A narrative technique in which a story begins in the middle of the action, rather than at the beginning, creating immediacy and intrigue.',
+    origin: 'From Latin "in the middle of things." A technique used in classical epics like The Iliad and The Odyssey.',
+    structure: [
+      'Story begins in the middle of action',
+      'Background information provided later',
+      'Creates immediacy and engagement',
+      'Common in epic poetry and modern narratives',
+      'Requires flashback or exposition later'
+    ],
+    exampleSnippet: '[A poem that begins with action already in progress, then fills in context]'
+  },
+  {
+    name: 'End-Stopped Line',
+    type: 'Device',
+    description: 'A line of poetry that ends with a punctuation mark, creating a pause and completing a thought. The opposite of enjambment.',
+    structure: [
+      'Line ends with punctuation',
+      'Creates a pause and completion',
+      'Opposite of enjambment',
+      'Common in formal poetry',
+      'Creates a more measured, controlled rhythm'
+    ],
+    exampleSnippet: 'Shall I compare thee to a summer\'s day? / Thou art more lovely and more temperate.'
+  },
+  {
+    name: 'Caesura Variation',
+    type: 'Device',
+    description: 'The strategic variation of pauses within lines of verse, creating rhythm, emphasis, and emotional effect beyond the basic metrical pattern.',
+    structure: [
+      'Variation of pauses within lines',
+      'Creates rhythm and emphasis',
+      'Can be marked by punctuation or natural speech pauses',
+      'Adds complexity to meter',
+      'Common in dramatic and narrative poetry'
+    ],
+    exampleSnippet: 'To be, || or not to be: || that is the question' // || marks caesurae
   }
 ];

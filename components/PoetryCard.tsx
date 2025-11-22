@@ -8,6 +8,7 @@ interface PoetryCardProps {
   item: PoetryItem;
   onSelect: (item: PoetryItem) => void;
   animationIndex: number;
+  variant?: 'default' | 'matte';
 }
 
 const Tag: React.FC<{ type: PoetryItem['type'] }> = ({ type }) => {
@@ -32,14 +33,18 @@ const Tag: React.FC<{ type: PoetryItem['type'] }> = ({ type }) => {
 };
 
 
-export const PoetryCard: React.FC<PoetryCardProps> = ({ item, onSelect, animationIndex }) => {
+export const PoetryCard: React.FC<PoetryCardProps> = ({ item, onSelect, animationIndex, variant = 'default' }) => {
   const { isAuthenticated } = useAuth();
+
+  // Default variant uses the original background (bg-alt) to maintain visual consistency
+  // Matte variant explicitly uses bg-alt for notebook cards
+  const bgClass = 'bg-[rgb(var(--app-bg-alt))]';
 
   return (
     <div className="relative h-full group">
       <div
         onClick={() => onSelect(item)}
-        className="w-full h-full text-left bg-[rgb(var(--app-bg-alt))] border border-default hover:border-accent rounded-sm transition-all duration-300 ease-out animate-fade-in cursor-pointer p-5 flex flex-col shadow-sm"
+        className={`w-full h-full text-left ${bgClass} border border-default hover:border-accent rounded-sm transition-all duration-300 ease-out animate-fade-in cursor-pointer p-5 flex flex-col shadow-sm`}
         style={{ animationDelay: `${animationIndex * 50}ms` }}
         role="button"
         tabIndex={0}
@@ -65,9 +70,27 @@ export const PoetryCard: React.FC<PoetryCardProps> = ({ item, onSelect, animatio
           />
         </div>
 
-        <p className="text-muted text-sm font-light leading-relaxed mb-6 line-clamp-3">
+        <p className="text-muted text-sm font-light leading-relaxed mb-4 line-clamp-3">
           {item.description}
         </p>
+
+        {item.tags && item.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {item.tags.slice(0, 3).map((tag, index) => (
+              <span
+                key={index}
+                className="px-1.5 py-0.5 text-[9px] bg-bg-alt/30 border border-default/20 rounded text-muted/70"
+              >
+                {tag}
+              </span>
+            ))}
+            {item.tags.length > 3 && (
+              <span className="px-1.5 py-0.5 text-[9px] text-muted/50">
+                +{item.tags.length - 3}
+              </span>
+            )}
+          </div>
+        )}
         
         <div className="mt-auto pt-4 border-t border-[rgb(var(--app-border)/0.4)]">
           <p className="text-xs text-muted font-mono italic truncate opacity-70 group-hover:opacity-100 transition-opacity">

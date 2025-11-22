@@ -13,7 +13,10 @@ export const poetryData: PoetryItem[] = [
       'Shakespearean: ABAB CDCD EFEF GG',
       'Petrarchan: ABBAABBA CDECDE or CDCDCD'
     ],
-    exampleSnippet: 'Shall I compare thee to a summer’s day? / Thou art more lovely and more temperate...'
+    exampleSnippet: 'Shall I compare thee to a summer's day? / Thou art more lovely and more temperate...',
+    tags: ['fixed form', 'lyric', 'traditional'],
+    seeAlso: ['Iambic Pentameter', 'Volta', 'Couplet', 'Quatrain'],
+    notes: ['The volta (turn) occurs at line 9 in Petrarchan sonnets and before the final couplet in Shakespearean sonnets.']
   },
   {
     name: 'Haiku',
@@ -25,7 +28,10 @@ export const poetryData: PoetryItem[] = [
       'Syllable structure: 5-7-5',
       'Often focuses on nature'
     ],
-    exampleSnippet: 'An old silent pond... / A frog jumps into the pond, / splash! Silence again.'
+    exampleSnippet: 'An old silent pond... / A frog jumps into the pond, / splash! Silence again.',
+    tags: ['fixed form', 'syllabic', 'nature'],
+    seeAlso: ['Tanka', 'Senryu', 'Syllabic Verse'],
+    notes: ['Traditional haiku includes a kigo (seasonal reference) and a kireji (cutting word). English haiku often focuses on nature and a moment of insight.']
   },
   {
     name: 'Villanelle',
@@ -38,7 +44,10 @@ export const poetryData: PoetryItem[] = [
       'Concluding quatrain (4-line stanza)',
       'Two rhymes and two refrains'
     ],
-    exampleSnippet: 'Do not go gentle into that good night, / Old age should burn and rave at close of day...'
+    exampleSnippet: 'Do not go gentle into that good night, / Old age should burn and rave at close of day...',
+    tags: ['fixed form', 'repetition', 'lyric'],
+    seeAlso: ['Refrain', 'Repetition', 'Tercet', 'Terza Rima'],
+    notes: ['The two refrains create a haunting, obsessive quality. Choose refrains that can bear repetition and gain meaning with each appearance.']
   },
   {
     name: 'Limerick',
@@ -64,7 +73,10 @@ export const poetryData: PoetryItem[] = [
       'One 3-line concluding stanza (envoi)',
       'End-words repeat in a spiral pattern'
     ],
-    exampleSnippet: 'September rain falls on the house. / In the failing light, the old grandmother...'
+    exampleSnippet: 'September rain falls on the house. / In the failing light, the old grandmother...',
+    tags: ['fixed form', 'repetition', 'complex'],
+    seeAlso: ['Repetition', 'Refrain', 'Villanelle', 'Pantoum'],
+    notes: ['The end-words follow a specific pattern: 123456, 615243, 364125, 532614, 451362, 246531, then all six in the envoi. Choose end-words that can bear repetition and shift meaning.']
   },
   {
     name: 'Ode',
@@ -199,7 +211,10 @@ export const poetryData: PoetryItem[] = [
       'Lines 2 & 4 of a stanza are repeated as lines 1 & 3 of the next',
       'The last stanza often uses the 1st and 3rd lines of the poem as its 2nd and 4th lines'
     ],
-    exampleSnippet: 'Theirs was a house where the noon-sun lay,/ And all the windows looked upon a lake. / It had been his; he had been here to-day; / But he was gone, for everybody’s sake.'
+    exampleSnippet: 'Theirs was a house where the noon-sun lay,/ And all the windows looked upon a lake. / It had been his; he had been here to-day; / But he was gone, for everybody's sake.',
+    tags: ['fixed form', 'repetition', 'quatrain'],
+    seeAlso: ['Repetition', 'Refrain', 'Villanelle', 'Quatrain'],
+    notes: ['The repetition creates a circular, meditative quality. Each repeated line gains new meaning in its new context. The form works well for themes of memory, time, or reflection.']
   },
   {
     name: 'Rondeau',
@@ -476,6 +491,208 @@ export const poetryData: PoetryItem[] = [
     ],
     exampleSnippet: 'Thou still unravish\'d bride of quietness, / Thou foster-child of silence and slow time...' // Keats on Grecian Urn
   },
+  {
+    name: 'List Poem',
+    type: 'Form',
+    description: 'A poem that consists of a list of items, people, places, or ideas, often without traditional narrative structure, creating meaning through accumulation and juxtaposition.',
+    origin: 'An ancient form found across cultures, from biblical psalms to modern experimental poetry. Popularized in contemporary poetry by poets like Walt Whitman.',
+    structure: [
+      'No fixed structure or rhyme scheme',
+      'Organized as a list or catalog',
+      'Items may be related or seemingly unrelated',
+      'Meaning emerges from accumulation and order',
+      'Can use repetition, parallelism, or variation'
+    ],
+    exampleSnippet: 'I celebrate myself, and sing myself, / And what I assume you shall assume, / For every atom belonging to me as good belongs to you.',
+    tags: ['free form', 'catalog', 'experimental'],
+    seeAlso: ['Catalog', 'Free Verse', 'Found Poetry'],
+    notes: ['The power of a list poem comes from selection and order. Each item should contribute to the overall effect. Juxtaposition of items creates meaning.']
+  },
+  {
+    name: 'Found Poetry',
+    type: 'Form',
+    description: 'Poetry created by taking words, phrases, or passages from other sources and reframing them as poetry, often by making changes in spacing, line breaks, or by adding or deleting text.',
+    origin: 'A 20th-century form that gained prominence with Dada and Surrealist movements. Poets like Tristan Tzara and later, in the 1960s, poets like Ronald Johnson popularized the form.',
+    structure: [
+      'Source material from existing texts (newspapers, books, advertisements, etc.)',
+      'Words rearranged, recontextualized, or minimally altered',
+      'New meaning created through selection and arrangement',
+      'Original source may be credited or remain anonymous',
+      'Can be erasure (blackout) poetry, cento, or cut-up technique'
+    ],
+    exampleSnippet: '[A poem created by selecting and rearranging words from a newspaper article or book]',
+    tags: ['experimental', 'found text', 'modern'],
+    seeAlso: ['Erasure Poetry', 'Cento', 'List Poem'],
+    notes: ['Found poetry challenges notions of authorship and creativity. The poet\'s skill lies in selection, arrangement, and recontextualization. Always consider copyright and attribution.']
+  },
+  {
+    name: 'Blues Poem',
+    type: 'Form',
+    description: 'A poetic form that incorporates the structure, rhythm, and themes of blues music, often featuring repetition, call-and-response patterns, and themes of struggle, loss, and resilience.',
+    origin: 'Emerged in the early 20th century, drawing from African American musical traditions. Langston Hughes was a key figure in adapting blues structure to poetry.',
+    structure: [
+      'Often uses AAB rhyme scheme (first two lines similar, third line different)',
+      'Repetition and variation of lines',
+      'Themes of hardship, love, loss, and survival',
+      'Musical rhythm and cadence',
+      'May include call-and-response elements'
+    ],
+    exampleSnippet: 'I\'ve known rivers: / I\'ve known rivers ancient as the world and older than the flow of human blood in human veins.'
+  },
+  {
+    name: 'Golden Shovel',
+    type: 'Form',
+    description: 'A contemporary form invented by Terrance Hayes, where each word of a line (or lines) from an existing poem becomes the end word of each line in the new poem, reading vertically to reveal the source.',
+    origin: 'Invented by Terrance Hayes in 2010, inspired by Gwendolyn Brooks\' poem "We Real Cool." The form pays homage to existing poems while creating new work.',
+    structure: [
+      'Select a line or lines from an existing poem',
+      'Each word of the source becomes the end word of a line in the new poem',
+      'The source text is read vertically down the right side',
+      'The new poem must make sense horizontally',
+      'Source poem is typically credited'
+    ],
+    exampleSnippet: '[A poem where the end words, read vertically, spell out: "We real cool. We / Left school. We"]'
+  },
+  {
+    name: 'Erasure Poetry',
+    type: 'Form',
+    description: 'A form of found poetry created by erasing or blacking out words from an existing text, leaving behind selected words that form a new poem.',
+    origin: 'Gained prominence in the 1960s with poets like Ronald Johnson, though similar techniques existed earlier. Popularized by contemporary poets like Mary Ruefle and Austin Kleon.',
+    structure: [
+      'Start with an existing text (book, article, etc.)',
+      'Erase or black out unwanted words',
+      'Remaining words form the new poem',
+      'Visual presentation often shows the erasure',
+      'Original source is typically credited'
+    ],
+    exampleSnippet: '[A poem created by blacking out most words in a page, leaving only selected words visible]'
+  },
+  {
+    name: 'Cento',
+    type: 'Form',
+    description: 'A poem composed entirely of lines taken from other poems by different authors, arranged to create a new work. The name comes from the Latin word for "patchwork."',
+    origin: 'An ancient form dating back to classical times. The term "cento" comes from Latin, meaning a garment made of patches. Popular in medieval times and revived in modern experimental poetry.',
+    structure: [
+      'Composed entirely of lines from other poems',
+      'Each line must be from a different source (or clearly attributed)',
+      'Lines arranged to create new meaning',
+      'Original sources should be credited',
+      'No fixed length or structure'
+    ],
+    exampleSnippet: '[A poem made entirely of lines from Shakespeare, Dickinson, Frost, etc., arranged to tell a new story]'
+  },
+  {
+    name: 'Aubade',
+    type: 'Form',
+    description: 'A poem or song about lovers parting at dawn, or more broadly, a morning love song or poem about the dawn.',
+    origin: 'A medieval French form, popular in troubadour poetry. The term comes from "aube" (dawn). Adapted by English poets like John Donne and later by modern poets.',
+    structure: [
+      'No fixed structure or rhyme scheme',
+      'Theme: lovers parting at dawn or morning meditation',
+      'Often melancholic or bittersweet tone',
+      'May include imagery of dawn, birds, or morning light',
+      'Can be any length or form'
+    ],
+    exampleSnippet: 'Stay, O sweet, and do not rise! / The light that shines comes from thine eyes.'
+  },
+  {
+    name: 'Pastoral',
+    type: 'Form',
+    description: 'A poem that idealizes rural life and the countryside, often featuring shepherds, nature, and an escape from urban complexity. Can be any form but shares thematic concerns.',
+    origin: 'Originated in ancient Greece with Theocritus (3rd century BCE) and was developed by Virgil. Popular in Renaissance and Romantic periods.',
+    structure: [
+      'No fixed structure, but often uses traditional forms',
+      'Focus on rural life, nature, and simplicity',
+      'Often contrasts country with city life',
+      'May feature shepherds or rural characters',
+      'Themes of innocence, harmony with nature, and escape'
+    ],
+    exampleSnippet: 'Come live with me and be my love, / And we will all the pleasures prove / That valleys, groves, hills, and fields, / Woods, or steepy mountain yields.'
+  },
+  {
+    name: 'Dramatic Monologue',
+    type: 'Form',
+    description: 'A poem written in the form of a speech by a single character, revealing their personality, situation, and inner thoughts. The speaker addresses a silent listener.',
+    origin: 'Developed in the Victorian era, with Robert Browning being the master of the form. His poems like "My Last Duchess" exemplify the dramatic monologue.',
+    structure: [
+      'No fixed structure, but often blank verse or free verse',
+      'Single speaker addressing a silent listener',
+      'Reveals character through speech',
+      'Set in a specific dramatic situation',
+      'Speaker\'s words reveal more than they intend'
+    ],
+    exampleSnippet: 'That\'s my last Duchess painted on the wall, / Looking as if she were alive. I call / That piece a wonder, now...'
+  },
+  {
+    name: 'Elegiac Couplet',
+    type: 'Form',
+    description: 'A pair of lines in classical poetry, consisting of a dactylic hexameter followed by a dactylic pentameter. In English, often refers to any couplet with elegiac tone.',
+    origin: 'An ancient Greek and Latin form used for elegies and epigrams. Ovid and Catullus were masters of the form. Adapted into English with varying success.',
+    structure: [
+      'Two lines: hexameter followed by pentameter',
+      'In classical form: dactylic hexameter + dactylic pentameter',
+      'Often used for mourning or reflection',
+      'In English, often iambic pentameter couplets with elegiac themes',
+      'Creates a falling, melancholic rhythm'
+    ],
+    exampleSnippet: '[In classical form: two lines of dactylic meter, the second shorter]'
+  },
+  {
+    name: 'Rispetto',
+    type: 'Form',
+    description: 'An Italian poetic form consisting of eight lines, typically in iambic tetrameter, with a rhyme scheme of ABABABCC.',
+    origin: 'An Italian form from the Renaissance period, related to the strambotto. Used by Italian poets and later adapted into English.',
+    structure: [
+      '8 lines',
+      'Typically iambic tetrameter',
+      'Rhyme scheme: ABABABCC',
+      'Often used for love poetry',
+      'The final couplet provides resolution or emphasis'
+    ],
+    exampleSnippet: '[An eight-line poem with alternating rhymes ending in a couplet]'
+  },
+  {
+    name: 'Monorhyme',
+    type: 'Form',
+    description: 'A poem in which all lines share the same end rhyme. Can be any length, creating a strong sense of unity and emphasis.',
+    origin: 'Found across many cultures and time periods. Common in Arabic and Persian poetry, and used in English poetry for emphasis and unity.',
+    structure: [
+      'All lines end with the same rhyme sound',
+      'No fixed length or meter',
+      'Creates strong unity and emphasis',
+      'Can be challenging to maintain without becoming monotonous',
+      'Often used for humorous or emphatic effect'
+    ],
+    exampleSnippet: 'In days of old when knights were bold / And chivalry was not yet cold, / When honor was worth more than gold...'
+  },
+  {
+    name: 'Nonet',
+    type: 'Form',
+    description: 'A nine-line poem where the first line has nine syllables, the second has eight, and so on, down to the last line with one syllable.',
+    origin: 'A modern form, likely invented in the 20th century. The name comes from "nine" in various languages.',
+    structure: [
+      '9 lines',
+      'Syllable count: 9, 8, 7, 6, 5, 4, 3, 2, 1',
+      'No required rhyme scheme',
+      'Creates a descending, funnel-like effect',
+      'The single-syllable final line provides emphasis'
+    ],
+    exampleSnippet: '[A nine-line poem with descending syllable counts from nine to one]'
+  },
+  {
+    name: 'Sicilian Octave',
+    type: 'Form',
+    description: 'An eight-line stanza form with a rhyme scheme of ABABABAB, typically in iambic pentameter.',
+    origin: 'An Italian form from Sicily, used in medieval and Renaissance poetry. Adapted into English poetry.',
+    structure: [
+      '8 lines',
+      'Rhyme scheme: ABABABAB',
+      'Typically iambic pentameter',
+      'Alternating rhyme creates a flowing, song-like quality',
+      'Often used for narrative or lyric poetry'
+    ],
+    exampleSnippet: '[An eight-line stanza with alternating rhymes throughout]'
+  },
   // Meters
   {
     name: 'Iambic Trimeter',
@@ -508,7 +725,10 @@ export const poetryData: PoetryItem[] = [
       'Pattern: da-DUM da-DUM da-DUM da-DUM da-DUM',
       'Most common meter in English poetry'
     ],
-    exampleSnippet: 'But, soft! what light through yonder window breaks?'
+    exampleSnippet: 'But, soft! what light through yonder window breaks?',
+    tags: ['iambic', 'pentameter', 'traditional'],
+    seeAlso: ['Iamb', 'Blank Verse', 'Sonnet', 'Feminine Ending', 'Masculine Ending'],
+    notes: ['The most natural meter for English speech. Variations like feminine endings and substitutions (spondees, trochees) are common and add musicality.']
   },
   {
     name: 'Iambic Hexameter (Alexandrine)',
@@ -726,5 +946,117 @@ export const poetryData: PoetryItem[] = [
       'Opposite of masculine ending (ends on stressed syllable)'
     ],
     exampleSnippet: 'To be or not to be, that is the question: / Whether \'tis nobler in the mind to suffer' // "question" and "suffer" are feminine endings
+  },
+  {
+    name: 'Masculine Ending',
+    type: 'Meter',
+    description: 'A line of verse that ends on a stressed syllable, creating a strong, conclusive effect. The standard ending in most English poetry.',
+    structure: [
+      'Line ends on a stressed syllable',
+      'Standard ending in most meters',
+      'Creates a strong, conclusive effect',
+      'Opposite of feminine ending',
+      'Common in iambic pentameter'
+    ],
+    exampleSnippet: 'Shall I compare thee to a summer\'s day? / Thou art more lovely and more temperate:' // "day" and "rate" are masculine endings
+  },
+  {
+    name: 'Sprung Rhythm',
+    type: 'Meter',
+    description: 'A metrical system developed by Gerard Manley Hopkins, where each foot begins with a stressed syllable and can contain a variable number of unstressed syllables.',
+    origin: 'Developed by Gerard Manley Hopkins in the 19th century, based on Anglo-Saxon and Welsh poetry. Allows for more natural speech rhythms.',
+    structure: [
+      'Each foot begins with a stressed syllable',
+      'Variable number of unstressed syllables (0-3)',
+      'More flexible than traditional accentual-syllabic meter',
+      'Closer to natural speech patterns',
+      'Allows for greater rhythmic variety'
+    ],
+    exampleSnippet: 'I caught this morning morning\'s minion, king- / dom of daylight\'s dauphin, dapple-dawn-drawn Falcon',
+    tags: ['accentual', 'modern', 'flexible'],
+    seeAlso: ['Accentual Verse', 'Accentual-Syllabic Verse', 'Free Verse'],
+    notes: ['Sprung rhythm allows for natural speech patterns while maintaining metrical structure. It bridges traditional meter and free verse, giving poets more flexibility.']
+  },
+  {
+    name: 'Accentual Verse',
+    type: 'Meter',
+    description: 'Verse that counts only stressed syllables per line, ignoring unstressed syllables. Common in Old English poetry and modern free verse.',
+    origin: 'The traditional meter of Old English poetry (Beowulf). Revived in modern poetry as a way to break from strict accentual-syllabic patterns.',
+    structure: [
+      'Counts only stressed syllables per line',
+      'Unstressed syllables vary freely',
+      'Common pattern: 4 stresses per line',
+      'Allows natural speech rhythms',
+      'Different from accentual-syllabic (which counts both)'
+    ],
+    exampleSnippet: 'So. The / Spear-Danes / in days / gone by / and the / kings who / ruled them / had courage / and greatness.'
+  },
+  {
+    name: 'Accentual-Syllabic Verse',
+    type: 'Meter',
+    description: 'The most common type of meter in English poetry, which counts both stressed and unstressed syllables, organizing them into regular feet.',
+    origin: 'Developed in English poetry from the 14th century onward, adapting classical quantitative meters to English stress patterns.',
+    structure: [
+      'Counts both stressed and unstressed syllables',
+      'Organizes syllables into metrical feet',
+      'Most English poetry uses this system',
+      'Examples: iambic pentameter, trochaic tetrameter',
+      'Allows for precise rhythmic control'
+    ],
+    exampleSnippet: 'But soft! what light through yonder window breaks?' // Iambic pentameter: 10 syllables, 5 iambs
+  },
+  {
+    name: 'Syllabic Verse',
+    type: 'Meter',
+    description: 'Poetry that counts only the number of syllables per line, without regard to stress patterns. Common in languages like French and Japanese.',
+    origin: 'Traditional in languages with less prominent stress (French, Japanese). Adapted into English by poets like Marianne Moore.',
+    structure: [
+      'Counts only syllables per line',
+      'Stress patterns are not regulated',
+      'Common in haiku (5-7-5 syllables)',
+      'Allows for natural stress patterns',
+      'Different from accentual-syllabic verse'
+    ],
+    exampleSnippet: 'An old silent pond... / A frog jumps into the pond, / splash! Silence again.' // Haiku: 5-7-5 syllables
+  },
+  {
+    name: 'Mixed Meter',
+    type: 'Meter',
+    description: 'Poetry that combines different metrical patterns within a single poem or stanza, creating rhythmic variety and emphasis.',
+    origin: 'Used throughout poetic history, from classical poetry to modern verse. Allows poets to vary rhythm for emphasis or mood.',
+    structure: [
+      'Combines different metrical feet or patterns',
+      'Can alternate between meters',
+      'Used for emphasis or mood changes',
+      'Common in dramatic and narrative poetry',
+      'Requires careful handling to maintain coherence'
+    ],
+    exampleSnippet: 'Tyger! Tyger! burning bright / In the forests of the night; / What immortal hand or eye / Could frame thy fearful symmetry?' // Trochaic and iambic mixed
+  },
+  {
+    name: 'Headless Line',
+    type: 'Meter',
+    description: 'A line of verse that is missing the first unstressed syllable, beginning directly with a stressed syllable. Also called acephalous.',
+    structure: [
+      'Missing first unstressed syllable',
+      'Begins with a stressed syllable',
+      'Creates emphasis and variation',
+      'Common in iambic and anapestic meters',
+      'Same as acephalous line'
+    ],
+    exampleSnippet: 'Thus with the year / Seasons return' // Iambic but headless (missing first unstressed syllable)
+  },
+  {
+    name: 'Hypercatalectic',
+    type: 'Meter',
+    description: 'A line of verse that has one or more extra syllables beyond the expected metrical pattern, often creating a feminine ending.',
+    structure: [
+      'Extra syllable(s) beyond the pattern',
+      'Often creates a feminine ending',
+      'Adds variation and softness',
+      'Opposite of catalectic (missing syllables)',
+      'Common in iambic pentameter'
+    ],
+    exampleSnippet: 'To be or not to be, that is the question:' // Extra syllable creates feminine ending
   },
 ];

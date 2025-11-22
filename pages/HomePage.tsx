@@ -46,6 +46,13 @@ export const HomePage: React.FC = () => {
     setModalItem(null);
   };
 
+  const handleSelectRelatedItem = (itemName: string) => {
+    const relatedItem = allData.find(item => item.name === itemName);
+    if (relatedItem) {
+      setModalItem(relatedItem);
+    }
+  };
+
   const handleShowMore = () => {
     setItemsToShow(prev => prev + 10);
   };
@@ -56,9 +63,15 @@ export const HomePage: React.FC = () => {
         if (activeFilter === 'all') return true;
         return item.type === activeFilter;
       })
-      .filter(item =>
-        item.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      .filter(item => {
+        if (!searchQuery) return true;
+        const query = searchQuery.toLowerCase();
+        return (
+          item.name.toLowerCase().includes(query) ||
+          item.description.toLowerCase().includes(query) ||
+          (item.tags && item.tags.some(tag => tag.toLowerCase().includes(query)))
+        );
+      });
   }, [searchQuery, activeFilter, allData]);
 
   const displayedData = useMemo(() => {
@@ -135,6 +148,7 @@ export const HomePage: React.FC = () => {
         <PoetryDetailModal
           item={modalItem}
           onClose={handleCloseModal}
+          onSelectItem={handleSelectRelatedItem}
         />
       )}
     </main>

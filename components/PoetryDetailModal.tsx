@@ -14,6 +14,7 @@ import { HistoryIcon } from './icons/HistoryIcon';
 interface PoetryDetailModalProps {
   item: PoetryItem;
   onClose: () => void;
+  onSelectItem?: (itemName: string) => void;
 }
 
 const Tag: React.FC<{ type: PoetryItem['type'] }> = ({ type }) => {
@@ -36,7 +37,7 @@ const Tag: React.FC<{ type: PoetryItem['type'] }> = ({ type }) => {
   );
 };
 
-export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onClose }) => {
+export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onClose, onSelectItem }) => {
   const [learnMoreContext, setLearnMoreContext] = useState<string | null>(null);
   const [isLoadingLearnMore, setIsLoadingLearnMore] = useState(false);
   const [learnMoreError, setLearnMoreError] = useState<string | null>(null);
@@ -151,6 +152,53 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
               {item.structure.map((rule, index) => <li key={index}>{rule}</li>)}
             </ul>
           </div>
+
+          {item.tags && item.tags.length > 0 && (
+            <div className="mb-6">
+              <h4 className="font-bold text-sm text-default uppercase tracking-wider mb-2">Tags</h4>
+              <div className="flex flex-wrap gap-2">
+                {item.tags.map((tag, index) => (
+                  <span
+                    key={index}
+                    className="px-2 py-1 text-xs bg-bg-alt/50 border border-default/30 rounded-sm text-muted"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {item.notes && item.notes.length > 0 && (
+            <div className="mb-6">
+              <h4 className="font-bold text-sm text-default uppercase tracking-wider mb-2">Notes</h4>
+              <ul className="list-disc list-inside space-y-1 text-muted ml-2">
+                {item.notes.map((note, index) => <li key={index}>{note}</li>)}
+              </ul>
+            </div>
+          )}
+
+          {item.seeAlso && item.seeAlso.length > 0 && (
+            <div className="mb-6">
+              <h4 className="font-bold text-sm text-default uppercase tracking-wider mb-2">See Also</h4>
+              <div className="flex flex-wrap gap-2">
+                {item.seeAlso.map((related, index) => (
+                  <button
+                    key={index}
+                    className="px-2 py-1 text-xs bg-accent/10 border border-accent/30 rounded-sm text-accent-text hover:bg-accent/20 transition-colors cursor-pointer"
+                    onClick={() => {
+                      if (onSelectItem) {
+                        onSelectItem(related);
+                      }
+                    }}
+                    aria-label={`View ${related}`}
+                  >
+                    {related}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="mb-8">
             <h4 className="font-bold text-sm text-default uppercase tracking-wider mb-2">Classic Snippet</h4>

@@ -6,6 +6,9 @@ export interface PoetryItem {
   structure: string[];
   exampleSnippet: string;
   origin?: string;
+  tags?: string[];
+  seeAlso?: string[];
+  notes?: string[];
 }
 
 export type ThemeMode = 'light' | 'dark';
