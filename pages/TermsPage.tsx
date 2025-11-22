@@ -1,3 +1,5 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { CheckIcon } from '../components/icons/CheckIcon';
 import { ProhibitedIcon } from '../components/icons/ProhibitedIcon';
 import { ScrollIcon } from '../components/icons/ScrollIcon';

@@ -1,3 +1,5 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { LockIcon } from '../components/icons/LockIcon';
 import { CookieIcon } from '../components/icons/CookieIcon';
 import { KeyIcon } from '../components/icons/KeyIcon';
