@@ -167,15 +167,15 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
               </div>
               <button
                 onClick={handleLearnMore}
-                disabled={isLoadingLearnMore || learnMoreContext !== null}
-                className="flex items-center space-x-2 px-4 py-2 text-sm font-semibold text-white border border-white bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 hover:border-white/80 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                disabled={isLoadingLearnMore}
+                className="flex items-center space-x-2 px-4 py-2 text-sm font-semibold text-accent-text border border-accent bg-accent/10 backdrop-blur-sm rounded-lg hover:bg-accent/20 hover:border-accent/80 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
               >
                 {isLoadingLearnMore ? (
                   <SpinnerIcon className="w-4 h-4 animate-spin" />
                 ) : (
                   <SparklesIcon className="w-4 h-4" />
                 )}
-                <span>{isLoadingLearnMore ? 'ANALYZING...' : 'LEARN MORE'}</span>
+                <span>{isLoadingLearnMore ? 'ANALYZING...' : learnMoreContext !== null ? 'REGENERATE' : 'LEARN MORE'}</span>
               </button>
             </div>
 
