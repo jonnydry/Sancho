@@ -14,9 +14,9 @@ export const poetryData: PoetryItem[] = [
       "Petrarchan: ABBAABBA CDECDE or CDCDCD"
     ],
     exampleSnippet: "Shall I compare thee to a summer's day? / Thou art more lovely and more temperate...",
-    tags: ['fixed form", 'lyric", 'traditional'],
-    seeAlso: ['Iambic Pentameter", 'Volta", 'Couplet", 'Quatrain'],
-    notes: ['The volta (turn) occurs at line 9 in Petrarchan sonnets and before the final couplet in Shakespearean sonnets.']
+    tags: ["fixed form", "lyric", "traditional"],
+    seeAlso: ["Iambic Pentameter", "Volta", "Couplet", "Quatrain"],
+    notes: ["The volta (turn) occurs at line 9 in Petrarchan sonnets and before the final couplet in Shakespearean sonnets."]
   },
   {
     name: "Haiku",
@@ -29,9 +29,9 @@ export const poetryData: PoetryItem[] = [
       "Often focuses on nature"
     ],
     exampleSnippet: "An old silent pond... / A frog jumps into the pond, / splash! Silence again.",
-    tags: ['fixed form", 'syllabic", 'nature'],
-    seeAlso: ['Tanka", 'Senryu", 'Syllabic Verse'],
-    notes: ['Traditional haiku includes a kigo (seasonal reference) and a kireji (cutting word). English haiku often focuses on nature and a moment of insight.']
+    tags: ["fixed form", "syllabic", "nature"],
+    seeAlso: ["Tanka", "Senryu", "Syllabic Verse"],
+    notes: ["Traditional haiku includes a kigo (seasonal reference) and a kireji (cutting word). English haiku often focuses on nature and a moment of insight."]
   },
   {
     name: "Villanelle",
@@ -45,15 +45,15 @@ export const poetryData: PoetryItem[] = [
       "Two rhymes and two refrains"
     ],
     exampleSnippet: "Do not go gentle into that good night, / Old age should burn and rave at close of day...",
-    tags: ['fixed form", 'repetition", 'lyric'],
-    seeAlso: ['Refrain", 'Repetition", 'Tercet", 'Terza Rima'],
-    notes: ['The two refrains create a haunting, obsessive quality. Choose refrains that can bear repetition and gain meaning with each appearance.']
+    tags: ["fixed form", "repetition", "lyric"],
+    seeAlso: ["Refrain", "Repetition", "Tercet", "Terza Rima"],
+    notes: ["The two refrains create a haunting, obsessive quality. Choose refrains that can bear repetition and gain meaning with each appearance."]
   },
   {
     name: "Limerick",
     type: "Form",
     description: "A five-line poem with a specific rhyme scheme (AABBA) and a humorous tone.",
-    origin: "Popularized in the 19th century by Edward Lear, its origins are associated with soldiers\' songs and folklore in 18th-century Ireland.",
+    origin: "Popularized in the 19th century by Edward Lear, its origins are associated with soldiers\" songs and folklore in 18th-century Ireland.",
     structure: [
       "5 lines",
       "Rhyme scheme: AABBA",
@@ -74,9 +74,9 @@ export const poetryData: PoetryItem[] = [
       "End-words repeat in a spiral pattern"
     ],
     exampleSnippet: "September rain falls on the house. / In the failing light, the old grandmother...",
-    tags: ['fixed form", 'repetition", 'complex'],
-    seeAlso: ['Repetition", 'Refrain", 'Villanelle", 'Pantoum'],
-    notes: ['The end-words follow a specific pattern: 123456, 615243, 364125, 532614, 451362, 246531, then all six in the envoi. Choose end-words that can bear repetition and shift meaning.']
+    tags: ["fixed form", "repetition", "complex"],
+    seeAlso: ["Repetition", "Refrain", "Villanelle", "Pantoum"],
+    notes: ["The end-words follow a specific pattern: 123456, 615243, 364125, 532614, 451362, 246531, then all six in the envoi. Choose end-words that can bear repetition and shift meaning."]
   },
   {
     name: "Ode",
@@ -112,7 +112,7 @@ export const poetryData: PoetryItem[] = [
       "Minimum of five couplets",
       "Rhyme scheme: AA BA CA DA...",
       "Refrain (radif) in first couplet and second line of subsequent couplets",
-      'Poet\'s name often in the final couplet"
+      "Poet\'s name often in the final couplet"
     ],
     exampleSnippet: "Tonight, I will not be myself. / Call me by another name, a name in a language I don\'t speak myself."
   },
@@ -168,7 +168,7 @@ export const poetryData: PoetryItem[] = [
     name: "Triolet",
     type: "Form",
     description: "A short poem of eight lines with a specific rhyme and repetition pattern.",
-    origin: "A medieval French form, one of the "formes fixes," popular with courtly poets in the 14th and 15th centuries.",
+    origin: "A medieval French form, one of the \"formes fixes,\" popular with courtly poets in the 14th and 15th centuries.",
     structure: [
       "8 lines",
       "Rhyme scheme: ABaAabAB (capital letters are repeated lines)",
@@ -212,19 +212,19 @@ export const poetryData: PoetryItem[] = [
       "The last stanza often uses the 1st and 3rd lines of the poem as its 2nd and 4th lines"
     ],
     exampleSnippet: "Theirs was a house where the noon-sun lay,/ And all the windows looked upon a lake. / It had been his; he had been here to-day; / But he was gone, for everybody's sake.",
-    tags: ['fixed form", 'repetition", 'quatrain'],
-    seeAlso: ['Repetition", 'Refrain", 'Villanelle", 'Quatrain'],
-    notes: ['The repetition creates a circular, meditative quality. Each repeated line gains new meaning in its new context. The form works well for themes of memory, time, or reflection.']
+    tags: ["fixed form", "repetition", "quatrain"],
+    seeAlso: ["Repetition", "Refrain", "Villanelle", "Quatrain"],
+    notes: ["The repetition creates a circular, meditative quality. Each repeated line gains new meaning in its new context. The form works well for themes of memory, time, or reflection."]
   },
   {
     name: "Rondeau",
     type: "Form",
     description: "A 15-line poem with two rhymes throughout, consisting of three stanzas (a quintet, a quatrain, and a sestet). The opening words of the first line are used as a refrain at the end of the second and third stanzas.",
-    origin: "A medieval and Renaissance French form, one of the "formes fixes," popular for love poetry.",
+    origin: "A medieval and Renaissance French form, one of the \"formes fixes,\" popular for love poetry.",
     structure: [
       "15 lines in three stanzas",
       "Rhyme scheme: aabba aabR aabbaR",
-      "The "R" represents the refrain (rentrement)"
+      "The \"R\" represents the refrain (rentrement)"
     ],
     exampleSnippet: "In Flanders fields the poppies blow / Between the crosses, row on row, / That mark our place; and in the sky / The larks, still bravely singing, fly / Scarce heard amid the guns below."
   },
@@ -282,7 +282,7 @@ export const poetryData: PoetryItem[] = [
     name: "Kyrielle",
     type: "Form",
     description: "A French poetic form consisting of quatrains where the last line of each stanza is a refrain.",
-    origin: "A French form dating back to the Middle Ages, often used in religious hymns and carols. The name derives from "Kyrie eleison."",
+    origin: "A French form dating back to the Middle Ages, often used in religious hymns and carols. The name derives from \"Kyrie eleison.\"",
     structure: [
       "Composed of quatrains (4-line stanzas)",
       "Typically eight syllables per line",
@@ -302,7 +302,7 @@ export const poetryData: PoetryItem[] = [
       "First line names the subject",
       "Meter is irregular and often forced for comedic effect"
     ],
-    exampleSnippet: "Sir Christopher Wren / Said, "I am going to dine with some men. / If anyone calls, / Say I am designing St. Paul\'s.""
+    exampleSnippet: "Sir Christopher Wren / Said, \"I am going to dine with some men. / If anyone calls, / Say I am designing St. Paul's.\""
   },
   {
     name: "Tanaga",
@@ -327,7 +327,7 @@ export const poetryData: PoetryItem[] = [
       "Can also use middle letters (mesostich) or last letters (telestich)",
       "No required rhyme scheme or meter"
     ],
-    exampleSnippet: "Elizabeth it is in vain you say / "Love not" — thou sayest it in so sweet a way..."
+    exampleSnippet: "Elizabeth it is in vain you say / \"Love not\" — thou sayest it in so sweet a way..."
   },
   {
     name: "Epigram",
@@ -340,7 +340,7 @@ export const poetryData: PoetryItem[] = [
       "Often has a surprising twist at the end",
       "Concise and memorable phrasing"
     ],
-    exampleSnippet: "I am His Highness\' dog at Kew; / Pray tell me, sir, whose dog are you?"
+    exampleSnippet: "I am His Highness' dog at Kew; / Pray tell me, sir, whose dog are you?"
   },
   {
     name: "Epic",
@@ -427,7 +427,7 @@ export const poetryData: PoetryItem[] = [
     name: "Ballade",
     type: "Form",
     description: "A French verse form consisting of three main stanzas and a shorter concluding stanza (envoi), with a strict rhyme scheme and a refrain.",
-    origin: "A medieval French form, one of the "formes fixes," distinct from the English ballad. François Villon was a master of this form in the 15th century.",
+    origin: "A medieval French form, one of the \"formes fixes,\" distinct from the English ballad. François Villon was a master of this form in the 15th century.",
     structure: [
       "Three stanzas of eight lines each",
       "Concluding envoi of four lines",
@@ -482,14 +482,14 @@ export const poetryData: PoetryItem[] = [
     name: "Ekphrastic Poetry",
     type: "Form",
     description: "Poetry that vividly describes or responds to a work of visual art, such as a painting, sculpture, or photograph.",
-    origin: "From the Greek "ekphrasis" meaning description. An ancient tradition, with Homer\'s description of Achilles\' shield in The Iliad being a famous early example.",
+    origin: "From the Greek \"ekphrasis\" meaning description. An ancient tradition, with Homer\'s description of Achilles\" shield in The Iliad being a famous early example.",
     structure: [
       "No fixed structure or form",
       "Subject is a work of visual art",
       "Describes, interprets, or responds to the artwork",
       "Often explores the relationship between visual and verbal art"
     ],
-    exampleSnippet: "Thou still unravish\'d bride of quietness, / Thou foster-child of silence and slow time...' // Keats on Grecian Urn
+    exampleSnippet: "Thou still unravish\'d bride of quietness, / Thou foster-child of silence and slow time..." // Keats on Grecian Urn
   },
   {
     name: "List Poem",
@@ -504,9 +504,9 @@ export const poetryData: PoetryItem[] = [
       "Can use repetition, parallelism, or variation"
     ],
     exampleSnippet: "I celebrate myself, and sing myself, / And what I assume you shall assume, / For every atom belonging to me as good belongs to you.",
-    tags: ['free form", 'catalog", 'experimental'],
-    seeAlso: ['Catalog", 'Free Verse", 'Found Poetry'],
-    notes: ['The power of a list poem comes from selection and order. Each item should contribute to the overall effect. Juxtaposition of items creates meaning.']
+    tags: ["free form", "catalog", "experimental"],
+    seeAlso: ["Catalog", "Free Verse", "Found Poetry"],
+    notes: ["The power of a list poem comes from selection and order. Each item should contribute to the overall effect. Juxtaposition of items creates meaning."]
   },
   {
     name: "Found Poetry",
@@ -521,9 +521,9 @@ export const poetryData: PoetryItem[] = [
       "Can be erasure (blackout) poetry, cento, or cut-up technique"
     ],
     exampleSnippet: "[A poem created by selecting and rearranging words from a newspaper article or book]",
-    tags: ['experimental", 'found text", 'modern'],
-    seeAlso: ['Erasure Poetry", 'Cento", 'List Poem'],
-    notes: ['Found poetry challenges notions of authorship and creativity. The poet\'s skill lies in selection, arrangement, and recontextualization. Always consider copyright and attribution.']
+    tags: ["experimental", "found text", "modern"],
+    seeAlso: ["Erasure Poetry", "Cento", "List Poem"],
+    notes: ["Found poetry challenges notions of authorship and creativity. The poet's skill lies in selection, arrangement, and recontextualization. Always consider copyright and attribution."]
   },
   {
     name: "Blues Poem",
@@ -543,7 +543,7 @@ export const poetryData: PoetryItem[] = [
     name: "Golden Shovel",
     type: "Form",
     description: "A contemporary form invented by Terrance Hayes, where each word of a line (or lines) from an existing poem becomes the end word of each line in the new poem, reading vertically to reveal the source.",
-    origin: "Invented by Terrance Hayes in 2010, inspired by Gwendolyn Brooks\' poem "We Real Cool." The form pays homage to existing poems while creating new work.",
+    origin: "Invented by Terrance Hayes in 2010, inspired by Gwendolyn Brooks' poem \"We Real Cool.\" The form pays homage to existing poems while creating new work.",
     structure: [
       "Select a line or lines from an existing poem",
       "Each word of the source becomes the end word of a line in the new poem",
@@ -551,7 +551,7 @@ export const poetryData: PoetryItem[] = [
       "The new poem must make sense horizontally",
       "Source poem is typically credited"
     ],
-    exampleSnippet: "[A poem where the end words, read vertically, spell out: "We real cool. We / Left school. We"]"
+    exampleSnippet: "[A poem where the end words, read vertically, spell out: \"We real cool. We / Left school. We\"]"
   },
   {
     name: "Erasure Poetry",
@@ -570,8 +570,8 @@ export const poetryData: PoetryItem[] = [
   {
     name: "Cento",
     type: "Form",
-    description: "A poem composed entirely of lines taken from other poems by different authors, arranged to create a new work. The name comes from the Latin word for "patchwork."",
-    origin: "An ancient form dating back to classical times. The term "cento" comes from Latin, meaning a garment made of patches. Popular in medieval times and revived in modern experimental poetry.",
+    description: "A poem composed entirely of lines taken from other poems by different authors, arranged to create a new work. The name comes from the Latin word for \"patchwork.\"",
+    origin: "An ancient form dating back to classical times. The term \"cento\" comes from Latin, meaning a garment made of patches. Popular in medieval times and revived in modern experimental poetry.",
     structure: [
       "Composed entirely of lines from other poems",
       "Each line must be from a different source (or clearly attributed)",
@@ -585,7 +585,7 @@ export const poetryData: PoetryItem[] = [
     name: "Aubade",
     type: "Form",
     description: "A poem or song about lovers parting at dawn, or more broadly, a morning love song or poem about the dawn.",
-    origin: "A medieval French form, popular in troubadour poetry. The term comes from "aube" (dawn). Adapted by English poets like John Donne and later by modern poets.",
+    origin: "A medieval French form, popular in troubadour poetry. The term comes from \"aube\" (dawn). Adapted by English poets like John Donne and later by modern poets.",
     structure: [
       "No fixed structure or rhyme scheme",
       "Theme: lovers parting at dawn or morning meditation",
@@ -613,13 +613,13 @@ export const poetryData: PoetryItem[] = [
     name: "Dramatic Monologue",
     type: "Form",
     description: "A poem written in the form of a speech by a single character, revealing their personality, situation, and inner thoughts. The speaker addresses a silent listener.",
-    origin: "Developed in the Victorian era, with Robert Browning being the master of the form. His poems like "My Last Duchess" exemplify the dramatic monologue.",
+    origin: "Developed in the Victorian era, with Robert Browning being the master of the form. His poems like \"My Last Duchess\" exemplify the dramatic monologue.",
     structure: [
       "No fixed structure, but often blank verse or free verse",
       "Single speaker addressing a silent listener",
       "Reveals character through speech",
       "Set in a specific dramatic situation",
-      'Speaker\'s words reveal more than they intend"
+      "Speaker\'s words reveal more than they intend"
     ],
     exampleSnippet: "That\'s my last Duchess painted on the wall, / Looking as if she were alive. I call / That piece a wonder, now..."
   },
@@ -669,7 +669,7 @@ export const poetryData: PoetryItem[] = [
     name: "Nonet",
     type: "Form",
     description: "A nine-line poem where the first line has nine syllables, the second has eight, and so on, down to the last line with one syllable.",
-    origin: "A modern form, likely invented in the 20th century. The name comes from "nine" in various languages.",
+    origin: "A modern form, likely invented in the 20th century. The name comes from \"nine\" in various languages.",
     structure: [
       "9 lines",
       "Syllable count: 9, 8, 7, 6, 5, 4, 3, 2, 1",
@@ -726,9 +726,9 @@ export const poetryData: PoetryItem[] = [
       "Most common meter in English poetry"
     ],
     exampleSnippet: "But, soft! what light through yonder window breaks?",
-    tags: ['iambic", 'pentameter", 'traditional'],
-    seeAlso: ['Iamb", 'Blank Verse", 'Sonnet", 'Feminine Ending", 'Masculine Ending'],
-    notes: ['The most natural meter for English speech. Variations like feminine endings and substitutions (spondees, trochees) are common and add musicality.']
+    tags: ["iambic", "pentameter", "traditional"],
+    seeAlso: ["Iamb", "Blank Verse", "Sonnet", "Feminine Ending", "Masculine Ending"],
+    notes: ["The most natural meter for English speech. Variations like feminine endings and substitutions (spondees, trochees) are common and add musicality."]
   },
   {
     name: "Iambic Hexameter (Alexandrine)",
@@ -792,7 +792,7 @@ export const poetryData: PoetryItem[] = [
     structure: [
       "Typically 9 syllables per line",
       "Pattern: da-da-DUM da-da-DUM da-da-DUM",
-      'Common in narrative poetry and children\'s rhymes"
+      "Common in narrative poetry and children\'s rhymes"
     ],
     exampleSnippet: "I am monarch of all I survey,"
   },
@@ -828,7 +828,7 @@ export const poetryData: PoetryItem[] = [
       "Pattern: da-da",
       "Used for variation and to quicken pace"
     ],
-    exampleSnippet: "When the blood creeps and the nerves prick.' // "When the" is pyrrhic
+    exampleSnippet: "When the blood creeps and the nerves prick." // \"When the\" is pyrrhic
   },
   {
     name: "Amphibrach",
@@ -839,7 +839,7 @@ export const poetryData: PoetryItem[] = [
       "Pattern: da-DUM-da",
       "Creates a rolling, flowing rhythm"
     ],
-    exampleSnippet: "To-morrow, and to-morrow, and to-morrow,' // "and to-mor",
+    exampleSnippet: "To-morrow, and to-morrow, and to-morrow,\" // \"and to-mor",
   },
   {
     name: "Cretic",
@@ -870,10 +870,10 @@ export const poetryData: PoetryItem[] = [
     structure: [
       "2 syllables",
       "Pattern: da-DUM (unstressed-stressed)",
-      "Examples: "today," "appear," "delight"",
+      "Examples: 'today', 'appear', 'delight'",
       "The building block of iambic meters"
     ],
-    exampleSnippet: "The world / is too / much with / us; late / and soon' // Each "/" separates iambs
+    exampleSnippet: "The world / is too / much with / us; late / and soon" // Each "/" separates iambs
   },
   {
     name: "Trochee",
@@ -882,10 +882,10 @@ export const poetryData: PoetryItem[] = [
     structure: [
       "2 syllables",
       "Pattern: DUM-da (stressed-unstressed)",
-      "Examples: "garden," "highway," "poet"",
+      "Examples: 'garden', 'highway', 'poet'",
       "Creates a falling, emphatic rhythm"
     ],
-    exampleSnippet: "Peter, / Peter, / pumpkin / eater' // Each "/" separates trochees
+    exampleSnippet: "Peter, / Peter, / pumpkin / eater" // Each "/" separates trochees
   },
   {
     name: "Dactyl",
@@ -894,7 +894,7 @@ export const poetryData: PoetryItem[] = [
     structure: [
       "3 syllables",
       "Pattern: DUM-da-da (stressed-unstressed-unstressed)",
-      "Examples: "elephant," "strawberry," "merrily"",
+      "Examples: 'elephant', 'strawberry', 'merrily'",
       "Creates a rolling, falling rhythm"
     ],
     exampleSnippet: "This is the / forest pri / meval. The / murmuring / pines and the / hemlocks"
@@ -906,7 +906,7 @@ export const poetryData: PoetryItem[] = [
     structure: [
       "3 syllables",
       "Pattern: da-da-DUM (unstressed-unstressed-stressed)",
-      "Examples: "understand," "contradict," "intervene"",
+      "Examples: 'understand', 'contradict', 'intervene'",
       "Creates a galloping, rising rhythm"
     ],
     exampleSnippet: "\'Twas the night / before Christ / mas when all / through the house"
@@ -921,19 +921,19 @@ export const poetryData: PoetryItem[] = [
       "Acatalectic line: complete (normal)",
       "Creates variety and emphasis at line endings"
     ],
-    exampleSnippet: "Tyger! Tyger! burning bright / In the forests of the night' // Trochaic with catalectic ending
+    exampleSnippet: "Tyger! Tyger! burning bright / In the forests of the night" // Trochaic with catalectic ending
   },
   {
     name: "Acephalous",
     type: "Meter",
-    description: "A line of verse that is missing the first syllable of the first metrical foot. Literally "headless" in Greek.",
+    description: "A line of verse that is missing the first syllable of the first metrical foot. Literally \"headless\" in Greek.",
     structure: [
       "Missing first syllable",
       "Common in iambic and anapestic meters",
       "Creates emphasis by beginning with a stressed syllable",
       "Also called an initial truncation"
     ],
-    exampleSnippet: "Thus with the year / Seasons return' // Iambic but missing first unstressed syllable
+    exampleSnippet: "Thus with the year / Seasons return" // Iambic but missing first unstressed syllable
   },
   {
     name: "Feminine Ending",
@@ -945,7 +945,7 @@ export const poetryData: PoetryItem[] = [
       "Creates a gentler, less conclusive effect",
       "Opposite of masculine ending (ends on stressed syllable)"
     ],
-    exampleSnippet: "To be or not to be, that is the question: / Whether \'tis nobler in the mind to suffer' // "question" and "suffer" are feminine endings
+    exampleSnippet: "To be or not to be, that is the question: / Whether \'tis nobler in the mind to suffer" // \"question\" and \"suffer\" are feminine endings
   },
   {
     name: "Masculine Ending",
@@ -958,7 +958,7 @@ export const poetryData: PoetryItem[] = [
       "Opposite of feminine ending",
       "Common in iambic pentameter"
     ],
-    exampleSnippet: "Shall I compare thee to a summer\'s day? / Thou art more lovely and more temperate:' // "day" and "rate" are masculine endings
+    exampleSnippet: "Shall I compare thee to a summer\'s day? / Thou art more lovely and more temperate:" // \"day\" and \"rate\" are masculine endings
   },
   {
     name: "Sprung Rhythm",
@@ -973,9 +973,9 @@ export const poetryData: PoetryItem[] = [
       "Allows for greater rhythmic variety"
     ],
     exampleSnippet: "I caught this morning morning\'s minion, king- / dom of daylight\'s dauphin, dapple-dawn-drawn Falcon",
-    tags: ['accentual", 'modern", 'flexible'],
-    seeAlso: ['Accentual Verse", 'Accentual-Syllabic Verse", 'Free Verse'],
-    notes: ['Sprung rhythm allows for natural speech patterns while maintaining metrical structure. It bridges traditional meter and free verse, giving poets more flexibility.']
+    tags: ["accentual", "modern", "flexible"],
+    seeAlso: ["Accentual Verse", "Accentual-Syllabic Verse", "Free Verse"],
+    notes: ["Sprung rhythm allows for natural speech patterns while maintaining metrical structure. It bridges traditional meter and free verse, giving poets more flexibility."]
   },
   {
     name: "Accentual Verse",
@@ -1003,7 +1003,7 @@ export const poetryData: PoetryItem[] = [
       "Examples: iambic pentameter, trochaic tetrameter",
       "Allows for precise rhythmic control"
     ],
-    exampleSnippet: "But soft! what light through yonder window breaks?' // Iambic pentameter: 10 syllables, 5 iambs
+    exampleSnippet: "But soft! what light through yonder window breaks?" // Iambic pentameter: 10 syllables, 5 iambs
   },
   {
     name: "Syllabic Verse",
@@ -1017,7 +1017,7 @@ export const poetryData: PoetryItem[] = [
       "Allows for natural stress patterns",
       "Different from accentual-syllabic verse"
     ],
-    exampleSnippet: "An old silent pond... / A frog jumps into the pond, / splash! Silence again.' // Haiku: 5-7-5 syllables
+    exampleSnippet: "An old silent pond... / A frog jumps into the pond, / splash! Silence again." // Haiku: 5-7-5 syllables
   },
   {
     name: "Mixed Meter",
@@ -1031,7 +1031,7 @@ export const poetryData: PoetryItem[] = [
       "Common in dramatic and narrative poetry",
       "Requires careful handling to maintain coherence"
     ],
-    exampleSnippet: "Tyger! Tyger! burning bright / In the forests of the night; / What immortal hand or eye / Could frame thy fearful symmetry?' // Trochaic and iambic mixed
+    exampleSnippet: "Tyger! Tyger! burning bright / In the forests of the night; / What immortal hand or eye / Could frame thy fearful symmetry?" // Trochaic and iambic mixed
   },
   {
     name: "Headless Line",
@@ -1044,7 +1044,7 @@ export const poetryData: PoetryItem[] = [
       "Common in iambic and anapestic meters",
       "Same as acephalous line"
     ],
-    exampleSnippet: "Thus with the year / Seasons return' // Iambic but headless (missing first unstressed syllable)
+    exampleSnippet: "Thus with the year / Seasons return" // Iambic but headless (missing first unstressed syllable)
   },
   {
     name: "Hypercatalectic",
@@ -1057,6 +1057,6 @@ export const poetryData: PoetryItem[] = [
       "Opposite of catalectic (missing syllables)",
       "Common in iambic pentameter"
     ],
-    exampleSnippet: "To be or not to be, that is the question:' // Extra syllable creates feminine ending
+    exampleSnippet: "To be or not to be, that is the question:" // Extra syllable creates feminine ending
   },
 ];
