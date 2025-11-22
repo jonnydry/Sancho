@@ -6,8 +6,6 @@ import { KeyIcon } from '../components/icons/KeyIcon';
 import { ShieldIcon } from '../components/icons/ShieldIcon';
 import { HomeIcon } from '../components/icons/HomeIcon';
 
-import { HomeIcon } from '../components/icons/HomeIcon';
-
 export const PrivacyPage: React.FC = () => {
   return (
     <div className="min-h-screen py-8 sm:py-16 px-4 sm:px-6 animate-fade-in">

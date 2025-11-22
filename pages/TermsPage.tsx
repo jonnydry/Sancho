@@ -5,8 +5,6 @@ import { ProhibitedIcon } from '../components/icons/ProhibitedIcon';
 import { ScrollIcon } from '../components/icons/ScrollIcon';
 import { HomeIcon } from '../components/icons/HomeIcon';
 
-import { HomeIcon } from '../components/icons/HomeIcon';
-
 export const TermsPage: React.FC = () => {
   return (
     <div className="min-h-screen py-8 sm:py-16 px-4 sm:px-6 animate-fade-in">
