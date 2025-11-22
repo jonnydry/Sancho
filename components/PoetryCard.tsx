@@ -39,7 +39,7 @@ export const PoetryCard: React.FC<PoetryCardProps> = ({ item, onSelect, animatio
     <div className="relative h-full group">
       <div
         onClick={() => onSelect(item)}
-        className="w-full h-full text-left bg-transparent border border-default hover:border-accent rounded-sm transition-all duration-300 ease-out animate-fade-in cursor-pointer p-5 flex flex-col"
+        className="w-full h-full text-left bg-transparent border border-[rgb(var(--app-border)/0.6)] hover:border-accent rounded-sm transition-all duration-300 ease-out animate-fade-in cursor-pointer p-5 flex flex-col"
         style={{ animationDelay: `${animationIndex * 50}ms` }}
         role="button"
         tabIndex={0}
@@ -69,7 +69,7 @@ export const PoetryCard: React.FC<PoetryCardProps> = ({ item, onSelect, animatio
           {item.description}
         </p>
         
-        <div className="mt-auto pt-4 border-t border-default/20">
+        <div className="mt-auto pt-4 border-t border-[rgb(var(--app-border)/0.4)]">
           <p className="text-xs text-muted font-mono italic truncate opacity-70 group-hover:opacity-100 transition-opacity">
             "{item.exampleSnippet}"
           </p>
