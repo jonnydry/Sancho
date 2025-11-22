@@ -2,6 +2,11 @@ import React from 'react';
 import { PoetryItem } from '../types';
 import { XIcon } from './icons/XIcon';
 
+import { GridIcon } from './icons/GridIcon';
+import { PoeticFormsIcon } from './icons/PoeticFormsIcon';
+import { PoeticMetersIcon } from './icons/PoeticMetersIcon';
+import { LiteraryDevicesIcon } from './icons/LiteraryDevicesIcon';
+
 type FilterType = 'all' | PoetryItem['type'];
 
 interface SearchFilterProps {
@@ -11,11 +16,11 @@ interface SearchFilterProps {
   setActiveFilter: (filter: FilterType) => void;
 }
 
-const filters: { label: string; value: FilterType }[] = [
-  { label: 'All', value: 'all' },
-  { label: 'Forms', value: 'Form' },
-  { label: 'Meters', value: 'Meter' },
-  { label: 'Devices', value: 'Device' },
+const filters: { label: string; value: FilterType; icon: React.FC<React.SVGProps<SVGSVGElement>> }[] = [
+  { label: 'All', value: 'all', icon: GridIcon },
+  { label: 'Forms', value: 'Form', icon: PoeticFormsIcon },
+  { label: 'Meters', value: 'Meter', icon: PoeticMetersIcon },
+  { label: 'Devices', value: 'Device', icon: LiteraryDevicesIcon },
 ];
 
 export const SearchFilter: React.FC<SearchFilterProps> = ({
@@ -48,16 +53,16 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
 
       {/* Text-only Tabs */}
       <div className="flex items-center gap-3 sm:gap-6 border-b border-default/30 pb-px">
-        {filters.map(({ label, value }) => (
+        {filters.map(({ label, value, icon: Icon }) => (
           <button
             key={value}
             onClick={() => setActiveFilter(value)}
-            className={`pb-2 text-xs sm:text-sm whitespace-nowrap transition-all duration-200 focus:outline-none ${
-              activeFilter === value
+            className={`pb-2 text-xs sm:text-sm whitespace-nowrap transition-all duration-200 focus:outline-none flex items-center gap-2 ${activeFilter === value
                 ? 'text-default font-bold border-b-2 border-accent'
                 : 'text-muted hover:text-default font-normal border-b-2 border-transparent hover:border-default/30'
-            }`}
+              }`}
           >
+            <Icon className="w-4 h-4" />
             {label.toUpperCase()}
           </button>
         ))}

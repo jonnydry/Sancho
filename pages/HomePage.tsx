@@ -5,6 +5,8 @@ import { PoetryItem } from '../types';
 import { PoetryDetailModal } from '../components/PoetryDetailModal';
 import { SanchoQuote } from '../components/SanchoQuote';
 
+import { ArrowDownIcon } from '../components/icons/ArrowDownIcon';
+
 export const HomePage: React.FC = () => {
   const [modalItem, setModalItem] = useState<PoetryItem | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -39,7 +41,7 @@ export const HomePage: React.FC = () => {
   const handleCardClick = (item: PoetryItem) => {
     setModalItem(item);
   };
-  
+
   const handleCloseModal = () => {
     setModalItem(null);
   };
@@ -54,7 +56,7 @@ export const HomePage: React.FC = () => {
         if (activeFilter === 'all') return true;
         return item.type === activeFilter;
       })
-      .filter(item => 
+      .filter(item =>
         item.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
   }, [searchQuery, activeFilter, allData]);
@@ -67,18 +69,18 @@ export const HomePage: React.FC = () => {
     <main className="py-8 sm:py-12 md:py-16 px-4 sm:px-6 md:px-8 min-h-screen">
       <div className="max-w-5xl mx-auto">
         <div className="flex flex-col items-center mb-16">
-           <div className="w-56 h-56 sm:w-72 sm:h-72 mb-6 animate-fade-in opacity-90 grayscale hover:grayscale-0 transition-all duration-500">
-            <img 
-              src="/sancho-logo.png" 
-              alt="Sancho Logo" 
-              className="w-full h-full object-contain" 
+          <div className="w-56 h-56 sm:w-72 sm:h-72 mb-6 animate-fade-in opacity-90 grayscale hover:grayscale-0 transition-all duration-500">
+            <img
+              src="/sancho-logo.png"
+              alt="Sancho Logo"
+              className="w-full h-full object-contain"
             />
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-default mb-2 tracking-tight">Sancho.ref</h1>
           <p className="text-muted text-xs uppercase tracking-[0.2em] mb-8">
             Poetic Reference Squire
           </p>
-          
+
           <div className="w-full max-w-2xl">
             <SanchoQuote />
           </div>
@@ -113,10 +115,11 @@ export const HomePage: React.FC = () => {
               <div className="text-center mt-16">
                 <button
                   onClick={handleShowMore}
-                  className="px-8 py-3 border border-white text-white text-sm font-semibold bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 hover:border-white/80 transition-all duration-300"
+                  className="px-8 py-3 border border-white text-white text-sm font-semibold bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 hover:border-white/80 transition-all duration-300 flex items-center gap-2 mx-auto"
                   aria-label="Show more poetry items"
                 >
-                  LOAD MORE
+                  <span>LOAD MORE</span>
+                  <ArrowDownIcon className="w-4 h-4" />
                 </button>
               </div>
             )}

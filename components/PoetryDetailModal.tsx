@@ -9,6 +9,8 @@ import { SpinnerIcon } from './icons/SpinnerIcon';
 import { PinButton } from './PinButton';
 import { useAuth } from '../hooks/useAuth.js';
 
+import { HistoryIcon } from './icons/HistoryIcon';
+
 interface PoetryDetailModalProps {
   item: PoetryItem;
   onClose: () => void;
@@ -127,11 +129,11 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
           </button>
 
           <div className="flex flex-col gap-2 mb-6 pr-8">
-             <div className="flex items-center gap-3">
-                <h2 id="modal-title" className="text-2xl sm:text-3xl font-bold text-default m-0 tracking-tight">{item.name}</h2>
-                {isAuthenticated && <PinButton item={item} size="md" />}
-             </div>
-             <Tag type={item.type} />
+            <div className="flex items-center gap-3">
+              <h2 id="modal-title" className="text-2xl sm:text-3xl font-bold text-default m-0 tracking-tight">{item.name}</h2>
+              {isAuthenticated && <PinButton item={item} size="md" />}
+            </div>
+            <Tag type={item.type} />
           </div>
 
           <p className="text-default text-base leading-relaxed mb-6 border-l-2 border-default/20 pl-4">{item.description}</p>
@@ -142,12 +144,12 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
               <p className="text-muted">{item.origin}</p>
             </div>
           )}
-          
+
           <div className="mb-6">
-              <h4 className="font-bold text-sm text-default uppercase tracking-wider mb-2">Conventions</h4>
-              <ul className="list-disc list-inside space-y-1 text-muted ml-2">
-                  {item.structure.map((rule, index) => <li key={index}>{rule}</li>)}
-              </ul>
+            <h4 className="font-bold text-sm text-default uppercase tracking-wider mb-2">Conventions</h4>
+            <ul className="list-disc list-inside space-y-1 text-muted ml-2">
+              {item.structure.map((rule, index) => <li key={index}>{rule}</li>)}
+            </ul>
           </div>
 
           <div className="mb-8">
@@ -159,7 +161,10 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
 
           <div className="pt-6 border-t border-default">
             <div className="flex items-center justify-between mb-6">
-              <h4 className="font-bold text-default text-lg">Historical Context</h4>
+              <div className="flex items-center gap-2">
+                <HistoryIcon className="w-5 h-5 text-default" />
+                <h4 className="font-bold text-default text-lg">Historical Context</h4>
+              </div>
               <button
                 onClick={handleLearnMore}
                 disabled={isLoadingLearnMore || learnMoreContext !== null}
@@ -173,7 +178,7 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
                 <span>{isLoadingLearnMore ? 'ANALYZING...' : 'LEARN MORE'}</span>
               </button>
             </div>
-            
+
             {learnMoreError && (
               <div className="p-4 text-sm text-red-600 border border-red-200 bg-red-50 dark:bg-red-900/10 dark:border-red-900 dark:text-red-400 rounded-sm">
                 {learnMoreError}
@@ -187,7 +192,7 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
             )}
           </div>
         </div>
-        
+
         <ExampleFinder topic={item.name} />
       </div>
     </div>

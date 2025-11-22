@@ -4,6 +4,8 @@ import { CheckIcon } from '../components/icons/CheckIcon';
 import { ProhibitedIcon } from '../components/icons/ProhibitedIcon';
 import { ScrollIcon } from '../components/icons/ScrollIcon';
 
+import { HomeIcon } from '../components/icons/HomeIcon';
+
 export const TermsPage: React.FC = () => {
   return (
     <div className="min-h-screen py-8 sm:py-16 px-4 sm:px-6 animate-fade-in">
@@ -129,9 +131,10 @@ export const TermsPage: React.FC = () => {
           <div className="text-center pt-8 sm:pt-12 border-t border-default/10">
             <Link
               to="/"
-              className="inline-block px-6 sm:px-8 py-3 border border-white text-white text-sm font-semibold bg-white/10 backdrop-blur-sm hover:bg-white/20 hover:border-white/80 transition-all duration-300 uppercase tracking-wider rounded-lg"
+              className="inline-block px-6 sm:px-8 py-3 border border-white text-white text-sm font-semibold bg-white/10 backdrop-blur-sm hover:bg-white/20 hover:border-white/80 transition-all duration-300 uppercase tracking-wider rounded-lg flex items-center justify-center gap-2"
             >
-              Return Home
+              <HomeIcon className="w-4 h-4" />
+              <span>Return Home</span>
             </Link>
           </div>
         </div>

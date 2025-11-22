@@ -1,15 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+import { HomeIcon } from '../components/icons/HomeIcon';
+import { InfoIcon } from '../components/icons/InfoIcon';
+
 export const NotFoundPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-default flex items-center justify-center p-4">
       <div className="max-w-md w-full text-center">
         <div className="w-32 h-32 mx-auto mb-6">
-          <img 
-            src="/sancho-logo.png" 
-            alt="Sancho Logo" 
-            className="w-full h-full object-contain opacity-50" 
+          <img
+            src="/sancho-logo.png"
+            alt="Sancho Logo"
+            className="w-full h-full object-contain opacity-50"
           />
         </div>
         <h1 className="text-6xl font-bold text-default mb-4">404</h1>
@@ -20,15 +23,17 @@ export const NotFoundPage: React.FC = () => {
         <div className="flex gap-4 justify-center">
           <Link
             to="/"
-            className="px-6 py-3 bg-accent hover:bg-accent-hover text-accent-text font-semibold rounded-lg transition-colors"
+            className="px-6 py-3 bg-accent hover:bg-accent-hover text-accent-text font-semibold rounded-lg transition-colors flex items-center gap-2"
           >
-            Return Home
+            <HomeIcon className="w-4 h-4" />
+            <span>Return Home</span>
           </Link>
           <Link
             to="/about"
-            className="px-6 py-3 bg-bg-alt hover:bg-default border border-default text-default font-semibold rounded-lg transition-colors"
+            className="px-6 py-3 bg-bg-alt hover:bg-default border border-default text-default font-semibold rounded-lg transition-colors flex items-center gap-2"
           >
-            Learn More
+            <InfoIcon className="w-4 h-4" />
+            <span>Learn More</span>
           </Link>
         </div>
       </div>
