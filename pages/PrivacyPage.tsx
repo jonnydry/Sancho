@@ -3,14 +3,14 @@ import { Link } from 'react-router-dom';
 
 export const PrivacyPage: React.FC = () => {
   return (
-    <div className="min-h-screen py-16 px-6 animate-fade-in">
+    <div className="min-h-screen py-8 sm:py-16 px-4 sm:px-6 animate-fade-in">
       <div className="max-w-3xl mx-auto">
-        <div className="mb-12 border-b border-default/20 pb-8">
-          <h1 className="text-3xl font-bold text-default mb-2 tracking-tight">Privacy Policy</h1>
-          <p className="text-xs font-mono text-muted uppercase tracking-wider">Last Updated: November 15, 2025</p>
+        <div className="mb-8 sm:mb-12 border-b border-default/20 pb-6 sm:pb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-default mb-2 tracking-tight">Privacy Policy</h1>
+          <p className="text-xs font-mono text-muted uppercase tracking-wider">Last Updated: November 22, 2025</p>
         </div>
 
-        <div className="space-y-12 text-default/90">
+        <div className="space-y-8 sm:space-y-12 text-default/90">
           <section>
             <h2 className="text-lg font-bold text-default uppercase tracking-wider mb-4">Introduction</h2>
             <p className="text-muted leading-relaxed">
@@ -19,10 +19,10 @@ export const PrivacyPage: React.FC = () => {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-default uppercase tracking-wider mb-4">Information We Collect</h2>
+            <h2 className="text-base sm:text-lg font-bold text-default uppercase tracking-wider mb-4">Information We Collect</h2>
             
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="bg-bg-alt/30 p-6 border border-default/20 rounded-sm">
+            <div className="grid md:grid-cols-2 gap-4 sm:gap-8">
+              <div className="bg-bg-alt/30 p-4 sm:p-6 border border-default/20 rounded-sm">
                 <h3 className="font-bold text-default mb-3 text-sm">Authentication Data</h3>
                 <p className="text-muted text-sm mb-3">When you log in with Replit Auth, we collect:</p>
                 <ul className="space-y-1 text-sm text-muted font-mono">
@@ -33,7 +33,7 @@ export const PrivacyPage: React.FC = () => {
                 </ul>
               </div>
 
-              <div className="bg-bg-alt/30 p-6 border border-default/20 rounded-sm">
+              <div className="bg-bg-alt/30 p-4 sm:p-6 border border-default/20 rounded-sm">
                 <h3 className="font-bold text-default mb-3 text-sm">Usage Data</h3>
                 <p className="text-muted text-sm mb-3">Automatically collected during use:</p>
                 <ul className="space-y-1 text-sm text-muted font-mono">
@@ -47,30 +47,30 @@ export const PrivacyPage: React.FC = () => {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-default uppercase tracking-wider mb-4">Data Usage & Security</h2>
+            <h2 className="text-base sm:text-lg font-bold text-default uppercase tracking-wider mb-4">Data Usage & Security</h2>
             <div className="space-y-4">
               <p className="text-muted leading-relaxed">
-                We use collected information to provide services, manage sessions, grant premium access, and optimize the platform. Your data is stored securely using:
+                We use collected information to provide services, manage sessions, grant premium access, and optimize the platform. Your data is protected through:
               </p>
               <ul className="grid sm:grid-cols-2 gap-3 text-sm text-muted">
                 <li className="flex items-center gap-2 p-2 border border-default/10 bg-bg-alt/20 rounded-sm">
-                  <span className="text-accent">🔒</span> Encrypted PostgreSQL Storage
+                  <span className="text-accent">🔒</span> PostgreSQL Database Storage
                 </li>
                 <li className="flex items-center gap-2 p-2 border border-default/10 bg-bg-alt/20 rounded-sm">
-                  <span className="text-accent">🍪</span> Secure Session Cookies
+                  <span className="text-accent">🍪</span> Session Management
                 </li>
                 <li className="flex items-center gap-2 p-2 border border-default/10 bg-bg-alt/20 rounded-sm">
-                  <span className="text-accent">🔑</span> OAuth Authentication
+                  <span className="text-accent">🔑</span> Replit Auth (OpenID Connect)
                 </li>
                 <li className="flex items-center gap-2 p-2 border border-default/10 bg-bg-alt/20 rounded-sm">
-                  <span className="text-accent">🛡️</span> API Key Protection
+                  <span className="text-accent">🛡️</span> Secure Backend Proxy
                 </li>
               </ul>
             </div>
           </section>
 
-          <section className="border-l-2 border-accent/30 pl-6">
-            <h2 className="text-lg font-bold text-default uppercase tracking-wider mb-4">Your Rights</h2>
+          <section className="border-l-2 border-accent/30 pl-4 sm:pl-6">
+            <h2 className="text-base sm:text-lg font-bold text-default uppercase tracking-wider mb-4">Your Rights</h2>
             <p className="text-muted mb-4 leading-relaxed">
               You have the right to access your personal data, request account deletion, and update profile information. To exercise these rights, please contact us through the Replit platform.
             </p>
@@ -79,10 +79,10 @@ export const PrivacyPage: React.FC = () => {
             </p>
           </section>
 
-          <div className="text-center pt-12 border-t border-default/10">
+          <div className="text-center pt-8 sm:pt-12 border-t border-default/10">
             <Link
               to="/"
-              className="inline-block px-8 py-3 border border-default text-default text-sm font-semibold hover:bg-accent hover:text-accent-text hover:border-accent transition-all duration-300 uppercase tracking-wider"
+              className="inline-block px-6 sm:px-8 py-3 border border-white text-white text-sm font-semibold bg-white/10 backdrop-blur-sm hover:bg-white/20 hover:border-white/80 transition-all duration-300 uppercase tracking-wider rounded-lg"
             >
               Return Home
             </Link>
