@@ -12,7 +12,7 @@ export const AboutPage: React.FC = () => {
     <div className="min-h-screen py-8 sm:py-16 px-4 sm:px-6 animate-fade-in">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-12 sm:mb-16">
-          <div className="w-28 h-28 sm:w-32 sm:h-32 mx-auto mb-6 opacity-90 grayscale hover:grayscale-0 transition-all duration-500">
+          <div className="w-56 h-56 sm:w-72 sm:h-72 mx-auto mb-6 opacity-90 grayscale hover:grayscale-0 transition-all duration-500">
             <img
               src="/sancho-logo.png"
               alt="Sancho Logo"
