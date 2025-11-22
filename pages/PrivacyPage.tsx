@@ -1,5 +1,7 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { LockIcon } from '../components/icons/LockIcon';
+import { CookieIcon } from '../components/icons/CookieIcon';
+import { KeyIcon } from '../components/icons/KeyIcon';
+import { ShieldIcon } from '../components/icons/ShieldIcon';
 
 export const PrivacyPage: React.FC = () => {
   return (
@@ -20,7 +22,7 @@ export const PrivacyPage: React.FC = () => {
 
           <section>
             <h2 className="text-base sm:text-lg font-bold text-default uppercase tracking-wider mb-4">Information We Collect</h2>
-            
+
             <div className="grid md:grid-cols-2 gap-4 sm:gap-8">
               <div className="bg-bg-alt/30 p-4 sm:p-6 border border-default/20 rounded-sm">
                 <h3 className="font-bold text-default mb-3 text-sm">Authentication Data</h3>
@@ -54,16 +56,20 @@ export const PrivacyPage: React.FC = () => {
               </p>
               <ul className="grid sm:grid-cols-2 gap-3 text-sm text-muted">
                 <li className="flex items-center gap-2 p-2 border border-default/10 bg-bg-alt/20 rounded-sm">
-                  <span className="text-accent">🔒</span> PostgreSQL Database Storage
+                  <LockIcon className="w-4 h-4 text-accent" />
+                  <span>PostgreSQL Database Storage</span>
                 </li>
                 <li className="flex items-center gap-2 p-2 border border-default/10 bg-bg-alt/20 rounded-sm">
-                  <span className="text-accent">🍪</span> Session Management
+                  <CookieIcon className="w-4 h-4 text-accent" />
+                  <span>Session Management</span>
                 </li>
                 <li className="flex items-center gap-2 p-2 border border-default/10 bg-bg-alt/20 rounded-sm">
-                  <span className="text-accent">🔑</span> Replit Auth (OpenID Connect)
+                  <KeyIcon className="w-4 h-4 text-accent" />
+                  <span>Replit Auth (OpenID Connect)</span>
                 </li>
                 <li className="flex items-center gap-2 p-2 border border-default/10 bg-bg-alt/20 rounded-sm">
-                  <span className="text-accent">🛡️</span> Secure Backend Proxy
+                  <ShieldIcon className="w-4 h-4 text-accent" />
+                  <span>Secure Backend Proxy</span>
                 </li>
               </ul>
             </div>

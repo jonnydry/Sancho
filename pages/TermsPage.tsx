@@ -1,5 +1,6 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { CheckIcon } from '../components/icons/CheckIcon';
+import { ProhibitedIcon } from '../components/icons/ProhibitedIcon';
+import { ScrollIcon } from '../components/icons/ScrollIcon';
 
 export const TermsPage: React.FC = () => {
   return (
@@ -21,10 +22,13 @@ export const TermsPage: React.FC = () => {
           <section>
             <div className="bg-bg-alt/30 p-5 sm:p-8 border border-default/20 rounded-sm">
               <h2 className="text-base sm:text-lg font-bold text-default uppercase tracking-wider mb-4 sm:mb-6">License & Usage</h2>
-              
+
               <div className="grid md:grid-cols-2 gap-5 sm:gap-8">
                 <div>
-                  <h3 className="text-sm font-bold text-accent mb-3">✅ Permitted Use</h3>
+                  <h3 className="text-sm font-bold text-accent mb-3 flex items-center gap-2">
+                    <CheckIcon className="w-4 h-4" />
+                    <span>Permitted Use</span>
+                  </h3>
                   <ul className="space-y-2 text-sm text-muted">
                     <li className="flex items-start gap-2">
                       <span className="text-default">•</span> Browse poetry forms & devices
@@ -41,7 +45,10 @@ export const TermsPage: React.FC = () => {
                   </ul>
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-tag-form-text mb-3">🚫 Prohibited</h3>
+                  <h3 className="text-sm font-bold text-tag-form-text mb-3 flex items-center gap-2">
+                    <ProhibitedIcon className="w-4 h-4" />
+                    <span>Prohibited</span>
+                  </h3>
                   <ul className="space-y-2 text-sm text-muted">
                     <li className="flex items-start gap-2">
                       <span className="text-default">•</span> Commercial redistribution
@@ -65,7 +72,8 @@ export const TermsPage: React.FC = () => {
             <h2 className="text-base sm:text-lg font-bold text-default uppercase tracking-wider mb-4">Content Licensing</h2>
             <div className="bg-bg-alt/30 p-5 sm:p-6 border border-default/20 rounded-sm mb-6">
               <h3 className="text-sm font-bold text-default mb-3 flex items-center gap-2">
-                <span>📜</span> Classic Poetry Snippets
+                <ScrollIcon className="w-4 h-4 text-default" />
+                <span>Classic Poetry Snippets</span>
               </h3>
               <p className="text-muted text-sm leading-relaxed mb-3">
                 Poetry examples and brief excerpts featured in Sancho are used strictly for educational purposes under fair use doctrine (17 U.S.C. § 107). Short excerpts are used to demonstrate specific poetic techniques, forms, and literary devices. These excerpts are transformative educational tools, not substitutes for the original works.

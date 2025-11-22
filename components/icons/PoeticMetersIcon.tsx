@@ -2,11 +2,9 @@ import React from 'react';
 
 export const PoeticMetersIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-        <path d="M2 12h2" />
-        <path d="M6 12v-4" />
-        <path d="M10 12v4" />
-        <path d="M14 12v-6" />
-        <path d="M18 12v2" />
-        <path d="M22 12h-2" />
+        <path d="M2 12h3" />
+        <path d="M5 12c0-3 2-8 5-8s4 5 4 8-1 8-4 8-5-5-5-8z" />
+        <path d="M14 12h3" />
+        <path d="M17 12c0-2 1.5-5 3.5-5s3.5 3 3.5 5" />
     </svg>
 );
