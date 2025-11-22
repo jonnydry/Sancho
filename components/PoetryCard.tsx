@@ -39,7 +39,7 @@ export const PoetryCard: React.FC<PoetryCardProps> = ({ item, onSelect, animatio
     <div className="relative h-full group">
       <div
         onClick={() => onSelect(item)}
-        className="w-full h-full text-left bg-transparent border border-[rgb(var(--app-border)/0.8)] hover:border-accent rounded-sm transition-all duration-300 ease-out animate-fade-in cursor-pointer p-5 flex flex-col"
+        className="w-full h-full text-left bg-[rgb(var(--app-bg-alt))] border border-default hover:border-accent rounded-sm transition-all duration-300 ease-out animate-fade-in cursor-pointer p-5 flex flex-col shadow-sm"
         style={{ animationDelay: `${animationIndex * 50}ms` }}
         role="button"
         tabIndex={0}
