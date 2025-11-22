@@ -36,9 +36,9 @@ const Tag: React.FC<{ type: PoetryItem['type'] }> = ({ type }) => {
 export const PoetryCard: React.FC<PoetryCardProps> = ({ item, onSelect, animationIndex, variant = 'default' }) => {
   const { isAuthenticated } = useAuth();
 
-  // Default variant uses the original background (bg-alt) to maintain visual consistency
+  // Default variant uses darker transparent background for dark mode aesthetic
   // Matte variant explicitly uses bg-alt for notebook cards
-  const bgClass = 'bg-[rgb(var(--app-bg-alt))]';
+  const bgClass = variant === 'default' ? 'bg-black/40 dark:bg-black/40' : 'bg-[rgb(var(--app-bg-alt))]';
 
   return (
     <div className="relative h-full group">
