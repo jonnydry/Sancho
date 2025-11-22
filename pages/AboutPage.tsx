@@ -1,5 +1,9 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { PoeticFormsIcon } from '../components/icons/PoeticFormsIcon';
+import { PoeticMetersIcon } from '../components/icons/PoeticMetersIcon';
+import { LiteraryDevicesIcon } from '../components/icons/LiteraryDevicesIcon';
+import { AiExamplesIcon } from '../components/icons/AiExamplesIcon';
+import { ClassicSnippetsIcon } from '../components/icons/ClassicSnippetsIcon';
+import { PremiumThemesIcon } from '../components/icons/PremiumThemesIcon';
 
 export const AboutPage: React.FC = () => {
   return (
@@ -7,10 +11,10 @@ export const AboutPage: React.FC = () => {
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-12 sm:mb-16">
           <div className="w-28 h-28 sm:w-32 sm:h-32 mx-auto mb-6 opacity-90 grayscale hover:grayscale-0 transition-all duration-500">
-            <img 
-              src="/sancho-logo.png" 
-              alt="Sancho Logo" 
-              className="w-full h-full object-contain" 
+            <img
+              src="/sancho-logo.png"
+              alt="Sancho Logo"
+              className="w-full h-full object-contain"
             />
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-default mb-2 tracking-tight">About Sancho</h1>
@@ -34,37 +38,55 @@ export const AboutPage: React.FC = () => {
             <h2 className="text-lg sm:text-xl font-bold text-default mb-6 sm:mb-8 tracking-tight border-b border-default/20 pb-2">Features</h2>
             <div className="grid md:grid-cols-2 gap-5 sm:gap-8">
               <div className="group">
-                <h3 className="text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">📝 37 Poetic Forms</h3>
+                <h3 className="flex items-center gap-2 text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">
+                  <PoeticFormsIcon className="w-5 h-5" />
+                  <span>37 Poetic Forms</span>
+                </h3>
                 <p className="text-muted text-sm leading-relaxed">
                   From sonnets and haikus to villanelles and ghazals, explore diverse poetic structures with detailed conventions and examples.
                 </p>
               </div>
               <div className="group">
-                <h3 className="text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">📊 22 Poetic Meters</h3>
+                <h3 className="flex items-center gap-2 text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">
+                  <PoeticMetersIcon className="w-5 h-5" />
+                  <span>22 Poetic Meters</span>
+                </h3>
                 <p className="text-muted text-sm leading-relaxed">
                   Master iambic pentameter, trochaic tetrameter, and other rhythmic patterns that give poetry its musical quality.
                 </p>
               </div>
               <div className="group">
-                <h3 className="text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">🎨 31 Literary Devices</h3>
+                <h3 className="flex items-center gap-2 text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">
+                  <LiteraryDevicesIcon className="w-5 h-5" />
+                  <span>31 Literary Devices</span>
+                </h3>
                 <p className="text-muted text-sm leading-relaxed">
                   Learn about metaphor, alliteration, enjambment, and other techniques poets use to craft meaning and beauty.
                 </p>
               </div>
               <div className="group">
-                <h3 className="text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">🤖 AI-Powered Examples</h3>
+                <h3 className="flex items-center gap-2 text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">
+                  <AiExamplesIcon className="w-5 h-5" />
+                  <span>AI-Powered Examples</span>
+                </h3>
                 <p className="text-muted text-sm leading-relaxed">
                   Generate fresh poetry examples using XAI's Grok model to see any form, meter, or device in action.
                 </p>
               </div>
               <div className="group">
-                <h3 className="text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">🎭 Classic Snippets</h3>
+                <h3 className="flex items-center gap-2 text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">
+                  <ClassicSnippetsIcon className="w-5 h-5" />
+                  <span>Classic Snippets</span>
+                </h3>
                 <p className="text-muted text-sm leading-relaxed">
                   Each entry includes authentic examples from renowned poets throughout literary history.
                 </p>
               </div>
               <div className="group">
-                <h3 className="text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">🎨 Premium Themes</h3>
+                <h3 className="flex items-center gap-2 text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">
+                  <PremiumThemesIcon className="w-5 h-5" />
+                  <span>Premium Themes</span>
+                </h3>
                 <p className="text-muted text-sm leading-relaxed">
                   Unlock beautiful Paper and Slate color schemes by logging in with your Replit account.
                 </p>
