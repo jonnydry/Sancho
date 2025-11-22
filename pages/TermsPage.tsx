@@ -3,26 +3,26 @@ import { Link } from 'react-router-dom';
 
 export const TermsPage: React.FC = () => {
   return (
-    <div className="min-h-screen py-16 px-6 animate-fade-in">
+    <div className="min-h-screen py-8 sm:py-16 px-4 sm:px-6 animate-fade-in">
       <div className="max-w-3xl mx-auto">
-        <div className="mb-12 border-b border-default/20 pb-8">
-          <h1 className="text-3xl font-bold text-default mb-2 tracking-tight">Terms of Service</h1>
-          <p className="text-xs font-mono text-muted uppercase tracking-wider">Last Updated: November 15, 2025</p>
+        <div className="mb-8 sm:mb-12 border-b border-default/20 pb-6 sm:pb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-default mb-2 tracking-tight">Terms of Service</h1>
+          <p className="text-xs font-mono text-muted uppercase tracking-wider">Last Updated: November 22, 2025</p>
         </div>
 
-        <div className="space-y-12 text-default/90">
+        <div className="space-y-8 sm:space-y-12 text-default/90">
           <section>
-            <h2 className="text-lg font-bold text-default uppercase tracking-wider mb-4">Agreement</h2>
+            <h2 className="text-base sm:text-lg font-bold text-default uppercase tracking-wider mb-4">Agreement</h2>
             <p className="text-muted leading-relaxed">
               By accessing or using Sancho, you agree to be bound by these Terms of Service. If you do not agree with any of these terms, you are prohibited from using this service.
             </p>
           </section>
 
           <section>
-            <div className="bg-bg-alt/30 p-8 border border-default/20 rounded-sm">
-              <h2 className="text-lg font-bold text-default uppercase tracking-wider mb-6">License & Usage</h2>
+            <div className="bg-bg-alt/30 p-5 sm:p-8 border border-default/20 rounded-sm">
+              <h2 className="text-base sm:text-lg font-bold text-default uppercase tracking-wider mb-4 sm:mb-6">License & Usage</h2>
               
-              <div className="grid md:grid-cols-2 gap-8">
+              <div className="grid md:grid-cols-2 gap-5 sm:gap-8">
                 <div>
                   <h3 className="text-sm font-bold text-accent mb-3">✅ Permitted Use</h3>
                   <ul className="space-y-2 text-sm text-muted">
@@ -62,8 +62,20 @@ export const TermsPage: React.FC = () => {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-default uppercase tracking-wider mb-4">AI Content Disclaimer</h2>
-            <div className="border-l-2 border-accent/50 pl-6 py-2">
+            <h2 className="text-base sm:text-lg font-bold text-default uppercase tracking-wider mb-4">Content Licensing</h2>
+            <div className="bg-bg-alt/30 p-5 sm:p-6 border border-default/20 rounded-sm mb-6">
+              <h3 className="text-sm font-bold text-default mb-3 flex items-center gap-2">
+                <span>📜</span> Classic Poetry Snippets
+              </h3>
+              <p className="text-muted text-sm leading-relaxed mb-3">
+                Poetry examples and brief excerpts featured in Sancho are used strictly for educational purposes under fair use doctrine (17 U.S.C. § 107). Short excerpts are used to demonstrate specific poetic techniques, forms, and literary devices. These excerpts are transformative educational tools, not substitutes for the original works.
+              </p>
+              <p className="text-xs text-muted/70 italic">
+                Educational Fair Use: Brief excerpts from copyrighted works are used for nonprofit educational purposes. Attribution is provided through contextual references (author names and work titles appear in examples when known). Works in the public domain are freely used. If you believe any content infringes your copyright, please contact us through the Replit platform.
+              </p>
+            </div>
+            <h2 className="text-base sm:text-lg font-bold text-default uppercase tracking-wider mb-4">AI Content Disclaimer</h2>
+            <div className="border-l-2 border-accent/50 pl-4 sm:pl-6 py-2">
               <p className="text-muted mb-4 leading-relaxed">
                 Sancho uses XAI's Grok model to generate content. Please be aware:
               </p>
@@ -76,7 +88,7 @@ export const TermsPage: React.FC = () => {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-default uppercase tracking-wider mb-4">Rate Limiting</h2>
+            <h2 className="text-base sm:text-lg font-bold text-default uppercase tracking-wider mb-4">Rate Limiting</h2>
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="p-4 border border-default/10 bg-bg-alt/20 rounded-sm flex items-center justify-between">
                 <span className="text-sm font-bold text-default">Poetry Examples</span>
@@ -90,10 +102,10 @@ export const TermsPage: React.FC = () => {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-default uppercase tracking-wider mb-4">Legal</h2>
+            <h2 className="text-base sm:text-lg font-bold text-default uppercase tracking-wider mb-4">Legal</h2>
             <div className="space-y-4 text-sm text-muted leading-relaxed">
               <p>
-                <strong>Intellectual Property:</strong> The service design, branding, and database are owned by Sancho. Classic poetry snippets are used under fair use for education.
+                <strong>Intellectual Property:</strong> The service design, branding, user interface, and original database are owned by Sancho. Poetry excerpts are used under fair use for educational purposes with proper attribution to original authors. Public domain works are freely used.
               </p>
               <p>
                 <strong>Disclaimer:</strong> Materials are provided "as is". We disclaim all warranties regarding accuracy, reliability, or fitness for purpose.
@@ -104,10 +116,10 @@ export const TermsPage: React.FC = () => {
             </div>
           </section>
 
-          <div className="text-center pt-12 border-t border-default/10">
+          <div className="text-center pt-8 sm:pt-12 border-t border-default/10">
             <Link
               to="/"
-              className="inline-block px-8 py-3 border border-default text-default text-sm font-semibold hover:bg-accent hover:text-accent-text hover:border-accent transition-all duration-300 uppercase tracking-wider"
+              className="inline-block px-6 sm:px-8 py-3 border border-white text-white text-sm font-semibold bg-white/10 backdrop-blur-sm hover:bg-white/20 hover:border-white/80 transition-all duration-300 uppercase tracking-wider rounded-lg"
             >
               Return Home
             </Link>
