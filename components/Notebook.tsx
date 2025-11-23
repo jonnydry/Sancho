@@ -57,20 +57,20 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
 
       {/* Sidebar */}
       <div
-        className="fixed top-0 right-0 h-full w-full max-w-md bg-[rgb(var(--app-bg-alt)/0.2)] backdrop-blur-xl border-l border-[rgb(var(--app-border)/0.2)] z-50 shadow-2xl flex flex-col animate-slide-in-right"
+        className="fixed top-0 right-0 h-full w-full max-w-md bg-bg/50 dark:bg-[rgb(var(--app-bg-alt)/0.2)] backdrop-blur-xl border-l border-default/30 dark:border-[rgb(var(--app-border)/0.2)] z-50 shadow-2xl flex flex-col animate-slide-in-right"
         role="dialog"
         aria-modal="true"
         aria-labelledby="notebook-title"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-[rgb(var(--app-border)/0.2)]">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-default/20 dark:border-[rgb(var(--app-border)/0.2)]">
           <div className="flex items-center gap-2">
             <BookPenIcon className="w-5 h-5 text-default" />
             <h2 id="notebook-title" className="text-lg sm:text-xl font-bold text-default">
               Notebook
             </h2>
             {pinnedItems.length > 0 && (
-              <span className="text-xs text-muted bg-bg-alt px-2 py-0.5 rounded-full">
+              <span className="text-xs font-semibold text-accent-text bg-accent px-2 py-0.5 rounded-full">
                 {pinnedItems.length}
               </span>
             )}
