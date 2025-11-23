@@ -38,7 +38,7 @@ export const PoetryCard: React.FC<PoetryCardProps> = ({ item, onSelect, animatio
 
   // Default variant uses darker transparent background for dark mode aesthetic
   // Matte variant explicitly uses bg-alt for notebook cards
-  const bgClass = variant === 'default' ? 'bg-black/40 dark:bg-black/40' : 'bg-[rgb(var(--app-bg-alt))]';
+  const bgClass = variant === 'default' ? 'bg-bg/30 dark:bg-black/40' : 'bg-[rgb(var(--app-bg-alt))]';
 
   return (
     <div className="relative h-full group">
