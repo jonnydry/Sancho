@@ -1,9 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import { Link } from 'react-router-dom';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { useAuth } from '../hooks/useAuth.js';
 import { BookPenIcon } from './icons/BookPenIcon';
-import { Notebook } from './Notebook';
+const Notebook = lazy(() => import('./Notebook').then(module => ({ default: module.Notebook })));
+
+const NotebookFallback = () => (
+  <div className="fixed inset-0 z-40 flex items-end justify-end pointer-events-none">
+    <div className="w-full max-w-md h-24 bg-bg/80 border-l border-default/30" aria-hidden="true" />
+    <span className="sr-only">Loading notebook</span>
+  </div>
+);
 
 export const Header: React.FC = () => {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -71,7 +78,11 @@ export const Header: React.FC = () => {
           </div>
         </div>
       </header>
-      {isAuthenticated && <Notebook isOpen={isNotebookOpen} onClose={() => setIsNotebookOpen(false)} />}
+      {isAuthenticated && isNotebookOpen && (
+        <Suspense fallback={<NotebookFallback />}>
+          <Notebook isOpen={isNotebookOpen} onClose={() => setIsNotebookOpen(false)} />
+        </Suspense>
+      )}
     </>
   );
 };

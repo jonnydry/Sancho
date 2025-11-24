@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { PoetryItem, LearnMoreResponse } from '../types';
 import { ExampleFinder } from './ExampleFinder';
 import { XIcon } from './icons/XIcon';
@@ -8,6 +8,7 @@ import { SparklesIcon } from './icons/SparklesIcon';
 import { SpinnerIcon } from './icons/SpinnerIcon';
 import { PinButton } from './PinButton';
 import { useAuth } from '../hooks/useAuth.js';
+import { ItemTag } from './ItemTag';
 
 import { HistoryIcon } from './icons/HistoryIcon';
 
@@ -17,31 +18,12 @@ interface PoetryDetailModalProps {
   onSelectItem?: (itemName: string) => void;
 }
 
-const Tag: React.FC<{ type: PoetryItem['type'] }> = ({ type }) => {
-  let colorClass = '';
-  switch (type) {
-    case 'Form':
-      colorClass = 'text-tag-form-text';
-      break;
-    case 'Meter':
-      colorClass = 'text-tag-meter-text';
-      break;
-    case 'Device':
-      colorClass = 'text-tag-device-text';
-      break;
-  }
-  return (
-    <span className={`text-xs uppercase tracking-widest font-bold ${colorClass}`}>
-      {type}
-    </span>
-  );
-};
-
 export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onClose, onSelectItem }) => {
   const [learnMoreContext, setLearnMoreContext] = useState<string | null>(null);
   const [isLoadingLearnMore, setIsLoadingLearnMore] = useState(false);
   const [learnMoreError, setLearnMoreError] = useState<string | null>(null);
   const { isAuthenticated } = useAuth();
+  const dialogRef = useRef<HTMLDivElement | null>(null);
 
   const handleLearnMore = useCallback(async () => {
     setIsLoadingLearnMore(true);
@@ -65,40 +47,39 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
     };
 
     const handleTab = (event: KeyboardEvent) => {
-      if (event.key === 'Tab') {
-        const modal = document.querySelector('[role="dialog"]') as HTMLElement;
-        if (!modal) return;
+      if (event.key !== 'Tab' || !dialogRef.current) return;
 
-        const focusableElements = modal.querySelectorAll(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        const firstElement = focusableElements[0] as HTMLElement;
-        const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+      const focusableElements = dialogRef.current.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusableElements.length === 0) {
+        return;
+      }
 
-        if (event.shiftKey) {
-          if (document.activeElement === firstElement) {
-            event.preventDefault();
-            lastElement.focus();
-          }
-        } else {
-          if (document.activeElement === lastElement) {
-            event.preventDefault();
-            firstElement.focus();
-          }
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      if (event.shiftKey) {
+        if (document.activeElement === firstElement) {
+          event.preventDefault();
+          lastElement.focus();
         }
+      } else if (document.activeElement === lastElement) {
+        event.preventDefault();
+        firstElement.focus();
       }
     };
 
     window.addEventListener('keydown', handleEsc);
     window.addEventListener('keydown', handleTab);
 
-    const modal = document.querySelector('[role="dialog"]') as HTMLElement;
-    if (modal) {
-      const firstFocusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])') as HTMLElement;
+    const modalEl = dialogRef.current;
+    if (modalEl) {
+      const firstFocusable = modalEl.querySelector<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
       if (firstFocusable) {
         firstFocusable.focus();
       } else {
-        modal.focus();
+        modalEl.focus();
       }
     }
 
@@ -115,6 +96,8 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
+      ref={dialogRef}
+      tabIndex={-1}
     >
       <div
         className="relative bg-bg rounded-sm w-full max-w-2xl max-h-[85vh] sm:max-h-[90vh] overflow-y-auto m-4 animate-modal-in border border-default shadow-lg"
@@ -134,7 +117,7 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
               <h2 id="modal-title" className="text-2xl sm:text-3xl font-bold text-default m-0 tracking-tight">{item.name}</h2>
               {isAuthenticated && <PinButton item={item} size="md" />}
             </div>
-            <Tag type={item.type} />
+            <ItemTag type={item.type} className="text-xs" />
           </div>
 
           <p className="text-default text-base leading-relaxed mb-6 border-l-2 border-default/20 pl-4">{item.description}</p>

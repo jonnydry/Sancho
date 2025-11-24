@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { Header } from './components/Header';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -6,10 +6,19 @@ import { AuthProvider } from './contexts/AuthContext';
 import { PinnedItemsProvider } from './contexts/PinnedItemsContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { HomePage } from './pages/HomePage';
-import { AboutPage } from './pages/AboutPage';
-import { PrivacyPage } from './pages/PrivacyPage';
-import { TermsPage } from './pages/TermsPage';
-import { NotFoundPage } from './pages/NotFoundPage';
+
+// Lazy load routes for code splitting
+const AboutPage = lazy(() => import('./pages/AboutPage').then(module => ({ default: module.AboutPage })));
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage').then(module => ({ default: module.PrivacyPage })));
+const TermsPage = lazy(() => import('./pages/TermsPage').then(module => ({ default: module.TermsPage })));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage').then(module => ({ default: module.NotFoundPage })));
+
+// Loading fallback component
+const RouteLoadingFallback: React.FC = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <p className="text-muted font-mono text-sm animate-pulse">Loading...</p>
+  </div>
+);
 
 const App: React.FC = () => {
   return (
@@ -21,13 +30,15 @@ const App: React.FC = () => {
           <div className="min-h-screen flex flex-col bg-bg text-default">
             <Header />
             <div className="flex-grow">
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/about" element={<AboutPage />} />
-                <Route path="/privacy" element={<PrivacyPage />} />
-                <Route path="/terms" element={<TermsPage />} />
-                <Route path="*" element={<NotFoundPage />} />
-              </Routes>
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/about" element={<AboutPage />} />
+                  <Route path="/privacy" element={<PrivacyPage />} />
+                  <Route path="/terms" element={<TermsPage />} />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </Suspense>
             </div>
             <footer className="text-center py-8 px-4 border-t border-default">
               <p className="text-muted text-sm mb-2">

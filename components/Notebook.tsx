@@ -1,10 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense, useRef, useCallback } from 'react';
 import { usePinnedItems } from '../contexts/PinnedItemsContext';
 import { PoetryItem } from '../types';
 import { XIcon } from './icons/XIcon';
 import { BookPenIcon } from './icons/BookPenIcon';
 import { PoetryCard } from './PoetryCard';
-import { PoetryDetailModal } from './PoetryDetailModal';
+
+const PoetryDetailModal = lazy(() => import('./PoetryDetailModal').then(module => ({ default: module.PoetryDetailModal })));
+
+const ModalFallback = () => (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+    <p className="text-muted font-mono text-sm animate-pulse">Loading context...</p>
+  </div>
+);
 
 interface NotebookProps {
   isOpen: boolean;
@@ -14,6 +21,14 @@ interface NotebookProps {
 export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
   const { pinnedItems, isLoading, unpinItem } = usePinnedItems();
   const [selectedItem, setSelectedItem] = useState<PoetryItem | null>(null);
+  const previousOverflow = useRef<string | null>(null);
+
+  const restoreOverflow = useCallback(() => {
+    if (typeof document === 'undefined') return;
+    if (previousOverflow.current === null) return;
+    document.body.style.overflow = previousOverflow.current;
+    previousOverflow.current = null;
+  }, []);
 
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
@@ -24,17 +39,21 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
 
     if (isOpen) {
       window.addEventListener('keydown', handleEsc);
-      // Prevent body scroll when sidebar is open
-      document.body.style.overflow = 'hidden';
+      if (typeof document !== 'undefined') {
+        if (previousOverflow.current === null) {
+          previousOverflow.current = document.body.style.overflow || '';
+        }
+        document.body.style.overflow = 'hidden';
+      }
     } else {
-      document.body.style.overflow = '';
+      restoreOverflow();
     }
 
     return () => {
       window.removeEventListener('keydown', handleEsc);
-      document.body.style.overflow = '';
+      restoreOverflow();
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, restoreOverflow]);
 
   const handleCardClick = (item: PoetryItem) => {
     setSelectedItem(item);
@@ -117,7 +136,9 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
 
       {/* Modal for selected item */}
       {selectedItem && (
-        <PoetryDetailModal item={selectedItem} onClose={handleCloseModal} />
+        <Suspense fallback={<ModalFallback />}>
+          <PoetryDetailModal item={selectedItem} onClose={handleCloseModal} />
+        </Suspense>
       )}
     </>
   );

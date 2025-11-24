@@ -17,6 +17,9 @@ export const AboutPage: React.FC = () => {
               src="/sancho-logo.png"
               alt="Sancho Logo"
               className="w-full h-full object-contain"
+              width="288"
+              height="288"
+              loading="lazy"
             />
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-default mb-2 tracking-tight">About Sancho</h1>
@@ -149,7 +152,7 @@ export const AboutPage: React.FC = () => {
           <div className="text-center pt-8">
             <Link
               to="/"
-              className="inline-block px-6 sm:px-8 py-3 border border-white text-white text-sm font-semibold bg-white/10 backdrop-blur-sm hover:bg-white/20 hover:border-white/80 transition-all duration-300 uppercase tracking-wider rounded-lg"
+              className="inline-block px-6 sm:px-8 py-3 border border-default text-default text-sm font-semibold bg-[rgb(var(--app-bg-alt)/0.4)] backdrop-blur-sm hover:bg-[rgb(var(--app-bg-alt)/0.6)] hover:border-accent transition-all duration-300 uppercase tracking-wider rounded-lg"
             >
               Explore Poetry
             </Link>

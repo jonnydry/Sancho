@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import compression from 'compression';
 import OpenAI from 'openai';
 import { setupAuth, isAuthenticated, getFrontendOrigin } from './server/replitAuth.js';
 import { storage } from './server/storage.js';
@@ -132,7 +133,36 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+// Response compression (gzip/brotli) - compress JSON responses and static assets
+// Filter function to skip compression for very small responses (not worth CPU cost)
+app.use(compression({
+  filter: (req, res) => {
+    // Don't compress responses if compression is disabled or response is very small
+    if (req.headers['x-no-compression']) {
+      return false;
+    }
+    // Use compression for all other responses
+    return compression.filter(req, res);
+  },
+  level: 6, // Balance between compression ratio and CPU usage (0-9, 6 is good default)
+  threshold: 1024, // Only compress responses larger than 1KB
+}));
+
 app.use(express.json({ limit: '10mb' })); // Add payload size limit
+
+// Caching headers middleware
+app.use((req, res, next) => {
+  // Set no-cache for API endpoints that require fresh data
+  if (req.path.startsWith('/api')) {
+    // API endpoints should not be cached by default
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
+  // Static assets will get cache headers from express.static configuration
+  next();
+});
 
 // Input validation middleware
 function validateInput(req, res, next) {
@@ -482,6 +512,9 @@ app.delete('/api/pinned-items/:itemName', isAuthenticated, async (req, res) => {
 });
 
 app.get('/health', async (req, res) => {
+  // Health endpoint can be cached for a short period (10 seconds)
+  res.setHeader('Cache-Control', 'public, max-age=10');
+  
   const health = {
     status: 'ok',
     timestamp: new Date().toISOString(),
@@ -564,8 +597,24 @@ if (process.env.NODE_ENV === 'production') {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
   
-  // Serve static assets
-  app.use(express.static(path.join(__dirname, 'dist')));
+  // Serve static assets with caching headers
+  app.use(express.static(path.join(__dirname, 'dist'), {
+    etag: true, // Enable ETag support for conditional requests
+    lastModified: true, // Enable Last-Modified headers
+    maxAge: '1y', // Cache static assets for 1 year (browser cache)
+    immutable: true, // Mark as immutable (Vite adds content hashes to filenames)
+    setHeaders: (res, path) => {
+      // Additional headers for specific file types
+      if (path.endsWith('.html')) {
+        // HTML files should not be cached (SPA routing)
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      } else if (path.endsWith('.json')) {
+        // JSON data files - cache for shorter period
+        res.setHeader('Cache-Control', 'public, max-age=3600'); // 1 hour
+      }
+      // Other static assets (JS, CSS, images) get the default maxAge from above
+    }
+  }));
   
   // SPA catchall - serve index.html for all non-API routes
   // This ensures React Router works when accessing Express directly

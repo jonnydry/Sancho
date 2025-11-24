@@ -188,3 +188,12 @@ body {
 .animate-slide-in-right {
   animation: slideInRight 0.3s ease-out forwards;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-fade-in-fast,
+  .animate-modal-in,
+  .animate-slide-in-right {
+    animation: none !important;
+  }
+}

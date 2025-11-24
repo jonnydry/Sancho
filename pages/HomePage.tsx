@@ -1,11 +1,14 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, Suspense, lazy } from 'react';
 import { PoetryCard } from '../components/PoetryCard';
 import { SearchFilter } from '../components/SearchFilter';
 import { PoetryItem } from '../types';
-import { PoetryDetailModal } from '../components/PoetryDetailModal';
 import { SanchoQuote } from '../components/SanchoQuote';
+import { DataLoadingSkeleton } from '../components/DataLoadingSkeleton';
 
 import { ArrowDownIcon } from '../components/icons/ArrowDownIcon';
+
+// Lazy load modal component (only loads when needed)
+const PoetryDetailModal = lazy(() => import('../components/PoetryDetailModal').then(module => ({ default: module.PoetryDetailModal })));
 
 export const HomePage: React.FC = () => {
   const [modalItem, setModalItem] = useState<PoetryItem | null>(null);
@@ -58,20 +61,30 @@ export const HomePage: React.FC = () => {
   };
 
   const filteredData = useMemo(() => {
-    return allData
-      .filter(item => {
-        if (activeFilter === 'all') return true;
-        return item.type === activeFilter;
-      })
-      .filter(item => {
-        if (!searchQuery) return true;
-        const query = searchQuery.toLowerCase();
-        return (
-          item.name.toLowerCase().includes(query) ||
-          item.description.toLowerCase().includes(query) ||
-          (item.tags && item.tags.some(tag => tag.toLowerCase().includes(query)))
-        );
-      });
+    // Combine filters into single pass for better performance
+    const query = searchQuery.toLowerCase();
+    const hasQuery = query.length > 0;
+    const filterType = activeFilter;
+    
+    return allData.filter(item => {
+      // Type filter
+      if (filterType !== 'all' && item.type !== filterType) {
+        return false;
+      }
+      
+      // Search query filter
+      if (hasQuery) {
+        const matchesName = item.name.toLowerCase().includes(query);
+        const matchesDescription = item.description.toLowerCase().includes(query);
+        const matchesTags = item.tags && item.tags.some(tag => tag.toLowerCase().includes(query));
+        
+        if (!matchesName && !matchesDescription && !matchesTags) {
+          return false;
+        }
+      }
+      
+      return true;
+    });
   }, [searchQuery, activeFilter, allData]);
 
   const displayedData = useMemo(() => {
@@ -87,6 +100,9 @@ export const HomePage: React.FC = () => {
               src="/sancho-logo.png"
               alt="Sancho Logo"
               className="w-full h-full object-contain"
+              width="288"
+              height="288"
+              fetchPriority="high"
             />
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-default mb-2 tracking-tight">Sancho.ref</h1>
@@ -109,9 +125,7 @@ export const HomePage: React.FC = () => {
         </div>
 
         {isLoadingData ? (
-          <div className="text-center mt-20">
-            <p className="text-muted font-mono text-sm animate-pulse">Initializing database...</p>
-          </div>
+          <DataLoadingSkeleton />
         ) : displayedData.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
@@ -128,7 +142,7 @@ export const HomePage: React.FC = () => {
               <div className="text-center mt-16">
                 <button
                   onClick={handleShowMore}
-                  className="px-8 py-3 border border-white text-white text-sm font-semibold bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 hover:border-white/80 transition-all duration-300 flex items-center gap-2 mx-auto"
+                  className="px-8 py-3 border border-default text-default text-sm font-semibold bg-[rgb(var(--app-bg-alt)/0.4)] backdrop-blur-sm rounded-lg hover:bg-[rgb(var(--app-bg-alt)/0.6)] hover:border-accent transition-all duration-300 flex items-center gap-2 mx-auto"
                   aria-label="Show more poetry items"
                 >
                   <span>LOAD MORE</span>
@@ -145,11 +159,13 @@ export const HomePage: React.FC = () => {
         )}
       </div>
       {modalItem && (
-        <PoetryDetailModal
-          item={modalItem}
-          onClose={handleCloseModal}
-          onSelectItem={handleSelectRelatedItem}
-        />
+        <Suspense fallback={<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"><p className="text-muted font-mono text-sm animate-pulse">Loading...</p></div>}>
+          <PoetryDetailModal
+            item={modalItem}
+            onClose={handleCloseModal}
+            onSelectItem={handleSelectRelatedItem}
+          />
+        </Suspense>
       )}
     </main>
   );

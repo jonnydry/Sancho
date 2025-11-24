@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { findPoetryExample } from '../services/apiService';
 import { PoetryExampleResponse } from '../types';
 import { SparklesIcon } from './icons/SparklesIcon';
@@ -8,7 +8,7 @@ interface ExampleFinderProps {
   topic: string;
 }
 
-export const ExampleFinder: React.FC<ExampleFinderProps> = ({ topic }) => {
+export const ExampleFinder: React.FC<ExampleFinderProps> = memo(({ topic }) => {
   const [example, setExample] = useState<PoetryExampleResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,4 +65,4 @@ export const ExampleFinder: React.FC<ExampleFinderProps> = ({ topic }) => {
       )}
     </div>
   );
-};
+});

@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { PoetryItem } from '../types';
 import { ArrowUpRightIcon } from './icons/ArrowUpRightIcon';
 import { PinButton } from './PinButton';
 import { useAuth } from '../hooks/useAuth.js';
+import { ItemTag } from './ItemTag';
 
 interface PoetryCardProps {
   item: PoetryItem;
@@ -11,29 +12,7 @@ interface PoetryCardProps {
   variant?: 'default' | 'matte';
 }
 
-const Tag: React.FC<{ type: PoetryItem['type'] }> = ({ type }) => {
-  let colorClass = '';
-  // Using muted text colors for academic look
-  switch (type) {
-    case 'Form':
-      colorClass = 'text-tag-form-text';
-      break;
-    case 'Meter':
-      colorClass = 'text-tag-meter-text';
-      break;
-    case 'Device':
-      colorClass = 'text-tag-device-text';
-      break;
-  }
-  return (
-    <span className={`text-[10px] uppercase tracking-widest font-bold ${colorClass}`}>
-      {type}
-    </span>
-  );
-};
-
-
-export const PoetryCard: React.FC<PoetryCardProps> = ({ item, onSelect, animationIndex, variant = 'default' }) => {
+export const PoetryCard: React.FC<PoetryCardProps> = memo(({ item, onSelect, animationIndex, variant = 'default' }) => {
   const { isAuthenticated } = useAuth();
 
   // Default variant uses darker transparent background for dark mode aesthetic
@@ -62,7 +41,7 @@ export const PoetryCard: React.FC<PoetryCardProps> = ({ item, onSelect, animatio
                 <h3 className="text-lg font-bold text-default tracking-tight group-hover:text-accent transition-colors">{item.name}</h3>
                 {isAuthenticated && <PinButton item={item} size="sm" />}
              </div>
-             <Tag type={item.type} />
+             <ItemTag type={item.type} />
           </div>
           <ArrowUpRightIcon
             className="w-4 h-4 text-muted opacity-0 group-hover:opacity-100 transition-opacity"
@@ -100,4 +79,4 @@ export const PoetryCard: React.FC<PoetryCardProps> = ({ item, onSelect, animatio
       </div>
     </div>
   );
-};
+});

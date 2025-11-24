@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { PoetryItem } from '../types';
 import { useAuth } from '../hooks/useAuth.js';
 
@@ -81,7 +81,9 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
 
     try {
-      console.log('Attempting to pin item:', { name: item.name, type: item.type });
+      if (import.meta.env.DEV) {
+        console.log('Attempting to pin item:', { name: item.name, type: item.type });
+      }
       const response = await fetch('/api/pinned-items', {
         method: 'POST',
         headers: {
@@ -92,7 +94,9 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
       });
 
       if (response.ok) {
-        console.log('Successfully pinned item:', item.name);
+        if (import.meta.env.DEV) {
+          console.log('Successfully pinned item:', item.name);
+        }
         // Refresh to ensure server state matches (handles race conditions)
         await fetchPinnedItems();
       } else {
@@ -136,14 +140,18 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
 
     try {
-      console.log('Attempting to unpin item:', itemName);
+      if (import.meta.env.DEV) {
+        console.log('Attempting to unpin item:', itemName);
+      }
       const response = await fetch(`/api/pinned-items/${encodeURIComponent(itemName)}`, {
         method: 'DELETE',
         credentials: 'include',
       });
 
       if (response.ok) {
-        console.log('Successfully unpinned item:', itemName);
+        if (import.meta.env.DEV) {
+          console.log('Successfully unpinned item:', itemName);
+        }
         // Refresh to ensure server state matches
         await fetchPinnedItems();
       } else {
@@ -171,17 +179,18 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
     return pinnedItems.some(item => item.name === itemName);
   }, [pinnedItems]);
 
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
+    pinnedItems,
+    isLoading,
+    pinItem,
+    unpinItem,
+    isPinned,
+    refreshPinnedItems: fetchPinnedItems,
+  }), [pinnedItems, isLoading, pinItem, unpinItem, isPinned, fetchPinnedItems]);
+
   return (
-    <PinnedItemsContext.Provider
-      value={{
-        pinnedItems,
-        isLoading,
-        pinItem,
-        unpinItem,
-        isPinned,
-        refreshPinnedItems: fetchPinnedItems,
-      }}
-    >
+    <PinnedItemsContext.Provider value={contextValue}>
       {children}
     </PinnedItemsContext.Provider>
   );

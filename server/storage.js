@@ -2,6 +2,66 @@ import { users, pinnedItems } from "../shared/schema.js";
 import { db } from "./db.js";
 import { eq, and, desc } from "drizzle-orm";
 
+// Simple in-memory cache with TTL for frequently accessed data
+class SimpleCache {
+  constructor() {
+    this.cache = new Map();
+    this.maxSize = 1000; // Prevent unbounded memory growth
+  }
+
+  get(key) {
+    const entry = this.cache.get(key);
+    if (!entry) return null;
+    
+    // Check if expired
+    if (Date.now() > entry.expiresAt) {
+      this.cache.delete(key);
+      return null;
+    }
+    
+    return entry.value;
+  }
+
+  set(key, value, ttlMs) {
+    // Prevent cache from growing too large
+    if (this.cache.size >= this.maxSize) {
+      // Remove oldest entry (simple FIFO)
+      const firstKey = this.cache.keys().next().value;
+      this.cache.delete(firstKey);
+    }
+    
+    this.cache.set(key, {
+      value,
+      expiresAt: Date.now() + ttlMs,
+    });
+  }
+
+  delete(key) {
+    this.cache.delete(key);
+  }
+
+  clear() {
+    this.cache.clear();
+  }
+
+  // Invalidate all entries matching a pattern (for user-specific caches)
+  invalidatePattern(pattern) {
+    for (const key of this.cache.keys()) {
+      if (pattern.test(key)) {
+        this.cache.delete(key);
+      }
+    }
+  }
+}
+
+// Cache instances with different TTLs
+const userCache = new SimpleCache();
+const pinnedItemsCache = new SimpleCache();
+
+// Cache TTLs
+const USER_CACHE_TTL = 10 * 1000; // 10 seconds
+const PINNED_ITEMS_CACHE_TTL = 5 * 1000; // 5 seconds
+
 // Helper function to handle database errors
 function handleDatabaseError(error, operation) {
   console.error(`Database error in ${operation}:`, error);
@@ -29,8 +89,17 @@ function handleDatabaseError(error, operation) {
 export class DatabaseStorage {
   // User operations - required for Replit Auth
   async getUser(id) {
+    // Check cache first
+    const cacheKey = `user:${id}`;
+    const cached = userCache.get(cacheKey);
+    if (cached !== null) {
+      return cached;
+    }
+
     try {
       const [user] = await db.select().from(users).where(eq(users.id, id));
+      // Cache the result (including null for non-existent users to avoid repeated queries)
+      userCache.set(cacheKey, user, USER_CACHE_TTL);
       return user;
     } catch (error) {
       handleDatabaseError(error, 'getUser');
@@ -50,6 +119,12 @@ export class DatabaseStorage {
           },
         })
         .returning();
+      
+      // Invalidate user cache after update
+      if (userData.id) {
+        userCache.delete(`user:${userData.id}`);
+      }
+      
       return user;
     } catch (error) {
       handleDatabaseError(error, 'upsertUser');
@@ -58,16 +133,27 @@ export class DatabaseStorage {
 
   // Pinned items operations
   async getPinnedItems(userId) {
+    // Check cache first
+    const cacheKey = `pinned:${userId}`;
+    const cached = pinnedItemsCache.get(cacheKey);
+    if (cached !== null) {
+      return cached;
+    }
+
     try {
       const items = await db
         .select()
         .from(pinnedItems)
         .where(eq(pinnedItems.userId, userId))
         .orderBy(desc(pinnedItems.createdAt));
-      return items.map(item => ({
+      const processedItems = items.map(item => ({
         ...item,
         itemData: typeof item.itemData === 'string' ? JSON.parse(item.itemData) : item.itemData,
       }));
+      
+      // Cache the result
+      pinnedItemsCache.set(cacheKey, processedItems, PINNED_ITEMS_CACHE_TTL);
+      return processedItems;
     } catch (error) {
       handleDatabaseError(error, 'getPinnedItems');
     }
@@ -93,6 +179,9 @@ export class DatabaseStorage {
       if (!pinned) {
         throw new Error('Failed to insert pinned item: no item returned from database');
       }
+      
+      // Invalidate pinned items cache for this user
+      pinnedItemsCache.delete(`pinned:${userId}`);
       
       return {
         ...pinned,
@@ -147,6 +236,10 @@ export class DatabaseStorage {
           eq(pinnedItems.itemName, itemName)
         ))
         .returning();
+      
+      // Invalidate pinned items cache for this user
+      pinnedItemsCache.delete(`pinned:${userId}`);
+      
       return unpinned;
     } catch (error) {
       handleDatabaseError(error, 'unpinItem');

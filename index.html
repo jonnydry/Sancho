@@ -5,30 +5,34 @@
     <script>
       (function() {
         const root = document.documentElement;
-        
-        // Get initial mode from localStorage or system preference
-        let initialMode = localStorage.getItem('theme-mode');
-        if (initialMode !== 'light' && initialMode !== 'dark') {
-          if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            initialMode = 'dark';
-          } else {
-            initialMode = 'dark'; // default
-          }
+        if (!root) {
+          return;
         }
-        
-        // Get initial color from localStorage
-        let initialColor = localStorage.getItem('theme-color');
-        if (initialColor !== 'paper' && initialColor !== 'slate') {
-          initialColor = 'dark'; // default
+
+        let storedMode = null;
+        let storedColor = null;
+        try {
+          storedMode = window.localStorage.getItem('theme-mode');
+          storedColor = window.localStorage.getItem('theme-color');
+        } catch (_) {
+          storedMode = null;
+          storedColor = null;
         }
-        
-        // Remove all theme classes
+
+        let initialMode = 'dark';
+        if (storedMode === 'light' || storedMode === 'dark') {
+          initialMode = storedMode;
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          initialMode = 'dark';
+        }
+
+        let initialColor = 'dark';
+        if (storedColor === 'paper' || storedColor === 'slate') {
+          initialColor = storedColor;
+        }
+
         root.classList.remove('light', 'dark', 'theme-paper', 'theme-slate', 'theme-parchment', 'theme-veridian');
-        
-        // Apply mode class
         root.classList.add(initialMode);
-        
-        // Apply color theme class if not 'dark'
         if (initialColor !== 'dark') {
           root.classList.add('theme-' + initialColor);
         }
@@ -59,9 +63,20 @@
     <meta property="twitter:description" content="Explore 37 poetic forms, 22 meters, and 31 literary devices with AI-powered examples." />
     <meta property="twitter:image" content="/sancho-logo.png" />
     
-    <!-- Fonts -->
+    <!-- Resource Hints for Performance -->
+    <!-- DNS prefetch for API endpoints -->
+    <link rel="dns-prefetch" href="/api">
+    
+    <!-- Preconnect for external domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Prefetch likely navigation routes -->
+    <link rel="prefetch" href="/about" as="document">
+    <link rel="prefetch" href="/privacy" as="document">
+    <link rel="prefetch" href="/terms" as="document">
+    
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600;700&display=swap" rel="stylesheet">
     
     <!-- Structured Data for SEO -->

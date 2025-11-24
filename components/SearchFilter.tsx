@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useId } from 'react';
 import { PoetryItem } from '../types';
 import { XIcon } from './icons/XIcon';
 
@@ -23,17 +23,22 @@ const filters: { label: string; value: FilterType; icon: React.FC<React.SVGProps
   { label: 'Devices', value: 'Device', icon: LiteraryDevicesIcon },
 ];
 
-export const SearchFilter: React.FC<SearchFilterProps> = ({
+export const SearchFilter: React.FC<SearchFilterProps> = memo(({
   searchQuery,
   setSearchQuery,
   activeFilter,
   setActiveFilter,
 }) => {
+  const searchInputId = useId();
+  const filterGroupLabelId = useId();
+
   return (
     <div className="space-y-6 mb-8">
       {/* Minimal Input */}
       <div className="relative w-full group">
+        <label htmlFor={searchInputId} className="sr-only">Search poetry database</label>
         <input
+          id={searchInputId}
           type="text"
           placeholder="Search database..."
           value={searchQuery}
@@ -43,6 +48,7 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
         {searchQuery && (
           <button
             onClick={() => setSearchQuery('')}
+            type="button"
             className="absolute inset-y-0 right-0 flex items-center text-muted hover:text-default transition-colors"
             aria-label="Clear search"
           >
@@ -52,11 +58,20 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
       </div>
 
       {/* Text-only Tabs */}
-      <div className="flex items-center gap-3 sm:gap-6 border-b border-default/30 pb-px">
+      <span id={filterGroupLabelId} className="sr-only">Filter results by category</span>
+      <div
+        className="flex items-center gap-3 sm:gap-6 border-b border-default/30 pb-px"
+        role="radiogroup"
+        aria-labelledby={filterGroupLabelId}
+      >
         {filters.map(({ label, value, icon: Icon }) => (
           <button
             key={value}
+            type="button"
             onClick={() => setActiveFilter(value)}
+            role="radio"
+            aria-checked={activeFilter === value}
+            tabIndex={activeFilter === value ? 0 : -1}
             className={`pb-2 text-xs sm:text-sm whitespace-nowrap transition-all duration-200 focus:outline-none flex items-center gap-2 ${activeFilter === value
                 ? 'text-default font-bold border-b-2 border-accent'
                 : 'text-muted hover:text-default font-normal border-b-2 border-transparent hover:border-default/30'
@@ -69,4 +84,4 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
       </div>
     </div>
   );
-};
+});
