@@ -8,11 +8,12 @@ import { ItemTag } from './ItemTag';
 interface PoetryCardProps {
   item: PoetryItem;
   onSelect: (item: PoetryItem) => void;
+  onTagClick?: (tag: string) => void;
   animationIndex: number;
   variant?: 'default' | 'matte';
 }
 
-export const PoetryCard: React.FC<PoetryCardProps> = memo(({ item, onSelect, animationIndex, variant = 'default' }) => {
+export const PoetryCard: React.FC<PoetryCardProps> = memo(({ item, onSelect, onTagClick, animationIndex, variant = 'default' }) => {
   const { isAuthenticated } = useAuth();
 
   // Default variant uses darker transparent background for dark mode aesthetic
@@ -55,13 +56,19 @@ export const PoetryCard: React.FC<PoetryCardProps> = memo(({ item, onSelect, ani
 
         {item.tags && item.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-4">
-            {item.tags.slice(0, 3).map((tag, index) => (
-              <span
-                key={index}
-                className="px-1.5 py-0.5 text-[9px] bg-bg-alt/30 border border-default/20 rounded text-muted/70"
+            {item.tags.slice(0, 3).map((tag) => (
+              <button
+                key={tag}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onTagClick?.(tag);
+                }}
+                aria-label={`Filter by ${tag}`}
+                className="px-1.5 py-0.5 text-[9px] bg-bg-alt/30 border border-default/20 rounded text-muted/70 hover:bg-accent/20 hover:border-accent/40 hover:text-default transition-colors cursor-pointer"
               >
                 {tag}
-              </span>
+              </button>
             ))}
             {item.tags.length > 3 && (
               <span className="px-1.5 py-0.5 text-[9px] text-muted/50">

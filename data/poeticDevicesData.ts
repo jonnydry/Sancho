@@ -24,7 +24,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Connects two different concepts',
       'Often used for descriptive effect'
     ],
-    exampleSnippet: 'O, my luve is like a red, red rose, / That\'s newly sprung in June;'
+    exampleSnippet: 'O, my luve is like a red, red rose, / That\'s newly sprung in June;',
+    tags: ['figurative language', 'comparison']
   },
   {
     name: 'Alliteration',
@@ -49,7 +50,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Brings concepts to life',
       'Creates vivid imagery'
     ],
-    exampleSnippet: 'Because I could not stop for Death – / He kindly stopped for me –'
+    exampleSnippet: 'Because I could not stop for Death – / He kindly stopped for me –',
+    tags: ['figurative language', 'imagery']
   },
   {
     name: 'Assonance',
@@ -60,7 +62,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Creates internal rhyming',
       'Enhances the mood and musical quality'
     ],
-    exampleSnippet: 'The light of the fire is a sight. / Go and mow the lawn.'
+    exampleSnippet: 'The light of the fire is a sight. / Go and mow the lawn.',
+    tags: ['sound device', 'repetition']
   },
   {
     name: 'Consonance',
@@ -71,7 +74,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Creates a pleasing, harmonious sound',
       'Different from alliteration, which is at the start of words'
     ],
-    exampleSnippet: 'The silken, sad, uncertain rustling of each purple curtain.'
+    exampleSnippet: 'The silken, sad, uncertain rustling of each purple curtain.',
+    tags: ['sound device', 'repetition']
   },
   {
     name: 'Onomatopoeia',
@@ -82,7 +86,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Adds sensory detail to writing',
       'Examples: buzz, crash, sizzle'
     ],
-    exampleSnippet: 'The buzz saw snarled and rattled in the yard.'
+    exampleSnippet: 'The buzz saw snarled and rattled in the yard.',
+    tags: ['sound device', 'imagery']
   },
   {
     name: 'Enjambment',
@@ -107,7 +112,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Not meant to be taken literally',
       'Creates a strong emotional response'
     ],
-    exampleSnippet: 'And I will love thee still, my dear, / Till a’ the seas gang dry.'
+    exampleSnippet: 'And I will love thee still, my dear, / Till a' the seas gang dry.',
+    tags: ['figurative language', 'emphasis']
   },
   {
     name: 'Irony',
@@ -118,7 +124,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Can be verbal, situational, or dramatic',
       'Often used for humorous or emphatic effect'
     ],
-    exampleSnippet: 'Water, water, every where, / And all the boards did shrink; / Water, water, every where, / Nor any drop to drink.'
+    exampleSnippet: 'Water, water, every where, / And all the boards did shrink; / Water, water, every where, / Nor any drop to drink.',
+    tags: ['figurative language', 'tone']
   },
   {
     name: 'Oxymoron',
@@ -129,7 +136,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Creates a paradoxical effect',
       'Examples: "living dead", "deafening silence"'
     ],
-    exampleSnippet: 'O brawling love! O loving hate! / O anything, of nothing first create!'
+    exampleSnippet: 'O brawling love! O loving hate! / O anything, of nothing first create!',
+    tags: ['figurative language', 'contrast']
   },
   {
     name: 'Apostrophe',
@@ -140,7 +148,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Often begins with "O," or "Oh,"',
       'Creates a dramatic and emotional tone'
     ],
-    exampleSnippet: 'Twinkle, twinkle, little star, / How I wonder what you are.'
+    exampleSnippet: 'Twinkle, twinkle, little star, / How I wonder what you are.',
+    tags: ['figurative language', 'dramatic']
   },
   {
     name: 'Synecdoche',
@@ -196,7 +205,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Makes abstract ideas concrete',
       'Essential element of poetic language'
     ],
-    exampleSnippet: 'The fair breeze blew, the white foam flew, / The furrow followed free'
+    exampleSnippet: 'The fair breeze blew, the white foam flew, / The furrow followed free',
+    tags: ['descriptive', 'sensory']
   },
   {
     name: 'Symbolism',
@@ -208,7 +218,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Adds depth and layers of meaning',
       'Encourages interpretation'
     ],
-    exampleSnippet: 'Two roads diverged in a yellow wood...' // Roads symbolize life choices
+    exampleSnippet: 'Two roads diverged in a yellow wood...', // Roads symbolize life choices
+    tags: ['figurative language', 'imagery']
   },
   {
     name: 'Allusion',
@@ -220,7 +231,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Adds depth and layers of meaning',
       'Can be biblical, mythological, literary, or historical'
     ],
-    exampleSnippet: 'No! I am not Prince Hamlet, nor was meant to be' // Allusion to Shakespeare
+    exampleSnippet: 'No! I am not Prince Hamlet, nor was meant to be', // Allusion to Shakespeare
+    tags: ['figurative language', 'intertextual']
   },
   {
     name: 'Metonymy',
@@ -247,7 +259,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Different from oxymoron (paradox is a statement, oxymoron is two words)',
       'Challenges conventional thinking'
     ],
-    exampleSnippet: 'I must be cruel only to be kind' // Hamlet
+    exampleSnippet: 'I must be cruel only to be kind', // Hamlet
+    tags: ['figurative language', 'contrast']
   },
   {
     name: 'Refrain',
@@ -259,7 +272,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Creates rhythm and emphasis',
       'Common in ballads, villanelles, and songs'
     ],
-    exampleSnippet: 'And miles to go before I sleep, / And miles to go before I sleep.' // Frost
+    exampleSnippet: 'And miles to go before I sleep, / And miles to go before I sleep.', // Frost
+    tags: ['repetition', 'structural device']
   },
   {
     name: 'Internal Rhyme',
@@ -271,7 +285,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Creates musicality and connection',
       'Adds complexity to sound patterns'
     ],
-    exampleSnippet: 'Once upon a midnight dreary, while I pondered, weak and weary' // dreary/weary
+    exampleSnippet: 'Once upon a midnight dreary, while I pondered, weak and weary', // dreary/weary
+    tags: ['sound device', 'rhyme']
   },
   {
     name: 'Slant Rhyme',
@@ -284,7 +299,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Common in modern poetry',
       'Creates subtle, sophisticated sound patterns'
     ],
-    exampleSnippet: 'I heard a Fly buzz - when I died - / The Stillness in the Room / Was like the Stillness in the Air - / Between the Heaves of Storm -' // Room/Storm
+    exampleSnippet: 'I heard a Fly buzz - when I died - / The Stillness in the Room / Was like the Stillness in the Air - / Between the Heaves of Storm -', // Room/Storm
+    tags: ['sound device', 'rhyme']
   },
   {
     name: 'Cacophony',
@@ -297,7 +313,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Opposite of euphony',
       'Often matches harsh content'
     ],
-    exampleSnippet: 'Blow, winds, and crack your cheeks! rage! blow!'
+    exampleSnippet: 'Blow, winds, and crack your cheeks! rage! blow!',
+    tags: ['sound device', 'tone']
   },
   {
     name: 'Euphony',
@@ -310,7 +327,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Opposite of cacophony',
       'Often matches pleasant content'
     ],
-    exampleSnippet: 'Season of mists and mellow fruitfulness, / Close bosom-friend of the maturing sun'
+    exampleSnippet: 'Season of mists and mellow fruitfulness, / Close bosom-friend of the maturing sun',
+    tags: ['sound device', 'tone']
   },
   {
     name: 'Juxtaposition',
@@ -322,7 +340,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Creates emphasis through contrast',
       'Can be ironic or illuminating'
     ],
-    exampleSnippet: 'It was the best of times, it was the worst of times' // Dickens
+    exampleSnippet: 'It was the best of times, it was the worst of times', // Dickens
+    tags: ['structural device', 'contrast']
   },
   {
     name: 'Volta',
@@ -334,7 +353,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'In English sonnets: before the final couplet (line 13)',
       'Signals a change in perspective or conclusion'
     ],
-    exampleSnippet: 'But thy eternal summer shall not fade...' // Shift in Shakespeare\'s Sonnet 18
+    exampleSnippet: 'But thy eternal summer shall not fade...', // Shift in Shakespeare\'s Sonnet 18
+    tags: ['structural device', 'sonnet']
   },
   {
     name: 'Chiasmus',
@@ -346,7 +366,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Memorable and quotable',
       'Common in speeches and epigrams'
     ],
-    exampleSnippet: 'Ask not what your country can do for you—ask what you can do for your country' // Kennedy
+    exampleSnippet: 'Ask not what your country can do for you—ask what you can do for your country', // Kennedy
+    tags: ['structural device', 'rhetoric']
   },
   {
     name: 'Epistrophe',
@@ -358,7 +379,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Creates emphasis and rhythm',
       'Builds to a conclusion'
     ],
-    exampleSnippet: 'When I was a child, I spoke as a child, I understood as a child, I thought as a child'
+    exampleSnippet: 'When I was a child, I spoke as a child, I understood as a child, I thought as a child',
+    tags: ['repetition', 'structural device']
   },
   {
     name: 'Repetition',
@@ -370,7 +392,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Can build intensity or create patterns',
       'Includes anaphora, epistrophe, and refrain as specific types'
     ],
-    exampleSnippet: 'Rage, rage against the dying of the light' // Thomas
+    exampleSnippet: 'Rage, rage against the dying of the light', // Thomas
+    tags: ['repetition', 'emphasis']
   },
   {
     name: 'Pun',
@@ -382,7 +405,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Often humorous or clever',
       'Can create double meanings'
     ],
-    exampleSnippet: 'Ask for me tomorrow, and you shall find me a grave man' // Mercutio in Romeo & Juliet (grave = serious/tomb)
+    exampleSnippet: 'Ask for me tomorrow, and you shall find me a grave man', // Mercutio in Romeo & Juliet (grave = serious/tomb)
+    tags: ['wordplay', 'humorous']
   },
   {
     name: 'Allegory',
@@ -395,7 +419,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Often used to teach moral or political lessons',
       'Examples: The Pilgrim\'s Progress, Animal Farm'
     ],
-    exampleSnippet: 'All animals are equal, but some animals are more equal than others.' // Animal Farm allegory
+    exampleSnippet: 'All animals are equal, but some animals are more equal than others.', // Animal Farm allegory
+    tags: ['figurative language', 'narrative']
   },
   {
     name: 'Litotes',
@@ -408,7 +433,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Examples: "not bad" (meaning good), "not uncommon"',
       'Common in formal and academic writing'
     ],
-    exampleSnippet: 'He was not unfamiliar with the works of Shakespeare.' // Meaning: he was very familiar
+    exampleSnippet: 'He was not unfamiliar with the works of Shakespeare.', // Meaning: he was very familiar
+    tags: ['figurative language', 'rhetoric']
   },
   {
     name: 'Understatement',
@@ -421,7 +447,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Can be humorous or serious',
       'Common in British humor and satire'
     ],
-    exampleSnippet: 'It\'s just a flesh wound.' // When a limb has been cut off (Monty Python)
+    exampleSnippet: 'It\'s just a flesh wound.', // When a limb has been cut off (Monty Python)
+    tags: ['figurative language', 'tone']
   },
   {
     name: 'Rhetorical Question',
@@ -434,7 +461,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Common in speeches and persuasive writing',
       'Engages the reader or listener'
     ],
-    exampleSnippet: 'Shall I compare thee to a summer\'s day? / Thou art more lovely and more temperate.'
+    exampleSnippet: 'Shall I compare thee to a summer\'s day? / Thou art more lovely and more temperate.',
+    tags: ['rhetoric', 'emphasis']
   },
   {
     name: 'Synesthesia',
@@ -447,7 +475,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Examples: "loud colors," "sweet sound," "cold silence"',
       'Common in Symbolist and Modernist poetry'
     ],
-    exampleSnippet: 'The sound of colors, the taste of music, the feel of scents'
+    exampleSnippet: 'The sound of colors, the taste of music, the feel of scents',
+    tags: ['sensory', 'imagery']
   },
   {
     name: 'Polysyndeton',
@@ -460,7 +489,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Opposite of asyndeton',
       'Common in lists and descriptions'
     ],
-    exampleSnippet: 'We have ships and men and money and stores.'
+    exampleSnippet: 'We have ships and men and money and stores.',
+    tags: ['structural device', 'syntax']
   },
   {
     name: 'Asyndeton',
@@ -473,7 +503,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Common in lists and parallel structures',
       'Adds emphasis through brevity'
     ],
-    exampleSnippet: 'I came, I saw, I conquered.' // Instead of "I came, and I saw, and I conquered"
+    exampleSnippet: 'I came, I saw, I conquered.', // Instead of "I came, and I saw, and I conquered"
+    tags: ['structural device', 'syntax']
   },
   {
     name: 'Pathetic Fallacy',
@@ -486,7 +517,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Different from personification (which is more general)',
       'Creates atmosphere and mood'
     ],
-    exampleSnippet: 'The sullen wind was soon awake, / It tore the elm-tops down for spite'
+    exampleSnippet: 'The sullen wind was soon awake, / It tore the elm-tops down for spite',
+    tags: ['figurative language', 'nature']
   },
   {
     name: 'Motif',
@@ -499,7 +531,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Different from symbol (motif is repeated, symbol may appear once)',
       'Creates patterns and connections'
     ],
-    exampleSnippet: '[A recurring image like "darkness" or "water" appearing throughout a poem or collection]'
+    exampleSnippet: '[A recurring image like "darkness" or "water" appearing throughout a poem or collection]',
+    tags: ['structural device', 'repetition']
   },
   {
     name: 'Conceit',
@@ -512,7 +545,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Developed throughout a poem or section',
       'Common in Metaphysical poetry'
     ],
-    exampleSnippet: 'If they be two, they are two so / As stiff twin compasses are two; / Thy soul, the fixed foot, makes no show / To move, but doth, if the other do.'
+    exampleSnippet: 'If they be two, they are two so / As stiff twin compasses are two; / Thy soul, the fixed foot, makes no show / To move, but doth, if the other do.',
+    tags: ['figurative language', 'comparison']
   },
   {
     name: 'Catalog',
@@ -525,7 +559,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Can be used for description or emphasis',
       'Common in epic poetry and free verse'
     ],
-    exampleSnippet: 'I am the poet of the Body and I am the poet of the Soul, / The pleasures of heaven are with me and the pains of hell are with me'
+    exampleSnippet: 'I am the poet of the Body and I am the poet of the Soul, / The pleasures of heaven are with me and the pains of hell are with me',
+    tags: ['structural device', 'list']
   },
   {
     name: 'Extended Metaphor',
@@ -538,7 +573,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Creates deeper meaning and imagery',
       'Common in longer poems'
     ],
-    exampleSnippet: 'Hope is the thing with feathers / That perches in the soul, / And sings the tune without the words, / And never stops at all'
+    exampleSnippet: 'Hope is the thing with feathers / That perches in the soul, / And sings the tune without the words, / And never stops at all',
+    tags: ['figurative language', 'comparison']
   },
   {
     name: 'Zeugma',
@@ -551,7 +587,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Common in witty or clever writing',
       'Examples: "She broke his car and his heart"'
     ],
-    exampleSnippet: 'She opened her door and her heart to the homeless boy.'
+    exampleSnippet: 'She opened her door and her heart to the homeless boy.',
+    tags: ['wordplay', 'syntax']
   },
   {
     name: 'Antithesis',
@@ -564,7 +601,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Common in speeches and persuasive writing',
       'Memorable and quotable'
     ],
-    exampleSnippet: 'It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness'
+    exampleSnippet: 'It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness',
+    tags: ['structural device', 'contrast']
   },
   {
     name: 'Epanalepsis',
@@ -577,7 +615,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Common in speeches and poetry',
       'Examples: "The king is dead, long live the king"'
     ],
-    exampleSnippet: 'Blood hath bought blood, and blows have answered blows'
+    exampleSnippet: 'Blood hath bought blood, and blows have answered blows',
+    tags: ['repetition', 'structural device']
   },
   {
     name: 'Anadiplosis',
@@ -590,7 +629,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Common in speeches and poetry',
       'Creates a chain-like effect'
     ],
-    exampleSnippet: 'Fear leads to anger. Anger leads to hate. Hate leads to suffering.'
+    exampleSnippet: 'Fear leads to anger. Anger leads to hate. Hate leads to suffering.',
+    tags: ['repetition', 'structural device']
   },
   {
     name: 'Epanorthosis',
@@ -603,7 +643,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Common in dramatic monologues',
       'Adds realism and nuance'
     ],
-    exampleSnippet: 'I saw him—no, I thought I saw him—in the crowd.'
+    exampleSnippet: 'I saw him—no, I thought I saw him—in the crowd.',
+    tags: ['rhetoric', 'dramatic']
   },
   {
     name: 'Metaphysical Conceit',
@@ -617,7 +658,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Surprising and unconventional',
       'Requires intellectual engagement'
     ],
-    exampleSnippet: 'Our two souls therefore, which are one, / Though I must go, endure not yet / A breach, but an expansion, / Like gold to airy thinness beat.'
+    exampleSnippet: 'Our two souls therefore, which are one, / Though I must go, endure not yet / A breach, but an expansion, / Like gold to airy thinness beat.',
+    tags: ['figurative language', 'comparison']
   },
   {
     name: 'Tone',
@@ -630,7 +672,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Different from mood (which is the reader\'s feeling)',
       'Essential element of poetic voice'
     ],
-    exampleSnippet: '[The overall emotional quality of a poem, such as melancholic, joyful, ironic, or contemplative]'
+    exampleSnippet: '[The overall emotional quality of a poem, such as melancholic, joyful, ironic, or contemplative]',
+    tags: ['voice', 'fundamental']
   },
   {
     name: 'Voice',
@@ -643,7 +686,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Gives the poem its unique character',
       'Essential for establishing point of view'
     ],
-    exampleSnippet: '[The unique way a poem "sounds" - formal, conversational, dramatic, etc.]'
+    exampleSnippet: '[The unique way a poem "sounds" - formal, conversational, dramatic, etc.]',
+    tags: ['voice', 'fundamental']
   },
   {
     name: 'In Medias Res',
@@ -657,7 +701,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Common in epic poetry and modern narratives',
       'Requires flashback or exposition later'
     ],
-    exampleSnippet: '[A poem that begins with action already in progress, then fills in context]'
+    exampleSnippet: '[A poem that begins with action already in progress, then fills in context]',
+    tags: ['narrative', 'structural device']
   },
   {
     name: 'End-Stopped Line',
@@ -670,7 +715,8 @@ export const poeticDevicesData: PoetryItem[] = [
       'Common in formal poetry',
       'Creates a more measured, controlled rhythm'
     ],
-    exampleSnippet: 'Shall I compare thee to a summer\'s day? / Thou art more lovely and more temperate.'
+    exampleSnippet: 'Shall I compare thee to a summer\'s day? / Thou art more lovely and more temperate.',
+    tags: ['structural device', 'line break']
   },
   {
     name: 'Caesura Variation',
@@ -683,6 +729,7 @@ export const poeticDevicesData: PoetryItem[] = [
       'Adds complexity to meter',
       'Common in dramatic and narrative poetry'
     ],
-    exampleSnippet: 'To be, || or not to be: || that is the question' // || marks caesurae
+    exampleSnippet: 'To be, || or not to be: || that is the question', // || marks caesurae
+    tags: ['structural device', 'rhythm']
   }
 ];

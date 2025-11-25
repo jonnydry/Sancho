@@ -6,6 +6,7 @@ import { SanchoQuote } from '../components/SanchoQuote';
 import { DataLoadingSkeleton } from '../components/DataLoadingSkeleton';
 
 import { ArrowDownIcon } from '../components/icons/ArrowDownIcon';
+import { XIcon } from '../components/icons/XIcon';
 
 // Lazy load modal component (only loads when needed)
 const PoetryDetailModal = lazy(() => import('../components/PoetryDetailModal').then(module => ({ default: module.PoetryDetailModal })));
@@ -14,6 +15,7 @@ export const HomePage: React.FC = () => {
   const [modalItem, setModalItem] = useState<PoetryItem | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<'all' | 'Form' | 'Meter' | 'Device'>('all');
+  const [activeTagFilter, setActiveTagFilter] = useState<string | null>(null);
   const [allData, setAllData] = useState<PoetryItem[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [itemsToShow, setItemsToShow] = useState(10);
@@ -39,7 +41,7 @@ export const HomePage: React.FC = () => {
 
   useEffect(() => {
     setItemsToShow(10);
-  }, [searchQuery, activeFilter]);
+  }, [searchQuery, activeFilter, activeTagFilter]);
 
   const handleCardClick = (item: PoetryItem) => {
     setModalItem(item);
@@ -60,6 +62,14 @@ export const HomePage: React.FC = () => {
     setItemsToShow(prev => prev + 10);
   };
 
+  const handleTagClick = (tag: string) => {
+    setActiveTagFilter(tag);
+  };
+
+  const handleClearTagFilter = () => {
+    setActiveTagFilter(null);
+  };
+
   const filteredData = useMemo(() => {
     // Combine filters into single pass for better performance
     const query = searchQuery.toLowerCase();
@@ -69,6 +79,11 @@ export const HomePage: React.FC = () => {
     return allData.filter(item => {
       // Type filter
       if (filterType !== 'all' && item.type !== filterType) {
+        return false;
+      }
+      
+      // Tag filter
+      if (activeTagFilter && (!item.tags || !item.tags.includes(activeTagFilter))) {
         return false;
       }
       
@@ -85,7 +100,7 @@ export const HomePage: React.FC = () => {
       
       return true;
     });
-  }, [searchQuery, activeFilter, allData]);
+  }, [searchQuery, activeFilter, activeTagFilter, allData]);
 
   const displayedData = useMemo(() => {
     return filteredData.slice(0, itemsToShow);
@@ -122,6 +137,18 @@ export const HomePage: React.FC = () => {
             activeFilter={activeFilter}
             setActiveFilter={setActiveFilter}
           />
+          {activeTagFilter && (
+            <div className="mt-4 flex items-center gap-2">
+              <span className="text-xs text-muted uppercase tracking-wider">Filtered by:</span>
+              <button
+                onClick={handleClearTagFilter}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs bg-accent/20 border border-accent/40 rounded text-default hover:bg-accent/30 transition-colors"
+              >
+                {activeTagFilter}
+                <XIcon className="w-3 h-3" />
+              </button>
+            </div>
+          )}
         </div>
 
         {isLoadingData ? (
@@ -134,6 +161,7 @@ export const HomePage: React.FC = () => {
                   key={item.name}
                   item={item}
                   onSelect={handleCardClick}
+                  onTagClick={handleTagClick}
                   animationIndex={index}
                 />
               ))}
