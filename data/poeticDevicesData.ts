@@ -112,7 +112,7 @@ export const poeticDevicesData: PoetryItem[] = [
       'Not meant to be taken literally',
       'Creates a strong emotional response'
     ],
-    exampleSnippet: 'And I will love thee still, my dear, / Till a' the seas gang dry.',
+    exampleSnippet: 'And I will love thee still, my dear, / Till a\' the seas gang dry.',
     tags: ['figurative language', 'emphasis']
   },
   {
