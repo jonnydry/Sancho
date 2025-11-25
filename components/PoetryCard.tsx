@@ -54,34 +54,36 @@ export const PoetryCard: React.FC<PoetryCardProps> = memo(({ item, onSelect, onT
           {item.description}
         </p>
 
-        {item.tags && item.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-4">
-            {item.tags.slice(0, 3).map((tag) => (
-              <button
-                key={tag}
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onTagClick?.(tag);
-                }}
-                aria-label={`Filter by ${tag}`}
-                className="px-1.5 py-0.5 text-[9px] bg-bg-alt/30 border border-default/20 rounded text-muted/70 hover:bg-accent/20 hover:border-accent/40 hover:text-default transition-colors cursor-pointer"
-              >
-                {tag}
-              </button>
-            ))}
-            {item.tags.length > 3 && (
-              <span className="px-1.5 py-0.5 text-[9px] text-muted/50">
-                +{item.tags.length - 3}
-              </span>
-            )}
+        <div className="mt-auto w-full">
+          {item.tags && item.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-4">
+              {item.tags.slice(0, 3).map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onTagClick?.(tag);
+                  }}
+                  aria-label={`Filter by ${tag}`}
+                  className="px-1.5 py-0.5 text-[9px] bg-bg-alt/30 border border-default/20 rounded text-muted/70 hover:bg-accent/20 hover:border-accent/40 hover:text-default transition-colors cursor-pointer"
+                >
+                  {tag}
+                </button>
+              ))}
+              {item.tags.length > 3 && (
+                <span className="px-1.5 py-0.5 text-[9px] text-muted/50">
+                  +{item.tags.length - 3}
+                </span>
+              )}
+            </div>
+          )}
+          
+          <div className="pt-4 border-t border-[rgb(var(--app-border)/0.4)]">
+            <p className="text-xs text-muted font-mono italic truncate opacity-70 group-hover:opacity-100 transition-opacity">
+              "{item.exampleSnippet}"
+            </p>
           </div>
-        )}
-        
-        <div className="mt-auto pt-4 border-t border-[rgb(var(--app-border)/0.4)]">
-          <p className="text-xs text-muted font-mono italic truncate opacity-70 group-hover:opacity-100 transition-opacity">
-            "{item.exampleSnippet}"
-          </p>
         </div>
       </div>
     </div>
