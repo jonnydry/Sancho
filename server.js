@@ -286,25 +286,34 @@ app.get('/api/sancho-quote', rateLimit(5, 60000), async (req, res) => { // 5 req
       });
     }
 
-    // Add variety by requesting a different quote each time
-    const varietyHint = `Please provide a DIFFERENT quote than you may have given recently. `;
-    const prompt = `${varietyHint}Please provide a single authentic quote from Sancho Panza from the novel "Don Quixote" by Miguel de Cervantes. The quote should be wise, humorous, or insightful - something that reflects Sancho's character.
+    // Generate a random seed to encourage variety
+    const randomSeed = Math.floor(Math.random() * 10000);
+    const partPreference = Math.random() > 0.5 ? 'Part I' : 'Part II';
+    const chapterRange = Math.floor(Math.random() * 74) + 1;
+    
+    const prompt = `Provide a single quote from Sancho Panza from "Don Quixote" by Miguel de Cervantes.
 
-Key guidelines:
-- Quote must be genuinely from Don Quixote (cite the specific part/chapter if possible)
-- Should showcase Sancho's personality: practical, humorous, loyal, or philosophical
-- Keep quote concise but authentic to Cervantes' writing style
-- Include accurate context when possible (chapter reference, situation)
-- Choose a quote that differs from common or frequently cited ones
+CRITICAL REQUIREMENTS:
+- The quote MUST be in ENGLISH only - never in Spanish
+- Use the Edith Grossman English translation if possible (published 2003)
+- If exact Grossman wording is unknown, provide an accurate English translation that captures the spirit of her acclaimed translation style
+- Quote must be genuinely from Don Quixote with accurate chapter/part reference
 
-Respond with JSON in this format: { "quote": "the actual quote text", "context": "brief context about when/why Sancho said this (e.g., Part I, Chapter 5)" }`;
+VARIETY REQUIREMENT (seed: ${randomSeed}):
+- Explore ${partPreference}, around chapter ${chapterRange} or nearby
+- Avoid these commonly quoted lines: "whether the stone hits the pitcher", "the proof of the pudding", "time ripens all things"
+- Find lesser-known gems that showcase Sancho's wit, proverbs, or practical wisdom
+
+Quote should reflect Sancho's personality: earthy humor, folk wisdom, loyalty, or philosophical observations.
+
+Respond with JSON: { "quote": "the English quote text", "context": "Part X, Chapter Y - brief situation context" }`;
 
     const response = await openai.chat.completions.create({
       model: "grok-4-1-fast-non-reasoning",
       messages: [
         {
           role: "system",
-          content: "You are a literature expert specializing in Miguel de Cervantes' Don Quixote. Only provide quotes that are actually from the novel, paraphrasing into proper English when needed while preserving the original meaning. Always include accurate chapter/part references when available."
+          content: "You are a literature expert specializing in Miguel de Cervantes' Don Quixote. You must ALWAYS respond in ENGLISH only - never use Spanish text. When possible, quote from Edith Grossman's celebrated 2003 English translation, known for its clarity and faithfulness to Cervantes' humor. If the exact Grossman wording is unavailable, provide an accurate English translation in her accessible, witty style. Always include accurate chapter/part references."
         },
         {
           role: "user",
@@ -312,8 +321,8 @@ Respond with JSON in this format: { "quote": "the actual quote text", "context":
         }
       ],
       response_format: { type: "json_object" },
-      temperature: 0.8, // Slightly higher temperature for more variety
-      max_tokens: 150
+      temperature: 0.95, // High temperature for maximum variety
+      max_tokens: 200
     });
 
     if (!response.choices?.[0]?.message?.content) {
