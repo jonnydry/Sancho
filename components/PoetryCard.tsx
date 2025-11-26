@@ -39,8 +39,8 @@ export const PoetryCard: React.FC<PoetryCardProps> = memo(({ item, onSelect, onT
         <div className="flex justify-between items-start mb-4">
           <div className="flex flex-col gap-1">
              <div className="flex items-center gap-2">
-                <h3 className="text-lg font-bold text-default tracking-tight group-hover:text-accent transition-colors">{item.name}</h3>
-                {isAuthenticated && <PinButton item={item} size="sm" />}
+                <h3 className="text-2xl font-bold text-default tracking-tight group-hover:text-accent transition-colors">{item.name}</h3>
+                {isAuthenticated && <PinButton item={item} size="lg" />}
              </div>
              <ItemTag type={item.type} />
           </div>
