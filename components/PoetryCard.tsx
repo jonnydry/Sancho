@@ -50,7 +50,7 @@ export const PoetryCard: React.FC<PoetryCardProps> = memo(({ item, onSelect, onT
           />
         </div>
 
-        <p className="text-muted text-sm font-light leading-relaxed mb-4 line-clamp-3">
+        <p className="text-muted text-base font-light leading-relaxed mb-4 line-clamp-3">
           {item.description}
         </p>
 
@@ -66,13 +66,13 @@ export const PoetryCard: React.FC<PoetryCardProps> = memo(({ item, onSelect, onT
                     onTagClick?.(tag);
                   }}
                   aria-label={`Filter by ${tag}`}
-                  className="px-1.5 py-0.5 text-[9px] bg-bg-alt/30 border border-default/20 rounded text-muted/70 hover:bg-accent/20 hover:border-accent/40 hover:text-default transition-colors cursor-pointer"
+                  className="px-2 py-1 text-xs bg-bg-alt/30 border border-default/20 rounded text-muted/70 hover:bg-accent/20 hover:border-accent/40 hover:text-default transition-colors cursor-pointer"
                 >
                   {tag}
                 </button>
               ))}
               {item.tags.length > 3 && (
-                <span className="px-1.5 py-0.5 text-[9px] text-muted/50">
+                <span className="px-2 py-1 text-xs text-muted/50">
                   +{item.tags.length - 3}
                 </span>
               )}
@@ -80,7 +80,7 @@ export const PoetryCard: React.FC<PoetryCardProps> = memo(({ item, onSelect, onT
           )}
           
           <div className="pt-4 border-t border-[rgb(var(--app-border)/0.4)]">
-            <p className="text-xs text-muted font-mono italic truncate opacity-70 group-hover:opacity-100 transition-opacity">
+            <p className="text-sm text-muted font-mono italic truncate opacity-70 group-hover:opacity-100 transition-opacity">
               "{item.exampleSnippet}"
             </p>
           </div>

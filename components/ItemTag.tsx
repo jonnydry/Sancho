@@ -13,7 +13,7 @@ const typeClassMap: Record<PoetryItem['type'], string> = {
 };
 
 export const ItemTag: React.FC<ItemTagProps> = ({ type, className = '' }) => (
-  <span className={`text-[10px] uppercase tracking-widest font-bold ${typeClassMap[type]} ${className}`.trim()}>
+  <span className={`text-xs uppercase tracking-widest font-bold ${typeClassMap[type]} ${className}`.trim()}>
     {type}
   </span>
 );

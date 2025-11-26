@@ -36,15 +36,9 @@ export const PinButton: React.FC<PinButtonProps> = ({ item, className = '', size
     setIsLoading(true);
     try {
       if (pinned) {
-        if (import.meta.env.DEV) {
-          console.log('Unpinning item:', item.name);
-        }
         await unpinItem(item.name);
         showNotification('Removed from Notebook', 'success');
       } else {
-        if (import.meta.env.DEV) {
-          console.log('Pinning item:', item.name);
-        }
         await pinItem(item);
         showNotification('Added to Notebook', 'success');
       }
@@ -57,9 +51,6 @@ export const PinButton: React.FC<PinButtonProps> = ({ item, className = '', size
         
         // Check if this is an authentication error that requires re-login
         if (error.hasOwnProperty('requiresLogin') && (error as any).requiresLogin) {
-          if (import.meta.env.DEV) {
-            console.log('Authentication required - redirecting to login');
-          }
           showNotification(errorMessage, 'error');
           
           // Redirect to login after a short delay to show the notification
