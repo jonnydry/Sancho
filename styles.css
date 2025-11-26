@@ -101,9 +101,9 @@ html {
   --app-text: 67 52 34; /* Deep Brown */
   --app-text-muted: 156 143 124;
   
-  /* Highlight: Sepia Ink */
-  --app-accent: 146 64 14; /* Amber-800 equivalent */
-  --app-accent-hover: 180 83 9;
+  /* Highlight: Rust/Sepia - Warm manuscript tone */
+  --app-accent: 159 89 45; /* Warm rust brown */
+  --app-accent-hover: 186 112 62;
   --app-accent-text: 255 255 255;
 }
 
