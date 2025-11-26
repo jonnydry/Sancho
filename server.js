@@ -248,7 +248,7 @@ app.post('/api/poetry-example', rateLimit(10, 60000), async (req, res) => { // 1
     const prompt = `Please provide a famous, concise example of a ${topic} in poetry. Include the author, the title, and a brief explanation of how it fits the conventions. Respond with JSON in this format: { "example": "string", "author": "string", "title": "string", "explanation": "string" }`;
 
     const response = await openai.chat.completions.create({
-      model: "grok-4",
+      model: "grok-4-1-fast-non-reasoning",
       messages: [
         {
           role: "system",
@@ -300,7 +300,7 @@ Key guidelines:
 Respond with JSON in this format: { "quote": "the actual quote text", "context": "brief context about when/why Sancho said this (e.g., Part I, Chapter 5)" }`;
 
     const response = await openai.chat.completions.create({
-      model: "grok-3-mini",
+      model: "grok-4-1-fast-non-reasoning",
       messages: [
         {
           role: "system",
@@ -392,7 +392,7 @@ app.post('/api/poetry-learn-more', rateLimit(10, 60000), async (req, res) => { /
     const prompt = `Provide a concise historical and cultural context paragraph about ${topic} in poetry. The paragraph should be 2-4 sentences and cover: (1) historical origins and evolution of this poetic form/device/meter, (2) its cultural and literary significance, and (3) key historical periods or movements associated with it. Use a scholarly but accessible tone. Respond with JSON in this format: { "context": "the paragraph text" }`;
 
     const response = await openai.chat.completions.create({
-      model: "grok-4-fast",
+      model: "grok-4-1-fast-non-reasoning",
       messages: [
         {
           role: "system",
