@@ -75,7 +75,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, []);
 
   // Enforce theme restrictions: reset premium themes if stored but user logs out
-  // Optimized: Polls less frequently (30s) and uses exponential backoff on errors
+  // Only reset on explicit unauthenticated response, not on errors or pending states
   useEffect(() => {
     if (!isBrowser) return;
     if (!PREMIUM_THEMES.includes(color)) {
@@ -83,10 +83,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
 
     let isActive = true;
-    let consecutiveErrors = 0;
-    const MAX_CONSECUTIVE_ERRORS = 3;
-    const POLL_INTERVAL = 30000; // 30 seconds (reduced from 10s)
-    const ERROR_BACKOFF_MULTIPLIER = 2;
+    const POLL_INTERVAL = 30000; // 30 seconds
 
     const checkAuthAndResetTheme = async () => {
       try {
@@ -100,9 +97,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (response.ok) {
           const data = await response.json();
           
-          // Reset error counter on success
-          consecutiveErrors = 0;
-          
           // Check again before accessing state
           if (!isActive) {
             return;
@@ -110,41 +104,34 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           
           const isAuthenticated = data.authenticated;
           
-          // If not authenticated and using a premium theme, reset to dark
-          // Check isActive one more time before state update
-          if (!isAuthenticated && PREMIUM_THEMES.includes(color) && isActive) {
+          // ONLY reset if we get a definitive "not authenticated" response
+          // Do NOT reset on errors or pending states - keep the user's theme choice
+          if (isAuthenticated === false && PREMIUM_THEMES.includes(color) && isActive) {
             setColorState('dark');
             window.localStorage.setItem('theme-color', 'dark');
-            // Stop polling once we've reset the theme
             return;
           }
-        } else {
-          consecutiveErrors++;
         }
+        // On non-ok response (401, 500, etc), do NOT reset the theme
+        // Let the user keep their selection until we get a clear answer
       } catch (error) {
-        consecutiveErrors++;
-        // Only log error if component is still mounted
-        if (isActive) {
-          console.error('Failed to check auth status for theme enforcement:', error);
+        // On network errors, do NOT reset the theme
+        // The user may still be authenticated, just having connectivity issues
+        if (isActive && process.env.NODE_ENV === 'development') {
+          console.warn('Auth check failed, keeping current theme:', error);
         }
-      }
-      
-      // Stop polling after too many consecutive errors to reduce load
-      if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS && isActive) {
-        console.warn('Stopping theme auth polling after consecutive errors');
-        return;
       }
     };
     
-    // Run once on mount / when premium theme is selected
-    checkAuthAndResetTheme();
+    // Delay initial check to allow auth state to stabilize
+    const initialTimeoutId = window.setTimeout(checkAuthAndResetTheme, 1000);
     
-    // Set up interval to check auth status every 30 seconds only when premium theme is active
-    // Reduced frequency to minimize server load
+    // Set up interval to check auth status periodically
     const intervalId = window.setInterval(checkAuthAndResetTheme, POLL_INTERVAL);
     
     return () => {
       isActive = false;
+      window.clearTimeout(initialTimeoutId);
       window.clearInterval(intervalId);
     };
   }, [color]);

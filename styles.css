@@ -93,7 +93,8 @@ html {
 }
 
 /* --- THEME: Paper (Ancient Manuscript) - Premium --- */
-.light.theme-paper {
+.light.theme-paper,
+html.light.theme-paper {
   --app-bg: 253 250 245; /* Shade 1: Cream */
   --app-bg-alt: 244 240 232; /* Shade 2: Parchment Surface */
   --app-border: 226 218 205; /* Shade 3: Aged Edge */

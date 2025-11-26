@@ -68,6 +68,15 @@ The project utilizes a dual-server architecture with a React frontend (Vite, Por
 
 ### Recent Updates
 
+#### 2025-11-26 - UI Enhancements and Theme Fixes
+- **Typography Scaling**: Increased base font size to 18px, card titles to 2xl for better readability
+- **Card Element Proportions**: Harmonized all card elements (description: text-base, tags: text-xs, snippet: text-sm, type badge: text-xs)
+- **Notebook Icon Sizing**: Enlarged notebook icons to lg size (w-6 h-6) for consistent visibility across cards and header
+- **Devices Category Icon**: Created custom magnifying glass icon representing literary devices discovery
+- **Paper Theme Accent Fix**: Changed accent color from green to rust/sepia (159 89 45) for cohesive manuscript aesthetic
+- **Theme Persistence Fix**: Fixed race condition where premium themes were being reset before auth check completed
+- **Sancho Quote Improvements**: English-only quotes with Edith Grossman translation preference, improved variety via random seeds
+
 #### 2025-11-22 - Custom Literary-Themed Icon Set
 - **Complete Icon Redesign**: Created 13 custom SVG icons with ornate, literary aesthetic that aligns with Sancho's classic poetry theme
 - **AboutPage Icons**: PoeticFormsIcon (scroll with lines), PoeticMetersIcon (musical staff), LiteraryDevicesIcon (quill with ink), AiExamplesIcon (magical quill), ClassicSnippetsIcon (open book with bookmark), PremiumThemesIcon (artist's palette)
