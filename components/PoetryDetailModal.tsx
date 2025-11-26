@@ -4,7 +4,7 @@ import { PoetryItem, LearnMoreResponse } from '../types';
 import { ExampleFinder } from './ExampleFinder';
 import { XIcon } from './icons/XIcon';
 import { fetchLearnMoreContext } from '../services/apiService';
-import { SparklesIcon } from './icons/SparklesIcon';
+import { LightbulbIcon } from './icons/LightbulbIcon';
 import { SpinnerIcon } from './icons/SpinnerIcon';
 import { PinButton } from './PinButton';
 import { useAuth } from '../hooks/useAuth.js';
@@ -199,14 +199,14 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
               <button
                 onClick={handleLearnMore}
                 disabled={isLoadingLearnMore}
-                className="flex items-center space-x-2 px-4 py-2 text-sm font-semibold text-accent-text border border-accent bg-accent/10 backdrop-blur-sm rounded-lg hover:bg-accent/20 hover:border-accent/80 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                className="flex items-center space-x-2 px-4 py-2 text-sm font-semibold text-accent-text border border-accent bg-accent/10 backdrop-blur-sm rounded-lg hover:bg-accent/20 hover:border-accent/80 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent/50"
               >
                 {isLoadingLearnMore ? (
                   <SpinnerIcon className="w-4 h-4 animate-spin" />
                 ) : (
-                  <SparklesIcon className="w-4 h-4" />
+                  <LightbulbIcon className="w-4 h-4" />
                 )}
-                <span>{isLoadingLearnMore ? 'ANALYZING...' : learnMoreContext !== null ? 'REGENERATE' : 'LEARN MORE'}</span>
+                <span>{isLoadingLearnMore ? 'Analyzing...' : learnMoreContext !== null ? 'Regenerate' : 'Learn More'}</span>
               </button>
             </div>
 

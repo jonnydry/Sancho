@@ -1,7 +1,7 @@
 import React, { useState, useCallback, memo } from 'react';
 import { findPoetryExample } from '../services/apiService';
 import { PoetryExampleResponse } from '../types';
-import { SparklesIcon } from './icons/SparklesIcon';
+import { SearchSparkleIcon } from './icons/SearchSparkleIcon';
 import { SpinnerIcon } from './icons/SpinnerIcon';
 
 interface ExampleFinderProps {
@@ -37,14 +37,14 @@ export const ExampleFinder: React.FC<ExampleFinderProps> = memo(({ topic }) => {
           className="flex items-center space-x-2 px-4 py-2 text-sm font-semibold text-accent-text border border-accent bg-accent/10 backdrop-blur-sm rounded-lg hover:bg-accent/20 hover:border-accent/80 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent/50"
         >
           {isLoading ? (
-            <SpinnerIcon className="w-5 h-5 animate-spin" />
+            <SpinnerIcon className="w-4 h-4 animate-spin" />
           ) : (
-            <SparklesIcon className="w-5 h-5" />
+            <SearchSparkleIcon className="w-4 h-4" />
           )}
           <span>{isLoading ? 'Generating...' : 'Find Example'}</span>
         </button>
       </div>
-      
+
       {error && <div className="mt-4 p-3 text-sm text-red-700 bg-red-100 dark:bg-red-900/50 dark:text-red-300 rounded-lg">{error}</div>}
 
       {example && (
