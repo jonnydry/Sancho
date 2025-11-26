@@ -196,11 +196,14 @@ export const isAuthenticated = async (req, res, next) => {
 
   try {
     const config = await getOidcConfig();
-    const tokenResponse = await client.refreshTokenGrant(config, refreshToken);
+    const tokenResponse = await client.refreshTokenGrant(config, refreshToken, {
+      client_id: process.env.REPL_ID
+    });
     updateUserSession(user, tokenResponse);
     return next();
   } catch (error) {
     console.error("Token refresh failed:", error.message);
+    console.error("Token refresh error details:", error);
     return res.status(401).json({ 
       error: "Session expired",
       message: "Your session has expired. Please log in again",
