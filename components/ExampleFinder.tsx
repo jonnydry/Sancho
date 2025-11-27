@@ -3,6 +3,7 @@ import { findPoetryExample } from '../services/apiService';
 import { PoetryExampleResponse } from '../types';
 import { SearchSparkleIcon } from './icons/SearchSparkleIcon';
 import { SpinnerIcon } from './icons/SpinnerIcon';
+import { AiExamplesIcon } from './icons/AiExamplesIcon';
 
 interface ExampleFinderProps {
   topic: string;
@@ -28,9 +29,12 @@ export const ExampleFinder: React.FC<ExampleFinderProps> = memo(({ topic }) => {
   }, [topic]);
 
   return (
-    <div className="mt-4 p-6 border-t border-default">
-      <div className="flex items-center justify-between mb-4">
-        <h4 className="font-semibold text-default">AI-Powered Example</h4>
+    <div className="pt-6 border-t border-default">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-2">
+          <AiExamplesIcon className="w-5 h-5 text-default" />
+          <h4 className="font-bold text-default text-lg">AI-Powered Example</h4>
+        </div>
         <button
           onClick={handleFindExample}
           disabled={isLoading}
