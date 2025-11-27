@@ -66,7 +66,7 @@ export const PoetryCard: React.FC<PoetryCardProps> = memo(({ item, onSelect, onT
                     onTagClick?.(tag);
                   }}
                   aria-label={`Filter by ${tag}`}
-                  className="px-2 py-1 text-xs bg-accent/5 border border-accent/20 rounded text-muted hover:bg-accent hover:text-accent-text hover:border-accent transition-colors cursor-pointer"
+                  className="px-2 py-1 text-xs bg-accent/5 border border-accent/20 rounded text-muted hover:bg-accent/20 hover:text-default hover:border-accent/50 hover:scale-105 hover:shadow-sm active:scale-100 transition-all duration-150 cursor-pointer"
                 >
                   {tag}
                 </button>
