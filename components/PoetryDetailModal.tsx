@@ -16,9 +16,10 @@ interface PoetryDetailModalProps {
   item: PoetryItem;
   onClose: () => void;
   onSelectItem?: (itemName: string) => void;
+  onTagClick?: (tag: string) => void;
 }
 
-export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onClose, onSelectItem }) => {
+export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onClose, onSelectItem, onTagClick }) => {
   const [learnMoreContext, setLearnMoreContext] = useState<string | null>(null);
   const [isLoadingLearnMore, setIsLoadingLearnMore] = useState(false);
   const [learnMoreError, setLearnMoreError] = useState<string | null>(null);
@@ -141,12 +142,13 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
               <h4 className="font-bold text-sm text-default uppercase tracking-wider mb-2">Tags</h4>
               <div className="flex flex-wrap gap-2">
                 {item.tags.map((tag, index) => (
-                  <span
+                  <button
                     key={index}
-                    className="px-2 py-1 text-xs bg-bg-alt/50 border border-default/30 rounded-sm text-muted"
+                    onClick={() => onTagClick?.(tag)}
+                    className="px-2 py-1 text-xs bg-bg-alt/50 border border-default/30 rounded-sm text-muted hover:bg-bg-alt hover:text-default hover:border-default transition-colors cursor-pointer"
                   >
                     {tag}
-                  </span>
+                  </button>
                 ))}
               </div>
             </div>

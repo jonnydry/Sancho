@@ -75,29 +75,29 @@ export const HomePage: React.FC = () => {
     const query = searchQuery.toLowerCase();
     const hasQuery = query.length > 0;
     const filterType = activeFilter;
-    
+
     return allData.filter(item => {
       // Type filter
       if (filterType !== 'all' && item.type !== filterType) {
         return false;
       }
-      
+
       // Tag filter
       if (activeTagFilter && (!item.tags || !item.tags.includes(activeTagFilter))) {
         return false;
       }
-      
+
       // Search query filter
       if (hasQuery) {
         const matchesName = item.name.toLowerCase().includes(query);
         const matchesDescription = item.description.toLowerCase().includes(query);
         const matchesTags = item.tags && item.tags.some(tag => tag.toLowerCase().includes(query));
-        
+
         if (!matchesName && !matchesDescription && !matchesTags) {
           return false;
         }
       }
-      
+
       return true;
     });
   }, [searchQuery, activeFilter, activeTagFilter, allData]);
@@ -192,6 +192,10 @@ export const HomePage: React.FC = () => {
             item={modalItem}
             onClose={handleCloseModal}
             onSelectItem={handleSelectRelatedItem}
+            onTagClick={(tag) => {
+              handleTagClick(tag);
+              handleCloseModal();
+            }}
           />
         </Suspense>
       )}
