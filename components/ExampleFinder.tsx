@@ -29,7 +29,7 @@ export const ExampleFinder: React.FC<ExampleFinderProps> = memo(({ topic }) => {
   }, [topic]);
 
   return (
-    <div className="pt-6 border-t border-default">
+    <div className="pt-6 px-5 sm:px-6 md:px-8 pb-5 sm:pb-6 md:pb-8 border-t border-default">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <AiExamplesIcon className="w-5 h-5 text-default" />
