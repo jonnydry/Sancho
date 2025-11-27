@@ -7,7 +7,7 @@ import { fetchLearnMoreContext } from '../services/apiService';
 import { LightbulbIcon } from './icons/LightbulbIcon';
 import { SpinnerIcon } from './icons/SpinnerIcon';
 import { PinButton } from './PinButton';
-import { useAuth } from '../hooks/useAuth.js';
+import { useAuth } from '../hooks/useAuth';
 import { ItemTag } from './ItemTag';
 
 import { HistoryIcon } from './icons/HistoryIcon';

@@ -7,21 +7,21 @@ interface Props {
 
 interface State {
   hasError: boolean;
-  error?: Error;
+  error: Error | null;
 }
 
-export class ErrorBoundary extends Component<Props, State> {
+export class ErrorBoundary extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = { hasError: false };
+    this.state = { hasError: false, error: null };
   }
 
   static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Error caught by boundary:', error, errorInfo);
   }
 
   render() {
@@ -31,25 +31,19 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="min-h-screen flex items-center justify-center bg-default text-default">
-          <div className="text-center p-8 max-w-md">
-            <h2 className="text-2xl font-bold mb-4">Something went wrong</h2>
-            <p className="text-muted mb-4">
-              We're sorry, but something unexpected happened. Please try refreshing the page.
-            </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-accent text-accent-text rounded-lg hover:bg-accent-hover transition-colors"
-            >
-              Refresh Page
-            </button>
+        <div className="p-4 m-4 bg-red-50 border border-red-200 rounded-md">
+          <h2 className="text-lg font-semibold text-red-800 mb-2">Something went wrong</h2>
+          <p className="text-red-600 mb-4">
+            We apologize for the inconvenience. Please try refreshing the page.
+          </p>
+          <div className="text-xs font-mono bg-white p-2 rounded border border-red-100 overflow-auto max-h-40">
             {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details className="mt-4 text-left">
-                <summary className="cursor-pointer text-muted">Error Details (Dev Only)</summary>
-                <pre className="mt-2 p-2 bg-bg-alt rounded text-sm overflow-auto">
+              <>
+                <div className="font-bold mb-1">Error Details:</div>
+                <div className="whitespace-pre-wrap">
                   {this.state.error.message}
-                </pre>
-              </details>
+                </div>
+              </>
             )}
           </div>
         </div>
