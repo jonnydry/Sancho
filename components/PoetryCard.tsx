@@ -38,11 +38,11 @@ export const PoetryCard: React.FC<PoetryCardProps> = memo(({ item, onSelect, onT
       >
         <div className="flex justify-between items-start mb-4">
           <div className="flex flex-col gap-1">
-             <div className="flex items-center gap-2">
-                <h3 className="text-2xl font-bold text-default tracking-tight group-hover:text-accent transition-colors">{item.name}</h3>
-                {isAuthenticated && <PinButton item={item} size="lg" />}
-             </div>
-             <ItemTag type={item.type} />
+            <div className="flex items-center gap-2">
+              <h3 className="text-2xl font-bold text-default tracking-tight group-hover:text-accent transition-colors">{item.name}</h3>
+              {isAuthenticated && <PinButton item={item} size="lg" />}
+            </div>
+            <ItemTag type={item.type} />
           </div>
           <ArrowUpRightIcon
             className="w-4 h-4 text-muted opacity-0 group-hover:opacity-100 transition-opacity"
@@ -66,7 +66,7 @@ export const PoetryCard: React.FC<PoetryCardProps> = memo(({ item, onSelect, onT
                     onTagClick?.(tag);
                   }}
                   aria-label={`Filter by ${tag}`}
-                  className="px-2 py-1 text-xs bg-bg-alt/30 border border-default/20 rounded text-muted/70 hover:bg-accent/20 hover:border-accent/40 hover:text-default transition-colors cursor-pointer"
+                  className="px-2 py-1 text-xs bg-bg-alt/50 border border-default/30 rounded text-muted hover:bg-accent/20 hover:border-accent/40 hover:text-default transition-colors cursor-pointer"
                 >
                   {tag}
                 </button>
@@ -78,7 +78,7 @@ export const PoetryCard: React.FC<PoetryCardProps> = memo(({ item, onSelect, onT
               )}
             </div>
           )}
-          
+
           <div className="pt-4 border-t border-[rgb(var(--app-border)/0.4)]">
             <p className="text-sm text-muted font-mono italic truncate opacity-70 group-hover:opacity-100 transition-opacity">
               "{item.exampleSnippet}"

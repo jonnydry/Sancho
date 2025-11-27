@@ -145,7 +145,7 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
                   <button
                     key={index}
                     onClick={() => onTagClick?.(tag)}
-                    className="px-2 py-1 text-xs bg-bg-alt/50 border border-default/30 rounded-sm text-muted hover:bg-bg-alt hover:text-default hover:border-default transition-colors cursor-pointer"
+                    className="px-2 py-1 text-xs bg-bg-alt/50 border border-default/30 rounded-sm text-muted hover:bg-accent/20 hover:border-accent/40 hover:text-default transition-colors cursor-pointer"
                   >
                     {tag}
                   </button>
