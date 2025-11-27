@@ -51,7 +51,9 @@ export const poeticDevicesData: PoetryItem[] = [
       'Creates vivid imagery'
     ],
     exampleSnippet: 'Because I could not stop for Death – / He kindly stopped for me –',
-    tags: ['figurative language', 'imagery']
+    tags: ['figurative language', 'imagery'],
+    seeAlso: ['Pathetic Fallacy', 'Transferred Epithet', 'Apostrophe', 'Allegory'],
+    notes: ['Personification is broader than pathetic fallacy (which specifically attributes human emotions to nature). Dickinson\'s personification of Death as a gentleman is a famous example.']
   },
   {
     name: 'Assonance',
@@ -113,7 +115,9 @@ export const poeticDevicesData: PoetryItem[] = [
       'Creates a strong emotional response'
     ],
     exampleSnippet: 'And I will love thee still, my dear, / Till a\' the seas gang dry.',
-    tags: ['figurative language', 'emphasis']
+    tags: ['figurative language', 'emphasis'],
+    seeAlso: ['Understatement', 'Litotes', 'Bathos'],
+    notes: ['Hyperbole is the opposite of understatement. Unintentional or overused hyperbole can lead to bathos (anticlimax).']
   },
   {
     name: 'Irony',
@@ -286,7 +290,9 @@ export const poeticDevicesData: PoetryItem[] = [
       'Adds complexity to sound patterns'
     ],
     exampleSnippet: 'Once upon a midnight dreary, while I pondered, weak and weary', // dreary/weary
-    tags: ['sound device', 'rhyme']
+    tags: ['sound device', 'rhyme'],
+    seeAlso: ['Perfect Rhyme', 'Slant Rhyme', 'Masculine Rhyme', 'Feminine Rhyme'],
+    notes: ['Internal rhyme creates a richer sonic texture than end rhyme alone. Poe used it masterfully in \'The Raven\' to create an incantatory effect.']
   },
   {
     name: 'Slant Rhyme',
@@ -300,7 +306,9 @@ export const poeticDevicesData: PoetryItem[] = [
       'Creates subtle, sophisticated sound patterns'
     ],
     exampleSnippet: 'I heard a Fly buzz - when I died - / The Stillness in the Room / Was like the Stillness in the Air - / Between the Heaves of Storm -', // Room/Storm
-    tags: ['sound device', 'rhyme']
+    tags: ['sound device', 'rhyme'],
+    seeAlso: ['Perfect Rhyme', 'Eye Rhyme', 'Consonance', 'Assonance'],
+    notes: ['Emily Dickinson was a master of slant rhyme, using it to create subtle dissonance and surprise. It offers more rhyming options than perfect rhyme.']
   },
   {
     name: 'Cacophony',
@@ -367,7 +375,9 @@ export const poeticDevicesData: PoetryItem[] = [
       'Common in speeches and epigrams'
     ],
     exampleSnippet: 'Ask not what your country can do for you—ask what you can do for your country', // Kennedy
-    tags: ['structural device', 'rhetoric']
+    tags: ['structural device', 'rhetoric'],
+    seeAlso: ['Antimetabole', 'Antithesis', 'Parallelism', 'Epanalepsis'],
+    notes: ['Chiasmus reverses grammatical structure; antimetabole reverses the same words. JFK\'s famous line is technically antimetabole since it uses the same words.']
   },
   {
     name: 'Epistrophe',
@@ -406,7 +416,9 @@ export const poeticDevicesData: PoetryItem[] = [
       'Can create double meanings'
     ],
     exampleSnippet: 'Ask for me tomorrow, and you shall find me a grave man', // Mercutio in Romeo & Juliet (grave = serious/tomb)
-    tags: ['wordplay', 'humorous']
+    tags: ['wordplay', 'humorous'],
+    seeAlso: ['Paronomasia', 'Malapropism', 'Zeugma', 'Rich Rhyme'],
+    notes: ['Shakespeare used puns extensively for both humor and thematic depth. Paronomasia is the rhetorical term for punning.']
   },
   {
     name: 'Allegory',
@@ -490,7 +502,9 @@ export const poeticDevicesData: PoetryItem[] = [
       'Common in lists and descriptions'
     ],
     exampleSnippet: 'We have ships and men and money and stores.',
-    tags: ['structural device', 'syntax']
+    tags: ['structural device', 'syntax'],
+    seeAlso: ['Asyndeton', 'Hendiadys', 'Catalog', 'Anaphora'],
+    notes: ['Polysyndeton slows the reader down and gives equal weight to each item. The Bible uses it extensively for rhythmic and emphatic effect.']
   },
   {
     name: 'Asyndeton',
@@ -546,7 +560,9 @@ export const poeticDevicesData: PoetryItem[] = [
       'Common in Metaphysical poetry'
     ],
     exampleSnippet: 'If they be two, they are two so / As stiff twin compasses are two; / Thy soul, the fixed foot, makes no show / To move, but doth, if the other do.',
-    tags: ['figurative language', 'comparison']
+    tags: ['figurative language', 'comparison'],
+    seeAlso: ['Metaphysical Conceit', 'Extended Metaphor', 'Metaphor', 'Catachresis'],
+    notes: ['The metaphysical conceit (Donne, Herbert) uses intellectual and scientific imagery. Petrarchan conceits use idealized love imagery (eyes like stars, lips like roses).']
   },
   {
     name: 'Catalog',
@@ -731,5 +747,357 @@ export const poeticDevicesData: PoetryItem[] = [
     ],
     exampleSnippet: 'To be, || or not to be: || that is the question', // || marks caesurae
     tags: ['structural device', 'rhythm']
+  },
+  {
+    name: 'Perfect Rhyme',
+    type: 'Device',
+    description: 'A rhyme in which the stressed vowel sounds and all subsequent sounds are identical in both words. Also called true rhyme, full rhyme, or exact rhyme.',
+    structure: [
+      'Identical vowel sounds in stressed syllables',
+      'Identical consonant sounds following the vowel',
+      'Different consonant sounds preceding the vowel',
+      'Examples: cat/hat, love/dove, moon/June',
+      'The most common and expected type of rhyme'
+    ],
+    exampleSnippet: 'Shall I compare thee to a summer\'s day? / Thou art more lovely and more temperate.',
+    tags: ['sound device', 'rhyme'],
+    seeAlso: ['Slant Rhyme', 'Eye Rhyme', 'Internal Rhyme', 'Rich Rhyme'],
+    notes: ['Perfect rhyme creates strong musical connections and closure. Overuse can feel predictable; variation with slant rhyme adds sophistication.']
+  },
+  {
+    name: 'Eye Rhyme',
+    type: 'Device',
+    description: 'Words that appear to rhyme based on their spelling but do not actually rhyme when spoken. Also called sight rhyme or visual rhyme.',
+    structure: [
+      'Similar spelling but different pronunciation',
+      'Creates visual but not auditory connection',
+      'Examples: love/move, cough/through, good/food',
+      'Some were true rhymes historically',
+      'Common in older poetry due to pronunciation changes'
+    ],
+    exampleSnippet: 'I have sought it with thimbles—I have sought it with care; / I have hunted it fairly—I have followed it there.',
+    tags: ['sound device', 'rhyme'],
+    seeAlso: ['Perfect Rhyme', 'Slant Rhyme'],
+    notes: ['Many eye rhymes were perfect rhymes in earlier English. They can create subtle effects when the visual similarity contrasts with the sound difference.']
+  },
+  {
+    name: 'Rich Rhyme',
+    type: 'Device',
+    description: 'A rhyme in which two words sound identical but have different meanings. Also called identical rhyme or rime riche.',
+    structure: [
+      'Words sound exactly the same',
+      'Different meanings (homonyms)',
+      'Examples: bear/bare, right/write, sea/see',
+      'Common in French poetry',
+      'Can create wordplay and double meanings'
+    ],
+    exampleSnippet: 'Fare thee well, and if for ever, / Still for ever, fare thee well.',
+    tags: ['sound device', 'rhyme', 'wordplay'],
+    seeAlso: ['Perfect Rhyme', 'Pun'],
+    notes: ['Rich rhyme is considered a sophisticated technique in French poetry but was sometimes avoided in English as too easy. It can create meaningful wordplay.']
+  },
+  {
+    name: 'Masculine Rhyme',
+    type: 'Device',
+    description: 'A rhyme that occurs on a single stressed syllable at the end of a line. The most common type of rhyme in English poetry.',
+    structure: [
+      'Rhyme on final stressed syllable',
+      'Single syllable rhymes (cat/hat)',
+      'Or multisyllable with final stress (defy/deny)',
+      'Creates strong, emphatic endings',
+      'Opposite of feminine rhyme'
+    ],
+    exampleSnippet: 'The Curfew tolls the knell of parting day, / The lowing herd wind slowly o\'er the lea.',
+    tags: ['sound device', 'rhyme'],
+    seeAlso: ['Feminine Rhyme', 'Perfect Rhyme', 'Triple Rhyme'],
+    notes: ['The terms masculine and feminine rhyme refer to the stress pattern, not gender. Masculine rhyme creates a sense of finality and strength.']
+  },
+  {
+    name: 'Feminine Rhyme',
+    type: 'Device',
+    description: 'A rhyme that occurs on two syllables, with the stress on the first syllable followed by an unstressed syllable. Also called double rhyme.',
+    structure: [
+      'Rhyme on two syllables',
+      'Stressed syllable followed by unstressed',
+      'Examples: treasure/measure, burning/turning',
+      'Creates a softer, more flowing effect',
+      'Opposite of masculine rhyme'
+    ],
+    exampleSnippet: 'Tell me not in mournful numbers, / Life is but an empty dream! / For the soul is dead that slumbers, / And things are not what they seem.',
+    tags: ['sound device', 'rhyme'],
+    seeAlso: ['Masculine Rhyme', 'Triple Rhyme'],
+    notes: ['Feminine rhyme adds variety and can create a lighter or more playful tone. It\'s common in comic verse and songs.']
+  },
+  {
+    name: 'Triple Rhyme',
+    type: 'Device',
+    description: 'A rhyme that extends over three syllables, with stress on the first of the three syllables. Relatively rare and often humorous.',
+    structure: [
+      'Rhyme on three syllables',
+      'Stress on first of the three',
+      'Examples: glittering/frittering, meticulous/ridiculous',
+      'Often used for comic effect',
+      'Rare in serious poetry'
+    ],
+    exampleSnippet: 'While I nodded, nearly napping, suddenly there came a tapping, / As of some one gently rapping, rapping at my chamber door.',
+    tags: ['sound device', 'rhyme', 'humorous'],
+    seeAlso: ['Masculine Rhyme', 'Feminine Rhyme'],
+    notes: ['Triple rhyme is difficult to achieve without seeming forced. It\'s most effective in humorous or playful poetry. Byron used it skillfully in Don Juan.']
+  },
+  {
+    name: 'Sibilance',
+    type: 'Device',
+    description: 'The repetition of \'s\' or soft consonant sounds (s, sh, z, x, soft c) to create a hissing or hushing effect.',
+    structure: [
+      'Repetition of s, sh, z, x, or soft c sounds',
+      'Creates a hissing or whispering effect',
+      'Often associated with snakes, wind, or secrets',
+      'Can suggest sinister or soothing qualities',
+      'A specific type of consonance'
+    ],
+    exampleSnippet: 'And the silken, sad, uncertain rustling of each purple curtain / Thrilled me—filled me with fantastic terrors never felt before.',
+    tags: ['sound device', 'consonance'],
+    seeAlso: ['Alliteration', 'Consonance', 'Onomatopoeia'],
+    notes: ['Sibilance can create various effects depending on context: sinister (serpents), peaceful (sleep), or secretive (whispers). Poe used it masterfully.']
+  },
+  {
+    name: 'Paronomasia',
+    type: 'Device',
+    description: 'A form of wordplay that exploits words with similar sounds or the same word with different meanings. A more formal term for punning.',
+    structure: [
+      'Play on words with similar sounds',
+      'Or same word with multiple meanings',
+      'Creates humor or double meaning',
+      'Can be subtle or obvious',
+      'Related to but distinct from simple puns'
+    ],
+    exampleSnippet: 'Ask for me tomorrow, and you shall find me a grave man.',
+    tags: ['wordplay', 'rhetoric'],
+    seeAlso: ['Pun', 'Zeugma'],
+    notes: ['Paronomasia is the rhetorical term for punning. It can range from groan-worthy to sophisticated wordplay. Shakespeare was a master of the technique.']
+  },
+  {
+    name: 'Ellipsis',
+    type: 'Device',
+    description: 'The deliberate omission of words that are grammatically necessary but can be understood from context, creating compression and emphasis.',
+    structure: [
+      'Omission of implied words',
+      'Reader supplies missing elements',
+      'Creates compression and speed',
+      'Adds emphasis through absence',
+      'Different from typographical ellipsis (...)'
+    ],
+    exampleSnippet: 'Some say the world will end in fire, / Some [say the world will end] in ice.',
+    tags: ['structural device', 'syntax'],
+    seeAlso: ['Asyndeton', 'Zeugma'],
+    notes: ['Ellipsis creates a sense of urgency and sophistication. The reader becomes an active participant by filling in the gaps. It\'s common in conversational and dramatic poetry.']
+  },
+  {
+    name: 'Tmesis',
+    type: 'Device',
+    description: 'The separation of a compound word or phrase by inserting another word or words between its parts.',
+    structure: [
+      'Splitting a word or phrase',
+      'Inserting words in the middle',
+      'Often for emphasis or humor',
+      'Examples: abso-bloody-lutely, any-old-where',
+      'Creates surprise and emphasis'
+    ],
+    exampleSnippet: 'This is not Romeo, he\'s some other where.',
+    tags: ['wordplay', 'syntax'],
+    seeAlso: ['Hyperbaton', 'Anacoluthon'],
+    notes: ['Tmesis is often used in colloquial speech for emphasis (fan-bloody-tastic). In poetry, it can create surprise or humor. The word comes from Greek for \'cutting.\'']
+  },
+  {
+    name: 'Hendiadys',
+    type: 'Device',
+    description: 'The expression of a single complex idea using two words connected by \'and\' instead of a noun modified by an adjective or adverb.',
+    structure: [
+      'Two words joined by \'and\'',
+      'Express a single idea',
+      'Instead of adjective + noun',
+      'Examples: \'nice and warm\' (nicely warm)',
+      'Creates emphasis and rhythm'
+    ],
+    exampleSnippet: 'The slings and arrows of outrageous fortune.',
+    tags: ['rhetoric', 'syntax'],
+    seeAlso: ['Polysyndeton', 'Pleonasm'],
+    notes: ['Hendiadys is common in everyday speech (\'good and ready\') and in Shakespeare. It adds emphasis and creates a more balanced, rhythmic phrase.']
+  },
+  {
+    name: 'Anacoluthon',
+    type: 'Device',
+    description: 'A sudden break in grammatical construction within a sentence, often used to show strong emotion, interrupted thought, or natural speech patterns.',
+    structure: [
+      'Sentence begins with one construction',
+      'Shifts to a different construction mid-sentence',
+      'Creates a grammatical break',
+      'Often shows emotion or confusion',
+      'Mimics natural speech patterns'
+    ],
+    exampleSnippet: 'If you fail—but you won\'t fail—the consequences would be dire.',
+    tags: ['syntax', 'dramatic'],
+    seeAlso: ['Ellipsis', 'Epanorthosis'],
+    notes: ['Anacoluthon can seem like an error but is often deliberately used to show a character\'s thought process, emotion, or to mimic realistic speech.']
+  },
+  {
+    name: 'Hyperbaton',
+    type: 'Device',
+    description: 'The deliberate rearrangement of normal word order for emphasis, rhythm, or poetic effect.',
+    structure: [
+      'Unusual or inverted word order',
+      'Words placed out of expected sequence',
+      'Often for emphasis or meter',
+      'Common in Latin and Greek poetry',
+      'Examples: \'Bright the stars shine\' instead of \'The stars shine bright\''
+    ],
+    exampleSnippet: 'Deep into that darkness peering, long I stood there wondering, fearing.',
+    tags: ['syntax', 'structural device'],
+    seeAlso: ['Anastrophe', 'Chiasmus'],
+    notes: ['Hyperbaton allows poets to place emphasis on particular words, meet metrical requirements, or create a more formal or archaic tone. Overuse can seem unnatural.']
+  },
+  {
+    name: 'Hysteron Proteron',
+    type: 'Device',
+    description: 'A figure of speech in which the logical or chronological order of words or events is reversed, placing what should come later first.',
+    structure: [
+      'Reversal of logical or temporal order',
+      'Later event mentioned before earlier',
+      'Examples: \'put on your shoes and socks\'',
+      'Can create emphasis or urgency',
+      'Sometimes used for dramatic effect'
+    ],
+    exampleSnippet: 'Let us die and charge into the thick of the fight.',
+    tags: ['rhetoric', 'syntax'],
+    seeAlso: ['Chiasmus', 'Hyperbaton'],
+    notes: ['Hysteron proteron can emphasize the more important element by placing it first, even if it happens later. Virgil\'s \'let us die and charge\' prioritizes the heroic death.']
+  },
+  {
+    name: 'Bathos',
+    type: 'Device',
+    description: 'An anticlimax created by an unintentional or intentional descent from the elevated to the commonplace or ridiculous, often for comic effect.',
+    structure: [
+      'Sudden shift from serious to trivial',
+      'Can be intentional (for humor) or accidental',
+      'Creates anticlimax',
+      'Often juxtaposes grand and mundane',
+      'Different from pathos (emotional appeal)'
+    ],
+    exampleSnippet: 'For God, for country, and for Acme Incorporated.',
+    tags: ['tone', 'humorous'],
+    seeAlso: ['Irony', 'Anticlimax', 'Juxtaposition'],
+    notes: ['Intentional bathos is a satirical technique; unintentional bathos is a common writing flaw. Pope coined the term in his satirical essay \'Peri Bathous.\'']
+  },
+  {
+    name: 'Catachresis',
+    type: 'Device',
+    description: 'The use of a word in a way that is not literally applicable, often involving a strained or mixed metaphor, or the use of a word where none exists.',
+    structure: [
+      'Strained or unusual word usage',
+      'Mixed or illogical metaphors',
+      'Using words beyond their literal range',
+      'Can be an error or deliberate technique',
+      'Sometimes fills a gap where no word exists'
+    ],
+    exampleSnippet: 'I will speak daggers to her, but use none.',
+    tags: ['figurative language', 'metaphor'],
+    seeAlso: ['Metaphor', 'Mixed Metaphor', 'Conceit'],
+    notes: ['Catachresis can be a powerful creative technique when deliberate (as in Shakespeare) or an embarrassing error when accidental. Mixed metaphors are a common form.']
+  },
+  {
+    name: 'Antimetabole',
+    type: 'Device',
+    description: 'A figure of speech in which words in one phrase or clause are repeated in reverse order in the next, creating a mirror-image pattern.',
+    structure: [
+      'Repeats words in reverse order',
+      'Creates AB:BA pattern',
+      'Similar to chiasmus but uses same words',
+      'Highly memorable and quotable',
+      'Common in speeches and epigrams'
+    ],
+    exampleSnippet: 'Ask not what your country can do for you—ask what you can do for your country.',
+    tags: ['repetition', 'rhetoric'],
+    seeAlso: ['Chiasmus', 'Epanalepsis', 'Parallelism'],
+    notes: ['Antimetabole uses the same words in reversed order; chiasmus reverses the grammatical structure. JFK\'s famous line is technically antimetabole.']
+  },
+  {
+    name: 'Prolepsis',
+    type: 'Device',
+    description: 'A figure of speech that treats a future event as if it has already happened, or assigns a quality to something before it appropriately applies.',
+    structure: [
+      'Anticipates future events as present',
+      'Describes things as they will become',
+      'Can refer to flash-forwards in narrative',
+      'Examples: \'the late king\' while he lives',
+      'Creates certainty or foreshadowing'
+    ],
+    exampleSnippet: 'The good die young, he muttered, looking at the doomed soldiers.',
+    tags: ['rhetoric', 'temporal'],
+    seeAlso: ['In Medias Res', 'Foreshadowing'],
+    notes: ['Prolepsis can create a sense of inevitability or fate. It\'s related to but distinct from foreshadowing, which hints rather than states outright.']
+  },
+  {
+    name: 'Pleonasm',
+    type: 'Device',
+    description: 'The use of more words than necessary to express an idea, either as a fault or for rhetorical emphasis. Related to redundancy.',
+    structure: [
+      'Redundant or excessive words',
+      'Can be a fault or intentional technique',
+      'Examples: \'free gift,\' \'burning fire\'',
+      'Creates emphasis through repetition',
+      'Different from tautology (which repeats meaning)'
+    ],
+    exampleSnippet: 'I saw it with my own eyes.',
+    tags: ['rhetoric', 'emphasis'],
+    seeAlso: ['Tautology', 'Repetition', 'Hendiadys'],
+    notes: ['Pleonasm is often considered poor writing, but can be used for emphasis. Some pleonasms are so common they\'re idiomatic (\'close proximity\').']
+  },
+  {
+    name: 'Malapropism',
+    type: 'Device',
+    description: 'The mistaken use of a word in place of a similar-sounding one, often with humorous effect. Named after Mrs. Malaprop in Sheridan\'s play The Rivals.',
+    structure: [
+      'Incorrect word for a similar-sounding one',
+      'Usually unintentional by the character',
+      'Creates humor through the mistake',
+      'Named after Sheridan\'s character',
+      'Examples: \'dance a flamingo\' for \'flamenco\''
+    ],
+    exampleSnippet: 'She\'s as headstrong as an allegory on the banks of the Nile.',
+    tags: ['wordplay', 'humorous'],
+    seeAlso: ['Pun', 'Paronomasia'],
+    notes: ['Malapropism is named after Mrs. Malaprop who says things like \'a nice derangement of epitaphs\' (arrangement of epithets). It\'s a character-building device in drama and fiction.']
+  },
+  {
+    name: 'Anthimeria',
+    type: 'Device',
+    description: 'The use of one part of speech as another, such as using a noun as a verb or an adjective as a noun.',
+    structure: [
+      'Using a word as a different part of speech',
+      'Noun as verb, verb as noun, etc.',
+      'Common in everyday language evolution',
+      'Examples: \'to friend\' someone, \'the big\'',
+      'Creates freshness and surprise'
+    ],
+    exampleSnippet: 'The thunder would not peace at my bidding.',
+    tags: ['wordplay', 'syntax'],
+    seeAlso: ['Neologism', 'Catachresis'],
+    notes: ['Anthimeria is common in English, which readily converts between parts of speech. Shakespeare frequently used it (\'uncle me no uncle\'). Social media has popularized verbing nouns.']
+  },
+  {
+    name: 'Transferred Epithet',
+    type: 'Device',
+    description: 'An adjective that grammatically modifies one noun but logically applies to another, often transferring a human quality to an inanimate object.',
+    structure: [
+      'Adjective applied to \'wrong\' noun',
+      'Logical meaning applies elsewhere',
+      'Often transfers emotion to objects',
+      'Examples: \'sleepless night,\' \'happy days\'',
+      'Creates economy and suggestiveness'
+    ],
+    exampleSnippet: 'He spent a sleepless night worrying about the exam.',
+    tags: ['figurative language', 'adjective'],
+    seeAlso: ['Personification', 'Pathetic Fallacy', 'Hypallage'],
+    notes: ['Transferred epithets are so common we often don\'t notice them. They create economy by suggesting the human emotion without stating it directly. Also called hypallage.']
   }
 ];

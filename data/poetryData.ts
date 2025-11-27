@@ -15,7 +15,7 @@ export const poetryData: PoetryItem[] = [
     ],
     exampleSnippet: "Shall I compare thee to a summer's day? / Thou art more lovely and more temperate...",
     tags: ["fixed form", "lyric", "traditional"],
-    seeAlso: ["Iambic Pentameter", "Volta", "Couplet", "Quatrain"],
+    seeAlso: ["Iambic Pentameter", "Volta", "Couplet", "Quatrain", "Canzone", "Dizain", "Ottava Rima"],
     notes: ["The volta (turn) occurs at line 9 in Petrarchan sonnets and before the final couplet in Shakespearean sonnets."]
   },
   {
@@ -30,7 +30,7 @@ export const poetryData: PoetryItem[] = [
     ],
     exampleSnippet: "An old silent pond... / A frog jumps into the pond, / splash! Silence again.",
     tags: ["fixed form", "syllabic", "nature"],
-    seeAlso: ["Tanka", "Senryu", "Syllabic Verse"],
+    seeAlso: ["Tanka", "Senryu", "Syllabic Verse", "Sijo", "Dodoitsu", "Renga", "Lune"],
     notes: ["Traditional haiku includes a kigo (seasonal reference) and a kireji (cutting word). English haiku often focuses on nature and a moment of insight."]
   },
   {
@@ -46,7 +46,7 @@ export const poetryData: PoetryItem[] = [
     ],
     exampleSnippet: "Do not go gentle into that good night, / Old age should burn and rave at close of day...",
     tags: ["fixed form", "repetition", "lyric"],
-    seeAlso: ["Refrain", "Repetition", "Tercet", "Terza Rima"],
+    seeAlso: ["Refrain", "Repetition", "Tercet", "Terza Rima", "Pantoum", "Sestina"],
     notes: ["The two refrains create a haunting, obsessive quality. Choose refrains that can bear repetition and gain meaning with each appearance."]
   },
   {
@@ -61,7 +61,9 @@ export const poetryData: PoetryItem[] = [
       "Lines 3, 4 have 2 metrical feet"
     ],
     exampleSnippet: "There once was a man from Nantucket / Who kept all his cash in a bucket...",
-    tags: ["fixed form", "humorous", "anapestic"]
+    tags: ["fixed form", "humorous", "anapestic"],
+    seeAlso: ["Clerihew", "Epigram", "Double Dactyl", "Anapestic Tetrameter"],
+    notes: ["The limerick's AABBA rhyme scheme and anapestic rhythm create its characteristic bouncy, humorous quality. Edward Lear popularized the form in the 19th century."]
   },
   {
     name: "Sestina",
@@ -90,7 +92,9 @@ export const poetryData: PoetryItem[] = [
       "Common types: Pindaric, Horatian, Irregular"
     ],
     exampleSnippet: "Thou still unravish\'d bride of quietness, / Thou foster-child of silence and slow time...",
-    tags: ["lyric", "apostrophe", "traditional"]
+    tags: ["lyric", "apostrophe", "traditional"],
+    seeAlso: ["Apostrophe", "Elegy", "Alcaic Stanza", "Sapphic Stanza"],
+    notes: ["The three main types of ode are Pindaric (complex triadic structure), Horatian (regular stanzas), and Irregular (free stanza structure). Keats mastered the form."]
   },
   {
     name: "Ballad",
@@ -104,7 +108,9 @@ export const poetryData: PoetryItem[] = [
       "Tells a story"
     ],
     exampleSnippet: "It is an ancient Mariner, / And he stoppeth one of three...",
-    tags: ["narrative", "song-like", "quatrain"]
+    tags: ["narrative", "song-like", "quatrain"],
+    seeAlso: ["Common Meter", "Quatrain", "Burns Stanza", "Refrain"],
+    notes: ["The ballad stanza (or ballad meter) is essentially common meter. Traditional ballads often include refrains and tell dramatic stories."]
   },
   {
     name: "Ghazal",
@@ -238,7 +244,9 @@ export const poetryData: PoetryItem[] = [
       "The \"R\" represents the refrain (rentrement)"
     ],
     exampleSnippet: "In Flanders fields the poppies blow / Between the crosses, row on row, / That mark our place; and in the sky / The larks, still bravely singing, fly / Scarce heard amid the guns below.",
-    tags: ["fixed form", "repetition", "French"]
+    tags: ["fixed form", "repetition", "French"],
+    seeAlso: ["Triolet", "Ballade", "Virelai", "Refrain"],
+    notes: ["The rondeau's opening words become the refrain (rentrement). John McCrae's 'In Flanders Fields' is the most famous English rondeau."]
   },
   {
     name: "Sea Shanty",
@@ -265,7 +273,9 @@ export const poetryData: PoetryItem[] = [
       "Often focuses on a single image or idea"
     ],
     exampleSnippet: "A lightning flash— / what I thought were faces / are plumes of pampas grass.",
-    tags: ["fixed form", "syllabic", "Japanese"]
+    tags: ["fixed form", "syllabic", "Japanese"],
+    seeAlso: ["Haiku", "Senryu", "Renga", "Sijo", "Dodoitsu"],
+    notes: ["Tanka is an older form than haiku; the haiku evolved from the tanka's first three lines. Tanka allows for more personal and emotional content than haiku."]
   },
   {
     name: "Rhyme Royal",
@@ -320,7 +330,9 @@ export const poetryData: PoetryItem[] = [
       "Meter is irregular and often forced for comedic effect"
     ],
     exampleSnippet: "Sir Christopher Wren / Said, \"I am going to dine with some men. / If anyone calls, / Say I am designing St. Paul's.\"",
-    tags: ["fixed form", "humorous", "quatrain"]
+    tags: ["fixed form", "humorous", "quatrain"],
+    seeAlso: ["Limerick", "Double Dactyl", "Epigram"],
+    notes: ["The clerihew must name its subject in the first line and maintain an absurd, whimsical tone. The irregular meter adds to its comic effect."]
   },
   {
     name: "Tanaga",
@@ -570,7 +582,9 @@ export const poetryData: PoetryItem[] = [
       "May include call-and-response elements"
     ],
     exampleSnippet: "I\'ve known rivers: / I\'ve known rivers ancient as the world and older than the flow of human blood in human veins.",
-    tags: ["song-like", "repetition", "American"]
+    tags: ["song-like", "repetition", "American"],
+    seeAlso: ["Bop", "Refrain", "Anaphora", "Sea Shanty"],
+    notes: ["The blues poem adapts the AAB structure of blues music. Langston Hughes pioneered this form, bringing African American musical traditions into poetry."]
   },
   {
     name: "Golden Shovel",
@@ -736,6 +750,317 @@ export const poetryData: PoetryItem[] = [
     ],
     exampleSnippet: "[An eight-line stanza with alternating rhymes throughout]",
     tags: ["fixed form", "Italian", "stanza form"]
+  },
+  {
+    name: "Sijo",
+    type: "Form",
+    description: "A traditional Korean poetic form consisting of three lines, each averaging 14-16 syllables, for a total of 44-46 syllables. Often philosophical or reflective in nature.",
+    origin: "Developed in Korea during the Goryeo period (918-1392) and flourished during the Joseon Dynasty. One of the most popular Korean poetic forms.",
+    structure: [
+      "3 lines",
+      "Each line: 14-16 syllables (total 44-46)",
+      "Line 1: introduces theme or situation",
+      "Line 2: develops or twists the theme",
+      "Line 3: resolves with a surprise or conclusion",
+      "Natural pause (caesura) in the middle of each line"
+    ],
+    exampleSnippet: "The moon hangs in the sky, a jade disc on black silk. / I pour myself more wine; the cup reflects my face. / Even the shadow drinks—now we are three friends here.",
+    tags: ["fixed form", "syllabic", "Korean"],
+    seeAlso: ["Haiku", "Tanka", "Senryu"],
+    notes: ["Sijo often contains philosophical musings, nature imagery, and a twist or surprise in the third line. The form is more flexible than haiku in syllable count."]
+  },
+  {
+    name: "Dodoitsu",
+    type: "Form",
+    description: "A Japanese poetic form consisting of four lines with a 7-7-7-5 syllable pattern, traditionally focusing on themes of love, work, or humor.",
+    origin: "Developed in Japan during the Edo period (1603-1868) as a form of popular song. Often performed by geisha and associated with entertainment districts.",
+    structure: [
+      "4 lines",
+      "Syllable pattern: 7-7-7-5 (total 26)",
+      "No required rhyme or seasonal reference",
+      "Often humorous, romantic, or satirical",
+      "Traditionally sung rather than read"
+    ],
+    exampleSnippet: "If only I could show you / the cherry blossoms at Yoshino— / those flowers in my heart / that bloom for you.",
+    tags: ["fixed form", "syllabic", "Japanese"],
+    seeAlso: ["Haiku", "Tanka", "Senryu"],
+    notes: ["Unlike haiku, dodoitsu focuses on human emotions rather than nature. The form is more casual and playful, often dealing with love and relationships."]
+  },
+  {
+    name: "Renga",
+    type: "Form",
+    description: "A collaborative Japanese linked-verse form where poets take turns composing alternating stanzas of 5-7-5 and 7-7 syllables, creating a continuous poem.",
+    origin: "Developed in Japan during the Heian period (794-1185) and became highly popular in the medieval period. Haiku evolved from the opening stanza (hokku) of renga.",
+    structure: [
+      "Alternating stanzas: 5-7-5 and 7-7 syllables",
+      "Composed by multiple poets in turn",
+      "Can be 36 (kasen), 50, 100, or more stanzas",
+      "Each stanza links to the previous one",
+      "First stanza (hokku) often by the most honored poet",
+      "Includes seasonal references (kigo)"
+    ],
+    exampleSnippet: "[Poet 1:] Old pond— / a frog jumps in, / the sound of water. / [Poet 2:] Willows sweep the bank / in the gathering dusk.",
+    tags: ["collaborative", "linked verse", "Japanese"],
+    seeAlso: ["Haiku", "Tanka", "Senryu"],
+    notes: ["Renga sessions were social events with specific rules. Each stanza must connect to the previous one while shifting the subject. The form influenced the development of haiku."]
+  },
+  {
+    name: "Canzone",
+    type: "Form",
+    description: "A medieval Italian lyric form consisting of five to seven stanzas of equal length with a complex rhyme scheme, followed by a shorter concluding stanza (envoi or commiato).",
+    origin: "Developed in medieval Italy by Provençal troubadours and perfected by Dante and Petrarch in the 13th and 14th centuries.",
+    structure: [
+      "5-7 stanzas of equal length (usually 10-20 lines)",
+      "Concluding envoi (shorter stanza)",
+      "Complex rhyme scheme repeated in each stanza",
+      "Traditionally in hendecasyllabic (11-syllable) lines",
+      "Often addresses themes of love or philosophy"
+    ],
+    exampleSnippet: "Clear, fresh, sweet waters, where she who alone / seems lady to me rested her lovely limbs...",
+    tags: ["fixed form", "Italian", "lyric"],
+    seeAlso: ["Sonnet", "Terza Rima", "Ottava Rima"],
+    notes: ["The canzone is one of the most sophisticated Italian poetic forms. Dante wrote extensively about its rules in De Vulgari Eloquentia."]
+  },
+  {
+    name: "Alcaic Stanza",
+    type: "Form",
+    description: "A classical Greek stanzaic form named after the poet Alcaeus, consisting of four lines with a specific metrical pattern, later adapted into Latin and English.",
+    origin: "Created by the Greek poet Alcaeus of Mytilene (c. 620-580 BCE). Adapted into Latin by Horace and into English by Tennyson and others.",
+    structure: [
+      "4 lines per stanza",
+      "Lines 1-2: 11 syllables each (Alcaic hendecasyllables)",
+      "Line 3: 9 syllables (Alcaic enneasyllable)",
+      "Line 4: 10 syllables (Alcaic decasyllable)",
+      "Specific pattern of long and short syllables in classical form"
+    ],
+    exampleSnippet: "O mighty-mouthed inventor of harmonies, / O skilled to sing of Time or Eternity, / God-gifted organ-voice of England, / Milton, a name to resound for ages.",
+    tags: ["fixed form", "classical", "Greek"],
+    seeAlso: ["Sapphic Stanza", "Ode"],
+    notes: ["The Alcaic stanza is difficult to adapt to English due to differences in stress patterns. Tennyson's 'Milton' is one of the most successful English adaptations."]
+  },
+  {
+    name: "Virelai",
+    type: "Form",
+    description: "A medieval French verse form characterized by interlocking rhymes with a refrain, creating a complex musical pattern often set to song.",
+    origin: "A medieval French form, one of the 'formes fixes,' popular in the 14th and 15th centuries. Guillaume de Machaut was a notable practitioner.",
+    structure: [
+      "Variable number of stanzas",
+      "Rhyme scheme typically: AbbaA (capital = refrain)",
+      "Opening lines become the refrain",
+      "Interlocking rhymes create musical effect",
+      "Often set to music"
+    ],
+    exampleSnippet: "Lady, to you I give / My heart to keep, as long as I may live. / Though you say, 'Go,' / And I must, even so / Lady, to you I give...",
+    tags: ["fixed form", "French", "medieval"],
+    seeAlso: ["Rondeau", "Ballade", "Triolet"],
+    notes: ["The virelai was originally sung, and its structure reflects musical considerations. The form has several variants, including the virelai ancien and virelai nouveau."]
+  },
+  {
+    name: "Burns Stanza",
+    type: "Form",
+    description: "A six-line stanza form with an AAABAB rhyme scheme, named after Robert Burns who used it extensively, though it predates him. Also called Standard Habbie.",
+    origin: "Named after Robert Sempill's 17th-century poem 'The Life and Death of Habbie Simson.' Robert Burns popularized it in the 18th century.",
+    structure: [
+      "6 lines per stanza",
+      "Rhyme scheme: AAABAB",
+      "Lines 1, 2, 3, 5: tetrameter (4 feet)",
+      "Lines 4, 6: dimeter (2 feet)",
+      "Creates a lilting, conversational rhythm"
+    ],
+    exampleSnippet: "Wee, sleekit, cowrin, tim'rous beastie, / O, what a panic's in thy breastie! / Thou need na start awa sae hasty, / Wi' bickering brattle! / I wad be laith to rin an' chase thee, / Wi' murd'ring pattle!",
+    tags: ["fixed form", "Scottish", "stanza form"],
+    seeAlso: ["Ballad", "Quatrain"],
+    notes: ["The short fourth and sixth lines create a punchy effect, often used for humor or emphasis. Burns used this form for many of his most famous poems."]
+  },
+  {
+    name: "Common Meter",
+    type: "Form",
+    description: "A quatrain form with alternating lines of iambic tetrameter and iambic trimeter (8-6-8-6 syllables), commonly used in hymns and ballads.",
+    origin: "Derived from the ballad tradition and codified in English hymnody during the 16th-17th centuries. Also called 'hymn meter' or 'ballad meter.'",
+    structure: [
+      "4 lines (quatrain)",
+      "Syllable pattern: 8-6-8-6",
+      "Alternating iambic tetrameter and trimeter",
+      "Rhyme scheme usually ABAB or ABCB",
+      "Very common in hymns and folk songs"
+    ],
+    exampleSnippet: "Amazing grace! How sweet the sound / That saved a wretch like me! / I once was lost, but now am found; / Was blind, but now I see.",
+    tags: ["stanza form", "hymn", "iambic"],
+    seeAlso: ["Ballad", "Long Meter", "Short Meter", "Quatrain"],
+    notes: ["Common meter is so prevalent that many hymns and poems in this form are interchangeable with the same tune (e.g., 'Amazing Grace' fits 'House of the Rising Sun')."]
+  },
+  {
+    name: "Long Meter",
+    type: "Form",
+    description: "A quatrain form with four lines of iambic tetrameter (8-8-8-8 syllables), commonly used in hymns.",
+    origin: "Developed alongside common meter in English hymnody during the Protestant Reformation. Used extensively in metrical psalms.",
+    structure: [
+      "4 lines (quatrain)",
+      "Syllable pattern: 8-8-8-8",
+      "All lines in iambic tetrameter",
+      "Rhyme scheme usually AABB or ABAB",
+      "More stately than common meter"
+    ],
+    exampleSnippet: "Praise God, from whom all blessings flow; / Praise Him, all creatures here below; / Praise Him above, ye heavenly host; / Praise Father, Son, and Holy Ghost.",
+    tags: ["stanza form", "hymn", "iambic"],
+    seeAlso: ["Common Meter", "Short Meter", "Quatrain"],
+    notes: ["Long meter creates a more measured, even pace than common meter. The Doxology ('Praise God from Whom All Blessings Flow') is the most famous example."]
+  },
+  {
+    name: "Short Meter",
+    type: "Form",
+    description: "A quatrain form with a 6-6-8-6 syllable pattern (iambic trimeter, trimeter, tetrameter, trimeter), commonly used in hymns.",
+    origin: "Developed in English hymnody alongside common meter and long meter. Less common but still widely used in Protestant hymn traditions.",
+    structure: [
+      "4 lines (quatrain)",
+      "Syllable pattern: 6-6-8-6",
+      "Iambic trimeter, trimeter, tetrameter, trimeter",
+      "Rhyme scheme usually AABB or ABAB",
+      "Creates a compact, energetic rhythm"
+    ],
+    exampleSnippet: "Blest be the tie that binds / Our hearts in Christian love; / The fellowship of kindred minds / Is like to that above.",
+    tags: ["stanza form", "hymn", "iambic"],
+    seeAlso: ["Common Meter", "Long Meter", "Quatrain"],
+    notes: ["The longer third line creates variety and emphasis. Short meter is often used for more intimate or personal hymns."]
+  },
+  {
+    name: "Bop",
+    type: "Form",
+    description: "A contemporary African American poetic form consisting of three stanzas with a repeated refrain line, exploring a problem, its impact, and resolution or further complication.",
+    origin: "Created by poet Afaa Michael Weaver (then known as Michael S. Weaver) in the 1990s. Named after bebop jazz for its improvisational quality.",
+    structure: [
+      "Three stanzas: 6 lines, 8 lines, 6 lines",
+      "A refrain line (often from a song) after each stanza",
+      "Stanza 1: introduces a problem or situation",
+      "Stanza 2: explores the problem's impact",
+      "Stanza 3: offers resolution or deeper complication",
+      "Refrain gains new meaning with each repetition"
+    ],
+    exampleSnippet: "[Six lines exploring a problem] / 'What's Going On' / [Eight lines on impact] / 'What's Going On' / [Six lines on resolution] / 'What's Going On'",
+    tags: ["contemporary", "American", "refrain"],
+    seeAlso: ["Blues Poem", "Villanelle", "Refrain"],
+    notes: ["The bop form uses jazz and blues music titles as refrains, connecting African American literary and musical traditions. The form encourages personal and political exploration."]
+  },
+  {
+    name: "Contrapuntal",
+    type: "Form",
+    description: "A contemporary poetic form where multiple poems or voices are interwoven on the page, meant to be read both separately and together, creating multiple meanings.",
+    origin: "A modern experimental form that emerged in the late 20th century, inspired by musical counterpoint. Julie Sheehan and other contemporary poets have developed this form.",
+    structure: [
+      "Two or more poems arranged in columns or sections",
+      "Each poem can be read independently",
+      "When read together, they create a third meaning",
+      "Often explores contrasting perspectives",
+      "Requires careful arrangement on the page"
+    ],
+    exampleSnippet: "[Left column: 'I remember summer' | Right column: 'You forget winter'] / [Read together: 'I remember summer, you forget winter']",
+    tags: ["experimental", "modern", "visual"],
+    seeAlso: ["Concrete Poetry", "Found Poetry", "Golden Shovel"],
+    notes: ["The contrapuntal form requires readers to engage actively with the text, choosing how to read and combine the voices. It's particularly effective for exploring relationships and conflicts."]
+  },
+  {
+    name: "Lune",
+    type: "Form",
+    description: "An American variant of haiku, created by Robert Kelly, consisting of three lines with a word count of 3-5-3 (or syllable count in Jack Collom's variant).",
+    origin: "Created by American poet Robert Kelly as an alternative to haiku that works better with English's natural rhythms. Jack Collom later created a syllabic variant.",
+    structure: [
+      "3 lines",
+      "Kelly's lune: 3 words / 5 words / 3 words",
+      "Collom's lune: 3 syllables / 5 syllables / 3 syllables",
+      "No required subject matter",
+      "More flexible than traditional haiku"
+    ],
+    exampleSnippet: "The cat sleeps / in the warm morning sun / curled and still.",
+    tags: ["fixed form", "American", "short"],
+    seeAlso: ["Haiku", "Senryu", "Tanka"],
+    notes: ["The lune was designed to be more natural in English than the syllable-based haiku. Word-based lunes capture English's tendency toward multisyllabic words."]
+  },
+  {
+    name: "Double Dactyl",
+    type: "Form",
+    description: "A humorous, strict poetic form consisting of two quatrains in dactylic meter, with specific requirements including a proper name and a single double-dactylic word.",
+    origin: "Invented by Anthony Hecht and Paul Pascal in 1966, also known as 'Higgledy-Piggledy' after its traditional opening nonsense words.",
+    structure: [
+      "8 lines in two quatrains",
+      "Dactylic dimeter throughout",
+      "Line 1: nonsense (usually 'Higgledy-piggledy')",
+      "Line 2: a proper name (person or place)",
+      "Line 6: a single double-dactylic word (6 syllables)",
+      "Lines 4 and 8 rhyme",
+      "Lines 4 and 8 are truncated (4 syllables)"
+    ],
+    exampleSnippet: "Higgledy-piggledy / Emily Dickinson / Wrote in her bedroom at / Amherst, alone. / 'Dash-es and capital- / Ization are what I / Like,' she said. 'Leave me a- / Lone with my poem.'",
+    tags: ["fixed form", "humorous", "dactylic"],
+    seeAlso: ["Limerick", "Clerihew", "Epigram"],
+    notes: ["Finding a single six-syllable double-dactylic word (like 'higgledy-piggledy' or 'incomprehensible') is the main challenge. The form is meant to be playful and witty."]
+  },
+  {
+    name: "Epithalamium",
+    type: "Form",
+    description: "A poem or song written specifically for a bride and groom on their wedding day, celebrating love and marriage.",
+    origin: "An ancient Greek form (epithalamion) sung outside the bridal chamber. Developed through Latin poets like Catullus and into English by Spenser and others.",
+    structure: [
+      "No fixed structure or length",
+      "Celebrates the bride and groom",
+      "Often includes blessings and wishes",
+      "May invoke gods or nature",
+      "Traditionally sung or performed at weddings"
+    ],
+    exampleSnippet: "Ye learned sisters which have oftentimes / Beene to me ayding, others to adorne: / Whom ye thought worthy of your gracefull rymes...",
+    tags: ["occasional", "classical", "celebratory"],
+    seeAlso: ["Ode", "Elegy", "Aubade"],
+    notes: ["Spenser's 'Epithalamion' (1595) is the most famous English example. The form allows great freedom while maintaining the celebratory purpose."]
+  },
+  {
+    name: "Dizain",
+    type: "Form",
+    description: "A French poetic form consisting of ten lines in iambic pentameter with a rhyme scheme of ABABBCCDCD.",
+    origin: "A French form popular during the Renaissance, used by poets like Clément Marot and later adopted by English poets.",
+    structure: [
+      "10 lines",
+      "Typically iambic pentameter",
+      "Rhyme scheme: ABABBCCDCD",
+      "No required subject matter",
+      "Often used for love poetry or philosophical reflection"
+    ],
+    exampleSnippet: "[A ten-line poem with the ABABBCCDCD rhyme scheme, exploring a single theme or image]",
+    tags: ["fixed form", "French", "decasyllabic"],
+    seeAlso: ["Sonnet", "Ottava Rima", "Rispetto"],
+    notes: ["The dizain can stand alone or be used as a stanza in longer poems. The rhyme scheme creates a sense of resolution and completeness."]
+  },
+  {
+    name: "Verse Epistle",
+    type: "Form",
+    description: "A poem written in the form of a letter, addressed to a specific person, often exploring philosophical, moral, or personal themes.",
+    origin: "Developed by classical poets like Horace (Epistulae) and Ovid (Heroides). Popular in English from the 17th century with poets like Alexander Pope.",
+    structure: [
+      "Written as a letter in verse",
+      "Addressed to a specific recipient",
+      "Often in heroic couplets or blank verse",
+      "Can be personal, philosophical, or satirical",
+      "Conversational but elevated in tone"
+    ],
+    exampleSnippet: "Know then thyself, presume not God to scan; / The proper study of mankind is man.",
+    tags: ["classical", "narrative", "philosophical"],
+    seeAlso: ["Epic", "Dramatic Monologue", "Ode"],
+    notes: ["Pope's 'Essay on Man' and 'Epistle to Dr. Arbuthnot' are famous examples. The form combines personal address with broader themes."]
+  },
+  {
+    name: "Invective",
+    type: "Form",
+    description: "A poem or speech of harsh criticism, abuse, or denunciation directed at a person, group, or idea. A form of aggressive satire.",
+    origin: "Ancient Greek and Latin poetry included invective traditions. Archilochus and Catullus wrote famous invectives. The form continues in political poetry.",
+    structure: [
+      "No fixed structure",
+      "Harshly critical or abusive in content",
+      "Often uses strong, vivid language",
+      "May employ satire, irony, or direct attack",
+      "Targets specific individuals or ideas"
+    ],
+    exampleSnippet: "I hate and love. You ask perhaps how that can be? / I know not, but I feel it, and I am in torment.",
+    tags: ["satire", "critical", "classical"],
+    seeAlso: ["Epigram", "Satire", "Ode"],
+    notes: ["Invective poetry ranges from witty criticism to fierce attack. It has a long political tradition and continues in contemporary protest poetry."]
   },
   // Meters
   {
@@ -1130,5 +1455,124 @@ export const poetryData: PoetryItem[] = [
     ],
     exampleSnippet: "To be or not to be, that is the question:", // Extra syllable creates feminine ending
     tags: ["metrical variation", "line ending", "extension"]
+  },
+  {
+    name: "Ionic (Greater)",
+    type: "Meter",
+    description: "A metrical foot consisting of two long (stressed) syllables followed by two short (unstressed) syllables. Also called ionic a maiore.",
+    origin: "An ancient Greek metrical foot used in lyric poetry, named for its supposed origin in Ionia. Used by poets like Sappho and Anacreon.",
+    structure: [
+      "4 syllables",
+      "Pattern: DUM-DUM-da-da (stressed-stressed-unstressed-unstressed)",
+      "Creates a rolling, wave-like rhythm",
+      "Rare in English poetry",
+      "Often used in combination with other feet"
+    ],
+    exampleSnippet: "Call her once before you go, / Call once yet!",
+    tags: ["metrical foot", "classical", "rare"],
+    seeAlso: ["Ionic (Lesser)", "Choriamb", "Dactyl"],
+    notes: ["The greater ionic creates a strong start that fades, like a wave breaking. It\'s challenging to sustain in English and is usually mixed with other meters."]
+  },
+  {
+    name: "Ionic (Lesser)",
+    type: "Meter",
+    description: "A metrical foot consisting of two short (unstressed) syllables followed by two long (stressed) syllables. Also called ionic a minore.",
+    origin: "An ancient Greek metrical foot, the reverse of the greater ionic. Used in classical Greek and Latin verse.",
+    structure: [
+      "4 syllables",
+      "Pattern: da-da-DUM-DUM (unstressed-unstressed-stressed-stressed)",
+      "Creates a building, rising rhythm",
+      "Rare in English poetry",
+      "Often combined with other feet"
+    ],
+    exampleSnippet: "In the dark of the moon, in the deep.",
+    tags: ["metrical foot", "classical", "rare"],
+    seeAlso: ["Ionic (Greater)", "Choriamb", "Anapest"],
+    notes: ["The lesser ionic builds from weak to strong, creating anticipation. Like its counterpart, it\'s rarely used alone in English verse."]
+  },
+  {
+    name: "Tribrach",
+    type: "Meter",
+    description: "A metrical foot consisting of three short (unstressed) syllables. Extremely rare and typically appears as a substitution within other meters.",
+    origin: "From Greek and Latin prosody. Used as a substitution in dactylic and anapestic meters, rarely as a sustained foot.",
+    structure: [
+      "3 syllables",
+      "Pattern: da-da-da (all unstressed)",
+      "Creates a rapid, light rhythm",
+      "Almost never sustained as the base meter",
+      "Used for variation and speed"
+    ],
+    exampleSnippet: "merrily, merrily", // The unstressed syllables create a tribrach effect
+    tags: ["metrical foot", "rare", "variation"],
+    seeAlso: ["Pyrrhic", "Molossus", "Dactyl"],
+    notes: ["The tribrach is essentially three pyrrhics compressed into a trisyllabic foot. It creates a hurrying effect and is almost impossible to sustain in English."]
+  },
+  {
+    name: "Molossus",
+    type: "Meter",
+    description: "A metrical foot consisting of three long (stressed) syllables. Extremely rare and creates a heavy, emphatic effect.",
+    origin: "Named after the Molossian people of ancient Epirus. Used in classical Greek and Latin poetry for emphasis and solemnity.",
+    structure: [
+      "3 syllables",
+      "Pattern: DUM-DUM-DUM (all stressed)",
+      "Creates a heavy, slow, emphatic rhythm",
+      "Cannot be sustained for long",
+      "Used for emphasis or variation"
+    ],
+    exampleSnippet: "Break, break, break, / On thy cold gray stones, O Sea!",
+    tags: ["metrical foot", "rare", "emphasis"],
+    seeAlso: ["Spondee", "Tribrach", "Cretic"],
+    notes: ["The molossus is the opposite of the tribrach—all heavy stresses. It creates a pounding, emphatic effect but exhausts the ear quickly."]
+  },
+  {
+    name: "Antibacchius",
+    type: "Meter",
+    description: "A metrical foot consisting of two stressed syllables followed by one unstressed syllable. The reverse of the bacchius.",
+    origin: "From Greek and Latin prosody. The antibacchius (or antibacchic) is the reverse pattern of the bacchius foot.",
+    structure: [
+      "3 syllables",
+      "Pattern: DUM-DUM-da (stressed-stressed-unstressed)",
+      "Creates a falling, emphatic rhythm",
+      "Rare in English poetry",
+      "Often appears as substitution"
+    ],
+    exampleSnippet: "Moonlight, starlight, / flooding the dark.",
+    tags: ["metrical foot", "rare", "trisyllabic"],
+    seeAlso: ["Bacchius", "Cretic", "Dactyl"],
+    notes: ["The antibacchius creates a strong start with a light ending. It\'s rare as a sustained meter but can appear naturally in English verse."]
+  },
+  {
+    name: "Amphibrachic Tetrameter",
+    type: "Meter",
+    description: "A line of verse consisting of four amphibrachic feet, where each foot has an unstressed syllable, a stressed syllable, and an unstressed syllable.",
+    origin: "Used in various European traditions, particularly in ballads and songs. Creates a distinctive waltz-like rhythm.",
+    structure: [
+      "12 syllables per line (may be catalectic)",
+      "Pattern: da-DUM-da da-DUM-da da-DUM-da da-DUM-da",
+      "Creates a lilting, waltz-like rhythm",
+      "Common in light verse and songs",
+      "Each foot has the stress in the middle"
+    ],
+    exampleSnippet: "The Assyrian came down like the wolf on the fold, / And his cohorts were gleaming in purple and gold.",
+    tags: ["amphibrachic", "line length", "song-like"],
+    seeAlso: ["Amphibrach", "Anapestic Tetrameter", "Dactylic Tetrameter"],
+    notes: ["Amphibrachic tetrameter creates a rocking, musical quality. Byron used it effectively in 'The Destruction of Sennacherib.' It's sometimes confused with anapestic meter."]
+  },
+  {
+    name: "Poulter's Measure",
+    type: "Meter",
+    description: "A meter consisting of alternating lines of iambic hexameter (12 syllables) and iambic heptameter (14 syllables), popular in 16th-century English poetry.",
+    origin: "Named by George Gascoigne after the poulter (poultry seller) who would give 12 eggs in the first dozen and 14 in the second. Popular in the Tudor era.",
+    structure: [
+      "Alternating lines of 12 and 14 syllables",
+      "Iambic hexameter followed by iambic heptameter",
+      "Pattern: 6 iambs / 7 iambs",
+      "Often breaks into common meter when printed as quatrains",
+      "Popular in 16th-century verse"
+    ],
+    exampleSnippet: "The young man Martial, that with so many blows / Did make Antiochus to yield unto his will at last.",
+    tags: ["iambic", "line length", "Renaissance"],
+    seeAlso: ["Common Meter", "Iambic Hexameter", "Fourteener"],
+    notes: ["Poulter's measure fell out of favor after the 16th century due to its monotonous quality. When split into quatrains, it becomes common meter, which proved more popular."]
   },
 ];
