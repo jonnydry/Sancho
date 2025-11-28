@@ -211,31 +211,43 @@ html.light.theme-paper {
 }
 
 /* Custom Scrollbar - Sleek & Minimal */
+html,
+body,
 * {
   scrollbar-width: thin;
   scrollbar-color: rgb(var(--app-scrollbar)) transparent;
 }
 
 /* Webkit Scrollbar (Chrome, Safari, Edge) */
-::-webkit-scrollbar {
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
-::-webkit-scrollbar-track {
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track,
+*::-webkit-scrollbar-track {
   background: transparent;
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgb(var(--app-scrollbar));
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb {
+  background: rgb(var(--app-scrollbar)) !important;
   border-radius: 3px;
   transition: background 0.2s ease;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgb(var(--app-text-muted));
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover,
+*::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--app-text-muted)) !important;
 }
 
-::-webkit-scrollbar-corner {
+html::-webkit-scrollbar-corner,
+body::-webkit-scrollbar-corner,
+*::-webkit-scrollbar-corner {
   background: transparent;
 }
