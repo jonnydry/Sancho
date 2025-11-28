@@ -203,3 +203,33 @@ html.light.theme-paper {
     animation: none !important;
   }
 }
+
+/* Custom Scrollbar - Sleek & Minimal */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--app-border)) transparent;
+}
+
+/* Webkit Scrollbar (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--app-border));
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--app-text-muted));
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
