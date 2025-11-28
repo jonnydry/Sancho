@@ -32,10 +32,13 @@
 body {
   font-family: 'Source Code Pro', monospace;
   font-size: 18px;
+  background-color: rgb(var(--app-bg));
+  color: rgb(var(--app-text));
 }
 
 html {
   font-size: 18px;
+  background-color: rgb(var(--app-bg));
 }
 
 /* 
@@ -48,6 +51,7 @@ html {
 
 /* --- THEME: Dark (Midnight Scholar) - Default --- */
 :root {
+  color-scheme: dark;
   --app-bg: 10 10 10; /* Shade 1: Absolute Black base */
   --app-bg-alt: 28 28 28; /* Shade 2: Lifted Charcoal surface (1C1C1C adjusted for contrast) */
   --app-border: 45 45 45; /* Shade 3: Subtle structure */
@@ -72,6 +76,7 @@ html {
 
 /* --- THEME: Light (Canvas Theory) - Default --- */
 .light { 
+  color-scheme: light;
   --app-bg: 252 252 252; /* Shade 1: Pure Canvas */
   --app-bg-alt: 243 244 246; /* Shade 2: Cool Gray Surface */
   --app-border: 229 231 235; /* Shade 3: Structural Gray */
