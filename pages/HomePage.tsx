@@ -187,7 +187,7 @@ export const HomePage: React.FC = () => {
         )}
       </div>
       {modalItem && (
-        <Suspense fallback={<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"><p className="text-muted font-mono text-sm animate-pulse">Loading...</p></div>}>
+        <Suspense fallback={<div className="fixed inset-0 z-50 flex items-center justify-center bg-bg/80"><p className="text-muted font-mono text-sm animate-pulse">Loading...</p></div>}>
           <PoetryDetailModal
             item={modalItem}
             onClose={handleCloseModal}

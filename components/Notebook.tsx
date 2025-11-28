@@ -8,7 +8,7 @@ import { PoetryCard } from './PoetryCard';
 const PoetryDetailModal = lazy(() => import('./PoetryDetailModal').then(module => ({ default: module.PoetryDetailModal })));
 
 const ModalFallback = () => (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-bg/70">
     <p className="text-muted font-mono text-sm animate-pulse">Loading context...</p>
   </div>
 );
@@ -69,7 +69,7 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 animate-fade-in-fast"
+        className="fixed inset-0 bg-bg/50 backdrop-blur-sm z-40 animate-fade-in-fast"
         onClick={onClose}
         aria-hidden="true"
       />
