@@ -41,6 +41,16 @@ html {
   background-color: rgb(var(--app-bg));
 }
 
+/* Mobile font size reduction */
+@media (max-width: 640px) {
+  html {
+    font-size: 15px;
+  }
+  body {
+    font-size: 15px;
+  }
+}
+
 /* 
    THEME PHILOSOPHY: 3 Shades + Creative Highlight
    Shade 1: Background (Deepest/Lightest Base)
