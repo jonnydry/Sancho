@@ -68,7 +68,13 @@ The project utilizes a dual-server architecture with a React frontend (Vite, Por
 
 ### Recent Updates
 
-#### 2025-11-28 - Interactive Element Polish & Mobile Typography
+#### 2025-11-28 - SEO Improvements & Interactive Polish
+- **Production Domain SEO**: Updated all meta tags, Open Graph, Twitter Cards, and JSON-LD structured data to use sanchopoetry.com domain
+- **Accurate Content Counts**: Fixed all SEO metadata to reflect actual database size (69 forms, 37 meters, 76 devices)
+- **Canonical URL**: Added canonical link tag pointing to production domain to prevent duplicate content issues
+- **Absolute Image URLs**: Changed social sharing images to absolute URLs for proper Facebook/Twitter previews
+- **robots.txt**: Created crawler directives allowing indexing while blocking /api/ endpoints
+- **sitemap.xml**: Created XML sitemap listing all public pages (/, /about, /privacy, /terms) for search engine indexing
 - **Tag Button Hover Enhancements**: Added subtle scale-up animation (105%), soft shadow, and improved text/border visibility on hover across all tag buttons (card view, modal tags, and "See Also" section)
 - **Mobile Font Size Optimization**: Reduced base font size from 18px to 15px on mobile devices (≤640px breakpoint) for better readability and proportional spacing
 - **Consistent Button Behavior**: Applied same interactive feedback across tag buttons and "See Also" navigation buttons for cohesive UX
