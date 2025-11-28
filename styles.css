@@ -51,6 +51,7 @@ html {
   --app-bg: 10 10 10; /* Shade 1: Absolute Black base */
   --app-bg-alt: 28 28 28; /* Shade 2: Lifted Charcoal surface (1C1C1C adjusted for contrast) */
   --app-border: 45 45 45; /* Shade 3: Subtle structure */
+  --app-scrollbar: 35 35 35; /* Dark scrollbar for dark mode */
 
   --app-text: 237 237 237;
   --app-text-muted: 115 115 115;
@@ -74,6 +75,7 @@ html {
   --app-bg: 252 252 252; /* Shade 1: Pure Canvas */
   --app-bg-alt: 243 244 246; /* Shade 2: Cool Gray Surface */
   --app-border: 229 231 235; /* Shade 3: Structural Gray */
+  --app-scrollbar: 200 200 200; /* Light scrollbar for light mode */
 
   --app-text: 17 24 39;
   --app-text-muted: 107 114 128;
@@ -98,6 +100,7 @@ html.light.theme-paper {
   --app-bg: 253 250 245; /* Shade 1: Cream */
   --app-bg-alt: 244 240 232; /* Shade 2: Parchment Surface */
   --app-border: 226 218 205; /* Shade 3: Aged Edge */
+  --app-scrollbar: 200 190 175; /* Parchment scrollbar for light paper */
   
   --app-text: 67 52 34; /* Deep Brown */
   --app-text-muted: 156 143 124;
@@ -112,6 +115,7 @@ html.light.theme-paper {
   --app-bg: 30 25 20; /* Shade 1: Dark Leather */
   --app-bg-alt: 45 40 35; /* Shade 2: Warm Stone Surface */
   --app-border: 75 65 55; /* Shade 3: Bronze Edge */
+  --app-scrollbar: 55 50 45; /* Dark scrollbar for dark paper */
   
   --app-text: 235 230 225;
   --app-text-muted: 170 160 150;
@@ -127,6 +131,7 @@ html.light.theme-paper {
   --app-bg: 248 250 252; /* Shade 1: Ice White */
   --app-bg-alt: 241 245 249; /* Shade 2: Mist Surface */
   --app-border: 203 213 225; /* Shade 3: Frost Border */
+  --app-scrollbar: 180 190 200; /* Slate scrollbar for light slate */
   
   --app-text: 51 65 85; /* Slate 700 */
   --app-text-muted: 100 116 139;
@@ -141,6 +146,7 @@ html.light.theme-paper {
   --app-bg: 15 23 42; /* Shade 1: Deep Ocean */
   --app-bg-alt: 30 41 59; /* Shade 2: Midnight Surface */
   --app-border: 51 65 85; /* Shade 3: Steel Edge */
+  --app-scrollbar: 40 50 65; /* Dark scrollbar for dark slate */
   
   --app-text: 226 232 240; /* Slate 200 */
   --app-text-muted: 148 163 184;
@@ -207,7 +213,7 @@ html.light.theme-paper {
 /* Custom Scrollbar - Sleek & Minimal */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgb(var(--app-border)) transparent;
+  scrollbar-color: rgb(var(--app-scrollbar)) transparent;
 }
 
 /* Webkit Scrollbar (Chrome, Safari, Edge) */
@@ -221,7 +227,7 @@ html.light.theme-paper {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgb(var(--app-border));
+  background: rgb(var(--app-scrollbar));
   border-radius: 3px;
   transition: background 0.2s ease;
 }
