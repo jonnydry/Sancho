@@ -34,11 +34,11 @@ export const Header: React.FC = () => {
             {isAuthenticated && (
               <button
                 onClick={() => setIsNotebookOpen(true)}
-                className="flex items-center justify-center p-1.5 text-muted hover:text-default transition-colors"
+                className="flex items-center justify-center p-2 rounded-full text-muted hover:bg-accent/10 hover:text-default transition-colors"
                 aria-label="Open Notebook"
                 title="Notebook"
               >
-                <BookPenIcon className="w-4 h-4" />
+                <BookPenIcon className="w-5 h-5" />
               </button>
             )}
             <ThemeSwitcher />
