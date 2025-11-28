@@ -68,6 +68,11 @@ The project utilizes a dual-server architecture with a React frontend (Vite, Por
 
 ### Recent Updates
 
+#### 2025-11-28 - Interactive Element Polish & Mobile Typography
+- **Tag Button Hover Enhancements**: Added subtle scale-up animation (105%), soft shadow, and improved text/border visibility on hover across all tag buttons (card view, modal tags, and "See Also" section)
+- **Mobile Font Size Optimization**: Reduced base font size from 18px to 15px on mobile devices (≤640px breakpoint) for better readability and proportional spacing
+- **Consistent Button Behavior**: Applied same interactive feedback across tag buttons and "See Also" navigation buttons for cohesive UX
+
 #### 2025-11-26 - UI Enhancements and Theme Fixes
 - **Typography Scaling**: Increased base font size to 18px, card titles to 2xl for better readability
 - **Card Element Proportions**: Harmonized all card elements (description: text-base, tags: text-xs, snippet: text-sm, type badge: text-xs)
