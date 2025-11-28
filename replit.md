@@ -5,7 +5,7 @@
 Sancho is a React-based web application that serves as a comprehensive guide to poetry. It allows users to explore various poetic forms, meters, and devices, and provides AI-generated poetry examples using XAI's Grok model. The project aims to be a valuable resource for poetry enthusiasts and learners, offering a rich educational experience with a focus on user-friendly design and modern web technologies.
 
 **Key Capabilities:**
-- **Extensive Poetry Database**: Browse 37 poetic forms, 22 poetic meters, and 31 poetic devices.
+- **Extensive Poetry Database**: Browse 69 poetic forms, 37 poetic meters, and 76 literary devices.
 - **AI-Powered Examples**: Generate poetry examples using XAI's Grok model.
 - **Dynamic Content**: Features dynamic Sancho Panza quotes from Don Quixote.
 - **Theming System**: Multiple color schemes (Dark, Paper, Slate) with premium options.
