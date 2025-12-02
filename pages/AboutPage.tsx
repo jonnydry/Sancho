@@ -45,7 +45,7 @@ export const AboutPage: React.FC = () => {
               <div className="group">
                 <h3 className="flex items-center gap-2 text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">
                   <PoeticFormsIcon className="w-5 h-5" />
-                  <span>37 Poetic Forms</span>
+                  <span>69 Poetic Forms</span>
                 </h3>
                 <p className="text-muted text-sm leading-relaxed">
                   From sonnets and haikus to villanelles and ghazals, explore diverse poetic structures with detailed conventions and examples.
@@ -54,7 +54,7 @@ export const AboutPage: React.FC = () => {
               <div className="group">
                 <h3 className="flex items-center gap-2 text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">
                   <PoeticMetersIcon className="w-5 h-5" />
-                  <span>22 Poetic Meters</span>
+                  <span>37 Poetic Meters</span>
                 </h3>
                 <p className="text-muted text-sm leading-relaxed">
                   Master iambic pentameter, trochaic tetrameter, and other rhythmic patterns that give poetry its musical quality.
@@ -63,7 +63,7 @@ export const AboutPage: React.FC = () => {
               <div className="group">
                 <h3 className="flex items-center gap-2 text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">
                   <LiteraryDevicesIcon className="w-5 h-5" />
-                  <span>31 Literary Devices</span>
+                  <span>76 Literary Devices</span>
                 </h3>
                 <p className="text-muted text-sm leading-relaxed">
                   Learn about metaphor, alliteration, enjambment, and other techniques poets use to craft meaning and beauty.
