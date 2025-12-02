@@ -75,7 +75,15 @@ export const AboutPage: React.FC = () => {
                   <span>AI-Powered Examples</span>
                 </h3>
                 <p className="text-muted text-sm leading-relaxed">
-                  Generate fresh poetry examples using XAI's Grok model to see any form, meter, or device in action.
+                  Generate fresh poetry examples using XAI's Grok model to see any form, meter, or device in action. For deeper insights into Grok and xAI concepts, check out{' '}
+                  <a
+                    href="https://grokipedia.com/grok"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent underline hover:no-underline"
+                  >
+                    Grokipedia
+                  </a>.
                 </p>
               </div>
               <div className="group">

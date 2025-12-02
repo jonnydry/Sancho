@@ -185,6 +185,20 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
             </div>
           )}
 
+          {(!item.seeAlso || item.seeAlso.length === 0) && (
+            <div className="mb-6">
+              <h4 className="font-bold text-sm text-default uppercase tracking-wider mb-2">External Resources</h4>
+              <a
+                href={`https://grokipedia.com/search?q=${encodeURIComponent(item.name)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-accent underline hover:no-underline"
+              >
+                Explore related topics on Grokipedia
+              </a>
+            </div>
+          )}
+
           <div className="mb-8">
             <h4 className="font-bold text-sm text-default uppercase tracking-wider mb-2">Classic Snippet</h4>
             <div className="bg-bg-alt/30 p-4 border border-default/20 rounded-sm">
@@ -222,6 +236,28 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
               <div className="p-5 border border-accent/30 bg-accent/5 rounded-sm animate-fade-in">
                 <p className="text-default leading-relaxed whitespace-pre-wrap">{learnMoreContext}</p>
               </div>
+            )}
+          </div>
+
+          <div className="pt-6 border-t border-default">
+            <h4 className="font-bold text-sm text-default uppercase tracking-wider mb-2">Further Reading</h4>
+            <p className="text-muted text-sm mb-2">
+              For more on {item.name}, explore additional resources.
+            </p>
+            <a
+              href={`https://grokipedia.com/${item.name.toLowerCase().replace(/\s+/g, '-')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs bg-accent/10 border border-accent/20 rounded-sm text-accent hover:bg-accent/20 hover:border-accent/50 transition-colors"
+              aria-label={`Read more about ${item.name} on Grokipedia`}
+            >
+              <ArrowUpRightIcon className="w-3 h-3" />
+              <span>Grokipedia: {item.name}</span>
+            </a>
+            {item.notes && item.notes.length > 0 && (
+              <p className="text-xs text-muted mt-2 italic">
+                Note: This links to external content for deeper exploration—Sancho provides the essentials.
+              </p>
             )}
           </div>
         </div>
