@@ -11,6 +11,7 @@ import { useAuth } from '../hooks/useAuth';
 import { ItemTag } from './ItemTag';
 
 import { HistoryIcon } from './icons/HistoryIcon';
+import { ArrowUpRightIcon } from './icons/ArrowUpRightIcon';
 
 interface PoetryDetailModalProps {
   item: PoetryItem;
