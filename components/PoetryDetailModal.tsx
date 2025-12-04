@@ -190,7 +190,7 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
             <div className="mb-6">
               <h4 className="font-bold text-sm text-default uppercase tracking-wider mb-2">External Resources</h4>
               <a
-                href={`https://grokipedia.com/search?q=${encodeURIComponent(item.name)}`}
+                href={`https://grokipedia.com/page/${item.name.replace(/\s+/g, '_')}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-accent underline hover:no-underline"
@@ -246,7 +246,7 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
               For more on {item.name}, explore additional resources.
             </p>
             <a
-              href={`https://grokipedia.com/${item.name.toLowerCase().replace(/\s+/g, '-')}`}
+              href={`https://grokipedia.com/page/${item.name.replace(/\s+/g, '_')}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 px-3 py-1.5 text-xs bg-accent/10 border border-accent/20 rounded-sm text-accent hover:bg-accent/20 hover:border-accent/50 transition-colors"
