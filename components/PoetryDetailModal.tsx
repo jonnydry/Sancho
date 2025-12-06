@@ -186,19 +186,6 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
             </div>
           )}
 
-          {(!item.seeAlso || item.seeAlso.length === 0) && (
-            <div className="mb-6">
-              <h4 className="font-bold text-sm text-default uppercase tracking-wider mb-2">External Resources</h4>
-              <a
-                href={`https://grokipedia.com/page/${item.name.replace(/\s+/g, '_')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-accent underline hover:no-underline"
-              >
-                Explore related topics on Grokipedia
-              </a>
-            </div>
-          )}
 
           <div className="mb-8">
             <h4 className="font-bold text-sm text-default uppercase tracking-wider mb-2">Classic Snippet</h4>
