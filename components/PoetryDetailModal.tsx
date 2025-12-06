@@ -216,12 +216,12 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
               <button
                 onClick={handleLearnMore}
                 disabled={isLoadingLearnMore}
-                className="flex items-center justify-center space-x-2 w-[180px] px-4 py-2 text-sm font-semibold text-accent dark:text-accent-text border border-accent bg-accent/10 backdrop-blur-sm rounded-lg hover:bg-accent/20 hover:border-accent/80 hover:scale-105 hover:shadow-sm active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent/50"
+                className="flex items-center justify-center space-x-1.5 px-3 py-1.5 text-xs font-semibold text-accent dark:text-accent-text border border-accent bg-accent/10 backdrop-blur-sm rounded-lg hover:bg-accent/20 hover:border-accent/80 hover:scale-105 hover:shadow-sm active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent/50"
               >
                 {isLoadingLearnMore ? (
-                  <SpinnerIcon className="w-4 h-4 animate-spin" />
+                  <SpinnerIcon className="w-3.5 h-3.5 animate-spin" />
                 ) : (
-                  <LightbulbIcon className="w-4 h-4" />
+                  <LightbulbIcon className="w-3.5 h-3.5" />
                 )}
                 <span>{isLoadingLearnMore ? 'Analyzing...' : learnMoreContext !== null ? 'Regenerate' : 'Learn More'}</span>
               </button>
@@ -241,22 +241,26 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
           </div>
 
           <div className="pt-6 border-t border-default">
-            <h4 className="font-bold text-sm text-default uppercase tracking-wider mb-2">Further Reading</h4>
-            <p className="text-muted text-sm mb-2">
-              For more on {item.name}, explore additional resources.
-            </p>
-            <a
-              href={`https://grokipedia.com/page/${item.name.replace(/\s+/g, '_')}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-accent dark:text-accent-text border border-accent bg-accent/10 backdrop-blur-sm rounded-lg hover:bg-accent/20 hover:border-accent/80 hover:scale-105 hover:shadow-sm active:scale-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent/50"
-              aria-label={`Read more about ${item.name} on Grokipedia`}
-            >
-              <ArrowUpRightIcon className="w-4 h-4" />
-              <span>Grokipedia: {item.name}</span>
-            </a>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h4 className="font-bold text-sm text-default uppercase tracking-wider">Further Reading</h4>
+                <p className="text-muted text-xs mt-1">
+                  For more on {item.name}, explore additional resources.
+                </p>
+              </div>
+              <a
+                href={`https://grokipedia.com/page/${item.name.replace(/\s+/g, '_')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-accent dark:text-accent-text border border-accent bg-accent/10 backdrop-blur-sm rounded-lg hover:bg-accent/20 hover:border-accent/80 hover:scale-105 hover:shadow-sm active:scale-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent/50"
+                aria-label={`Read more about ${item.name} on Grokipedia`}
+              >
+                <ArrowUpRightIcon className="w-3.5 h-3.5" />
+                <span>Grokipedia</span>
+              </a>
+            </div>
             {item.notes && item.notes.length > 0 && (
-              <p className="text-xs text-muted mt-2 italic">
+              <p className="text-xs text-muted italic">
                 Note: This links to external content for deeper exploration—Sancho provides the essentials.
               </p>
             )}
