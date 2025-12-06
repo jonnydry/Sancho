@@ -203,7 +203,7 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
               <button
                 onClick={handleLearnMore}
                 disabled={isLoadingLearnMore}
-                className="flex items-center justify-center space-x-1.5 px-3 py-1.5 text-xs font-semibold text-accent dark:text-accent-text border border-accent bg-accent/10 backdrop-blur-sm rounded-lg hover:bg-accent/20 hover:border-accent/80 hover:scale-105 hover:shadow-sm active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent/50"
+                className="flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-accent dark:text-accent-text border border-accent bg-accent/10 backdrop-blur-sm rounded-lg hover:bg-accent/20 hover:border-accent/80 hover:scale-105 hover:shadow-sm active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent/50"
               >
                 {isLoadingLearnMore ? (
                   <SpinnerIcon className="w-3.5 h-3.5 animate-spin" />
