@@ -240,34 +240,35 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
             )}
           </div>
 
-          <div className="pt-6 border-t border-default">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h4 className="font-bold text-sm text-default uppercase tracking-wider">Further Reading</h4>
-                <p className="text-muted text-xs mt-1">
-                  For more on {item.name}, explore additional resources.
-                </p>
-              </div>
-              <a
-                href={`https://grokipedia.com/page/${item.name.replace(/\s+/g, '_')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-accent dark:text-accent-text border border-accent bg-accent/10 backdrop-blur-sm rounded-lg hover:bg-accent/20 hover:border-accent/80 hover:scale-105 hover:shadow-sm active:scale-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent/50"
-                aria-label={`Read more about ${item.name} on Grokipedia`}
-              >
-                <ArrowUpRightIcon className="w-3.5 h-3.5" />
-                <span>Grokipedia</span>
-              </a>
-            </div>
-            {item.notes && item.notes.length > 0 && (
-              <p className="text-xs text-muted italic">
-                Note: This links to external content for deeper exploration—Sancho provides the essentials.
-              </p>
-            )}
-          </div>
         </div>
 
         <ExampleFinder topic={item.name} />
+
+        <div className="pt-6 px-5 sm:px-6 md:px-8 pb-5 sm:pb-6 md:pb-8 border-t border-default">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h4 className="font-bold text-sm text-default uppercase tracking-wider">Further Reading</h4>
+              <p className="text-muted text-xs mt-1">
+                For more on {item.name}, explore additional resources.
+              </p>
+            </div>
+            <a
+              href={`https://grokipedia.com/page/${item.name.replace(/\s+/g, '_')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-accent dark:text-accent-text border border-accent bg-accent/10 backdrop-blur-sm rounded-lg hover:bg-accent/20 hover:border-accent/80 hover:scale-105 hover:shadow-sm active:scale-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent/50"
+              aria-label={`Read more about ${item.name} on Grokipedia`}
+            >
+              <ArrowUpRightIcon className="w-3.5 h-3.5" />
+              <span>Grokipedia</span>
+            </a>
+          </div>
+          {item.notes && item.notes.length > 0 && (
+            <p className="text-xs text-muted italic">
+              Note: This links to external content for deeper exploration—Sancho provides the essentials.
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
