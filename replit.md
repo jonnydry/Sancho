@@ -68,6 +68,16 @@ The project utilizes a dual-server architecture with a React frontend (Vite, Por
 
 ### Recent Updates
 
+#### 2025-12-07 - Modal Redesign for Cohesiveness
+- **Four-Zone Layout**: Reorganized modal into distinct zones: Header, Reference Info, AI Features, Further Reading
+- **Unified Card System**: Reference sections (Origin, Conventions, Notes) grouped in subtle card backgrounds
+- **Consistent Section Headers**: All sections now use icons with uniform typography (SectionHeader component)
+- **AI Features Grouped**: Historical Context and AI Example unified in accent-bordered card
+- **Reusable Components**: Created ActionButton and TagButton components for consistent styling
+- **Uniform Button Sizing**: All action buttons standardized to h-8, text-xs with matching hover states
+- **ExampleFinder Embedded Mode**: Added `embedded` prop for seamless integration within AI features zone
+- **Visual Hierarchy**: Clear separation between static reference content and interactive AI features
+
 #### 2025-11-28 - SEO Improvements & Interactive Polish
 - **Production Domain SEO**: Updated all meta tags, Open Graph, Twitter Cards, and JSON-LD structured data to use sanchopoetry.com domain
 - **Accurate Content Counts**: Fixed all SEO metadata to reflect actual database size (69 forms, 37 meters, 76 devices)
