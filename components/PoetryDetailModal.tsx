@@ -64,7 +64,7 @@ const ActionButton: React.FC<{
 const TagButton: React.FC<{ onClick?: () => void; children: React.ReactNode }> = ({ onClick, children }) => (
   <button
     onClick={onClick}
-    className="px-2.5 py-1 text-xs bg-bg-alt/50 border border-default/30 rounded-md text-muted hover:bg-accent/10 hover:text-default hover:border-accent/40 active:scale-[0.98] transition-all duration-150 cursor-pointer"
+    className="flex items-center justify-center px-2.5 py-1 h-8 text-xs bg-bg-alt/50 border border-default/30 rounded-md text-muted hover:bg-accent/10 hover:text-default hover:border-accent/40 active:scale-[0.98] transition-all duration-150 cursor-pointer"
   >
     {children}
   </button>
@@ -158,7 +158,7 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-1 text-muted hover:text-default hover:bg-bg-alt/50 rounded-md transition-all duration-150"
+          className="absolute top-4 right-4 z-10 p-1 text-muted hover:text-default hover:bg-bg-alt/50 rounded-md active:scale-[0.98] transition-all duration-150"
           aria-label="Close"
         >
           <XIcon className="w-5 h-5" />
@@ -173,7 +173,7 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
             </div>
             <ItemTag type={item.type} className="text-xs" />
           </div>
-          <p className="mt-4 text-default leading-relaxed border-l-2 border-accent/30 pl-4 italic">{item.description}</p>
+          <p className="mt-4 text-default/90 leading-relaxed border-l-2 border-accent/30 pl-4 italic">{item.description}</p>
         </div>
 
         {/* ===== ZONE 2: REFERENCE INFO ===== */}
@@ -235,7 +235,7 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
           <div>
             <SectionHeader icon={<ClassicSnippetsIcon className="w-4 h-4" />} title="Classic Snippet" />
             <blockquote className="bg-bg-alt/40 border-l-4 border-accent/40 p-4 rounded-r-lg">
-              <p className="text-default font-serif text-sm italic leading-relaxed">"{item.exampleSnippet}"</p>
+              <p className="text-default/90 font-serif text-sm italic leading-relaxed">"{item.exampleSnippet}"</p>
             </blockquote>
           </div>
         </div>
@@ -269,7 +269,7 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
 
             {learnMoreContext && (
               <div className="p-4 bg-bg border border-default/20 rounded-md animate-fade-in">
-                <p className="text-default text-sm leading-relaxed whitespace-pre-wrap">{learnMoreContext}</p>
+                <p className="text-default/90 text-sm leading-relaxed whitespace-pre-wrap">{learnMoreContext}</p>
               </div>
             )}
           </div>
