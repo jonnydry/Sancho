@@ -31,11 +31,14 @@ export const NotificationToast: React.FC<NotificationProps> = ({
   const getTypeStyles = () => {
     switch (notification.type) {
       case 'success':
-        return 'bg-green-500/90 dark:bg-green-600/90 text-white border-green-600 dark:border-green-700';
+        // Use theme accent color for success - matches the app's color scheme
+        return 'bg-accent/90 text-accent-text border-accent';
       case 'error':
-        return 'bg-red-500/90 dark:bg-red-600/90 text-white border-red-600 dark:border-red-700';
+        // Error uses a muted red that works across themes
+        return 'bg-bg-alt text-default border-default ring-2 ring-red-500/50';
       case 'info':
-        return 'bg-blue-500/90 dark:bg-blue-600/90 text-white border-blue-600 dark:border-blue-700';
+        // Info uses the theme's muted text styling
+        return 'bg-bg-alt text-default border-default';
       default:
         return 'bg-bg-alt text-default border-default';
     }
@@ -50,7 +53,7 @@ export const NotificationToast: React.FC<NotificationProps> = ({
       <p className="flex-1 text-sm font-medium">{notification.message}</p>
       <button
         onClick={() => onDismiss(notification.id)}
-        className="flex-shrink-0 text-white/80 hover:text-white transition-colors"
+        className="flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity"
         aria-label="Dismiss notification"
       >
         <XIcon className="w-4 h-4" />
