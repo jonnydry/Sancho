@@ -94,11 +94,6 @@ export async function setupAuth(app) {
   app.use(passport.session());
 
   const config = await getOidcConfig();
-  
-  // Use shared frontend origin for OAuth callbacks
-  const frontendOrigin = getFrontendOrigin();
-  
-  console.log("Frontend origin for OAuth:", frontendOrigin);
 
   const verify = async (tokens, verified) => {
     const user = {};
@@ -111,21 +106,23 @@ export async function setupAuth(app) {
   const registeredStrategies = new Set();
 
   // Helper function to ensure strategy exists for a domain
-  const ensureStrategy = (req) => {
-    const host = req.get('host'); // Gets hostname:port (e.g., localhost:5000)
-    const strategyName = `replitauth:${host}`;
+  // Uses req.hostname (just hostname, no port) as required by Replit Auth
+  const ensureStrategy = (hostname) => {
+    const strategyName = `replitauth:${hostname}`;
     if (!registeredStrategies.has(strategyName)) {
       const strategy = new Strategy(
         {
           name: strategyName,
           config,
           scope: "openid email profile offline_access",
-          callbackURL: `${frontendOrigin}/api/callback`,
+          // Callback URL must match the domain the user is accessing
+          callbackURL: `https://${hostname}/api/callback`,
         },
         verify,
       );
       passport.use(strategy);
       registeredStrategies.add(strategyName);
+      console.log(`Registered OAuth strategy for: ${hostname}`);
     }
   };
 
@@ -133,30 +130,19 @@ export async function setupAuth(app) {
   passport.deserializeUser((user, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
-    ensureStrategy(req);
-    const host = req.get('host');
-    passport.authenticate(`replitauth:${host}`, {
+    // Use req.hostname (not req.get('host')) - hostname without port
+    ensureStrategy(req.hostname);
+    passport.authenticate(`replitauth:${req.hostname}`, {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
     })(req, res, next);
   });
 
   app.get("/api/callback", (req, res, next) => {
-    ensureStrategy(req);
-    const host = req.get('host');
-    passport.authenticate(`replitauth:${host}`, (err, user) => {
-      if (err || !user) {
-        console.error("Authentication error:", err);
-        return res.redirect("/api/login");
-      }
-      req.logIn(user, (loginErr) => {
-        if (loginErr) {
-          console.error("Login error:", loginErr);
-          return res.redirect("/api/login");
-        }
-        // Redirect to frontend origin
-        return res.redirect(frontendOrigin);
-      });
+    ensureStrategy(req.hostname);
+    passport.authenticate(`replitauth:${req.hostname}`, {
+      successReturnToOrRedirect: "/",
+      failureRedirect: "/api/login",
     })(req, res, next);
   });
 
@@ -165,7 +151,7 @@ export async function setupAuth(app) {
       res.redirect(
         client.buildEndSessionUrl(config, {
           client_id: process.env.REPL_ID,
-          post_logout_redirect_uri: frontendOrigin,
+          post_logout_redirect_uri: `${req.protocol}://${req.hostname}`,
         }).href
       );
     });
