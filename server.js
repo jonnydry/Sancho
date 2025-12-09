@@ -125,10 +125,23 @@ function isProductionEnvironment() {
   return false;
 }
 
+// Get all allowed origins for CORS in production
+function getAllowedOrigins() {
+  if (isProductionEnvironment()) {
+    // In production, allow all domains from REPLIT_DOMAINS
+    if (process.env.REPLIT_DOMAINS) {
+      return process.env.REPLIT_DOMAINS.split(',')
+        .map(domain => `https://${domain.trim()}`)
+        .filter(url => url.length > 8); // Filter out empty/invalid entries
+    }
+    // Fallback to single origin
+    return [getFrontendOrigin()];
+  }
+  return ['http://localhost:5000', 'http://127.0.0.1:5000'];
+}
+
 const corsOptions = {
-  origin: isProductionEnvironment()
-    ? getFrontendOrigin()
-    : ['http://localhost:5000', 'http://127.0.0.1:5000'],
+  origin: getAllowedOrigins(),
   credentials: true
 };
 
