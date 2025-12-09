@@ -23,7 +23,10 @@ export function getFrontendOrigin() {
   if (process.env.REPLIT_DEV_DOMAIN) {
     return `https://${process.env.REPLIT_DEV_DOMAIN}`;
   } else if (process.env.REPLIT_DOMAINS) {
-    return `https://${process.env.REPLIT_DOMAINS}`;
+    // REPLIT_DOMAINS is comma-separated in production (e.g., "sanchopoetry.com,www.sanchopoetry.com,...")
+    // Use the first domain for OAuth callbacks
+    const firstDomain = process.env.REPLIT_DOMAINS.split(',')[0].trim();
+    return `https://${firstDomain}`;
   } else if (process.env.FRONTEND_ORIGIN) {
     return process.env.FRONTEND_ORIGIN;
   } else {
