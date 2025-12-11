@@ -533,6 +533,39 @@ app.delete('/api/pinned-items/:itemName', isAuthenticated, async (req, res) => {
   }
 });
 
+// Delete user account and all associated data
+app.delete('/api/auth/delete-account', isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.user.claims.sub;
+    
+    // Delete user data from database
+    await storage.deleteUser(userId);
+    
+    // Log the user out and destroy their session
+    req.logout((err) => {
+      if (err) {
+        logger.error("Error during logout after account deletion", err);
+      }
+      
+      // Destroy the session
+      req.session.destroy((sessionErr) => {
+        if (sessionErr) {
+          logger.error("Error destroying session after account deletion", sessionErr);
+        }
+        
+        res.json({ success: true, message: "Account deleted successfully" });
+      });
+    });
+  } catch (error) {
+    logger.error("Error deleting account", error);
+    const errorMessage = error?.message || error?.toString() || "Unknown error occurred";
+    res.status(500).json({ 
+      error: "Failed to delete account. Please try again or contact support.",
+      details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+    });
+  }
+});
+
 app.get('/health', async (req, res) => {
   // Health endpoint can be cached for a short period (10 seconds)
   res.setHeader('Cache-Control', 'public, max-age=10');

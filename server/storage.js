@@ -261,6 +261,30 @@ export class DatabaseStorage {
       handleDatabaseError(error, 'isItemPinned');
     }
   }
+
+  // Delete user account and all associated data
+  async deleteUser(userId) {
+    try {
+      // First delete all pinned items for this user
+      await db
+        .delete(pinnedItems)
+        .where(eq(pinnedItems.userId, userId));
+
+      // Then delete the user record
+      const [deletedUser] = await db
+        .delete(users)
+        .where(eq(users.id, userId))
+        .returning();
+
+      // Clear all caches for this user
+      userCache.delete(`user:${userId}`);
+      pinnedItemsCache.delete(`pinned:${userId}`);
+
+      return deletedUser;
+    } catch (error) {
+      handleDatabaseError(error, 'deleteUser');
+    }
+  }
 }
 
 export const storage = new DatabaseStorage();

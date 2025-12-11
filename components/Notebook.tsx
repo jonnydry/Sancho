@@ -1,5 +1,6 @@
 import React, { useState, useEffect, lazy, Suspense, useRef, useCallback } from 'react';
 import { usePinnedItems } from '../contexts/PinnedItemsContext';
+import { useNotification } from '../contexts/NotificationContext';
 import { PoetryItem } from '../types';
 import { XIcon } from './icons/XIcon';
 import { BookPenIcon } from './icons/BookPenIcon';
@@ -20,7 +21,10 @@ interface NotebookProps {
 
 export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
   const { pinnedItems, isLoading, unpinItem } = usePinnedItems();
+  const { showNotification } = useNotification();
   const [selectedItem, setSelectedItem] = useState<PoetryItem | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const previousOverflow = useRef<string | null>(null);
 
   const restoreOverflow = useCallback(() => {
@@ -61,6 +65,32 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
 
   const handleCloseModal = () => {
     setSelectedItem(null);
+  };
+
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      const response = await fetch('/api/auth/delete-account', {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        showNotification('Account deleted successfully. Goodbye!', 'success');
+        // Redirect to home after a short delay
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1500);
+      } else {
+        const data = await response.json();
+        showNotification(data.error || 'Failed to delete account', 'error');
+      }
+    } catch (error) {
+      showNotification('Failed to delete account. Please try again.', 'error');
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -132,7 +162,52 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
             </div>
           )}
         </div>
+
+        {/* Account Section */}
+        <div className="border-t border-default p-4 sm:p-6">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-muted">Account</span>
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="text-xs text-muted hover:text-red-500 transition-colors"
+            >
+              Delete Account
+            </button>
+          </div>
+        </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-bg/70 backdrop-blur-sm"
+            onClick={() => !isDeleting && setShowDeleteConfirm(false)}
+          />
+          <div className="relative bg-bg-alt border border-default rounded-lg p-6 max-w-sm w-full shadow-2xl animate-modal-in">
+            <h3 className="text-lg font-bold text-default mb-2">Delete Account?</h3>
+            <p className="text-sm text-muted mb-6">
+              This will permanently delete your account and all saved notebook items. This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={isDeleting}
+                className="flex-1 px-4 py-2 text-sm font-medium text-default bg-bg border border-default rounded hover:bg-bg-alt transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={isDeleting}
+                className="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700 transition-colors disabled:opacity-50"
+              >
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal for selected item */}
       {selectedItem && (
