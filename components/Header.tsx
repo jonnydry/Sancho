@@ -30,42 +30,42 @@ export const Header: React.FC = () => {
               </Link>
             </nav>
           </div>
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-1.5 sm:gap-3">
             {isAuthenticated && (
               <button
                 onClick={() => setIsNotebookOpen(true)}
-                className="flex items-center justify-center p-2 rounded-full text-muted hover:bg-accent/10 hover:text-default transition-colors"
+                className="flex items-center justify-center p-1.5 sm:p-2 rounded-full text-muted hover:bg-accent/10 hover:text-default transition-colors"
                 aria-label="Open Notebook"
                 title="Notebook"
               >
-                <BookPenIcon className="w-5 h-5" />
+                <BookPenIcon className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             )}
             <ThemeSwitcher />
-            <div className="flex items-center gap-2 sm:gap-4 pl-2 sm:pl-4 border-l border-default">
+            <div className="flex items-center gap-1.5 sm:gap-3 pl-1.5 sm:pl-3 border-l border-default">
               {isLoading ? (
                 <span className="text-xs text-muted">...</span>
               ) : isAuthenticated && user ? (
-                <>
+                <a
+                  href="/api/logout"
+                  className="flex items-center gap-1.5 sm:gap-2 group"
+                  title="Click to logout"
+                >
                   {user.profileImageUrl ? (
                     <img 
                       src={user.profileImageUrl} 
                       alt={user.email || 'User profile'}
-                      className="w-6 h-6 rounded-full object-cover"
-                      title={user.email || 'User'}
+                      className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover ring-1 ring-transparent group-hover:ring-accent/50 transition-all"
                     />
                   ) : (
-                    <div className="w-6 h-6 rounded-full bg-accent/20 flex items-center justify-center text-xs text-default">
+                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-accent/20 flex items-center justify-center text-[10px] sm:text-xs text-default ring-1 ring-transparent group-hover:ring-accent/50 transition-all">
                       {user.firstName?.charAt(0) || user.email?.charAt(0) || 'U'}
                     </div>
                   )}
-                  <a
-                    href="/api/logout"
-                    className="text-xs text-default hover:text-accent hover:underline underline-offset-4 transition-all"
-                  >
+                  <span className="hidden sm:inline text-xs text-muted group-hover:text-accent transition-colors">
                     Logout
-                  </a>
-                </>
+                  </span>
+                </a>
               ) : (
                 <a
                   href="/api/login"

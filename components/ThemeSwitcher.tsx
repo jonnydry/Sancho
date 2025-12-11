@@ -24,9 +24,9 @@ export const ThemeSwitcher: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center space-x-4">
+    <div className="flex items-center gap-1.5 sm:gap-3">
       {isAuthenticated && (
-        <div className="flex items-center space-x-2 p-1 bg-[rgb(var(--app-bg-alt)/0.5)] rounded-full">
+        <div className="flex items-center gap-1 sm:gap-1.5 p-0.5 sm:p-1 bg-[rgb(var(--app-bg-alt)/0.5)] rounded-full">
           {themeColors.map((theme) => {
             const isSelected = color === theme.name;
             const isPremium = theme.premium;
@@ -40,9 +40,9 @@ export const ThemeSwitcher: React.FC = () => {
                 key={theme.name}
                 onClick={() => handleThemeClick(theme.name)}
                 disabled={isDisabled}
-                className={`w-5 h-5 rounded-full transition-transform duration-200 ${theme.class} ${
+                className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full transition-transform duration-200 ${theme.class} ${
                   isSelected
-                    ? 'ring-2 ring-offset-2 ring-accent dark:ring-offset-bg-alt'
+                    ? 'ring-2 ring-offset-1 sm:ring-offset-2 ring-accent dark:ring-offset-bg-alt'
                     : isDisabled
                     ? 'opacity-50 cursor-not-allowed'
                     : 'scale-90 hover:scale-100'
@@ -57,10 +57,10 @@ export const ThemeSwitcher: React.FC = () => {
       )}
       <button
         onClick={toggleMode}
-        className="p-2 rounded-full text-muted hover:bg-accent/10 transition-colors"
+        className="p-1.5 sm:p-2 rounded-full text-muted hover:bg-accent/10 transition-colors"
         aria-label="Toggle dark mode"
       >
-        {mode === 'light' ? <MoonIcon className="w-5 h-5" /> : <SunIcon className="w-5 h-5" />}
+        {mode === 'light' ? <MoonIcon className="w-4 h-4 sm:w-5 sm:h-5" /> : <SunIcon className="w-4 h-4 sm:w-5 sm:h-5" />}
       </button>
     </div>
   );
