@@ -68,6 +68,13 @@ The project utilizes a dual-server architecture with a React frontend (Vite, Por
 
 ### Recent Updates
 
+#### 2025-12-11 - Account Deletion Feature
+- **Delete Account Option**: Users can now delete their account from the Notebook panel
+- **Confirmation Dialog**: Two-step confirmation prevents accidental deletion
+- **Complete Data Cleanup**: Deletes all pinned items and user record from database
+- **Session Cleanup**: Properly logs out user and destroys session after deletion
+- **User Feedback**: Success/error notifications with automatic redirect to home page
+
 #### 2025-12-07 - Modal Redesign for Cohesiveness
 - **Four-Zone Layout**: Reorganized modal into distinct zones: Header, Reference Info, AI Features, Further Reading
 - **Unified Card System**: Reference sections (Origin, Conventions, Notes) grouped in subtle card backgrounds
