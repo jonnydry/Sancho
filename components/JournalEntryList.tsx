@@ -9,6 +9,7 @@ interface JournalEntryListProps {
   onSelect: (id: string) => void;
   onCreate: () => void;
   onDelete: (id: string) => void;
+  width?: number | string;
 }
 
 export const JournalEntryList: React.FC<JournalEntryListProps> = ({
@@ -17,6 +18,7 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
   onSelect,
   onCreate,
   onDelete,
+  width,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -30,7 +32,10 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
   }, [entries, searchQuery]);
 
   return (
-    <div className="w-16 sm:w-64 border-r border-default flex flex-col h-full bg-bg-alt/30 transition-all duration-300">
+    <div 
+      className={`border-r border-default flex flex-col h-full bg-bg-alt/30 transition-all duration-300 ${width ? '' : 'w-16 sm:w-64'}`}
+      style={width ? { width } : undefined}
+    >
       {/* Header & Search */}
       <div className="p-2 sm:p-3 border-b border-default flex flex-col gap-2">
         <div className="flex justify-center sm:justify-between items-center">

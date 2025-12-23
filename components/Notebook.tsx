@@ -110,8 +110,8 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 right-0 h-full w-full bg-bg/80 backdrop-blur-md backdrop-brightness-150 dark:backdrop-brightness-100 border-l border-default z-50 shadow-2xl flex flex-col animate-slide-in-right transition-all duration-300 ease-in-out ${
-          activeTab === 'journal' ? 'max-w-4xl' : 'max-w-md'
+        className={`fixed top-0 right-0 h-full w-full bg-bg/80 backdrop-blur-md backdrop-brightness-150 dark:backdrop-brightness-100 z-50 shadow-2xl flex flex-col animate-slide-in-right transition-all duration-300 ease-in-out ${
+          activeTab === 'journal' ? 'max-w-none border-l-0' : 'max-w-md border-l border-default'
         }`}
         role="dialog"
         aria-modal="true"

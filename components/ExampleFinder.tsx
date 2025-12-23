@@ -4,6 +4,7 @@ import { PoetryExampleResponse } from '../types';
 import { SearchSparkleIcon } from './icons/SearchSparkleIcon';
 import { SpinnerIcon } from './icons/SpinnerIcon';
 import { AiExamplesIcon } from './icons/AiExamplesIcon';
+import { ActionButton } from './PoetryDetailModal';
 
 interface ExampleFinderProps {
   topic: string;
@@ -40,18 +41,16 @@ export const ExampleFinder: React.FC<ExampleFinderProps> = memo(({ topic, embedd
           <AiExamplesIcon className={`w-4 h-4 ${embedded ? 'text-accent' : 'text-default'}`} />
           <h4 className="font-semibold text-sm text-default">AI-Powered Example</h4>
         </div>
-        <button
+        <ActionButton
           onClick={handleFindExample}
           disabled={isLoading}
-          className="flex items-center justify-center gap-1.5 px-3 py-1.5 h-8 text-xs font-semibold text-accent dark:text-accent-text border border-accent/50 bg-accent/5 rounded-md hover:bg-accent/15 hover:border-accent/70 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-accent/40 whitespace-nowrap leading-none box-border shrink-0"
+          loading={isLoading}
+          loadingText="Generating..."
+          icon={<SearchSparkleIcon className="w-3.5 h-3.5" />}
+          loadingIcon={<SpinnerIcon className="w-3.5 h-3.5 animate-spin" />}
         >
-          {isLoading ? (
-            <SpinnerIcon className="w-3.5 h-3.5 animate-spin" />
-          ) : (
-            <SearchSparkleIcon className="w-3.5 h-3.5" />
-          )}
-          <span>{isLoading ? 'Generating...' : 'Find Example'}</span>
-        </button>
+          Find Example
+        </ActionButton>
       </div>
 
       {error && (

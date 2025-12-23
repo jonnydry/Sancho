@@ -31,7 +31,7 @@ const SectionHeader: React.FC<{ icon: React.ReactNode; title: string }> = ({ ico
   </div>
 );
 
-const ActionButton: React.FC<{
+export const ActionButton: React.FC<{
   onClick?: () => void;
   disabled?: boolean;
   loading?: boolean;
@@ -280,7 +280,7 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
 
         {/* ===== ZONE 4: FURTHER READING ===== */}
         <div className="px-6 pb-6">
-          <div className="flex items-center justify-between p-4 bg-bg-alt/30 border border-default/20 rounded-lg">
+          <div className="flex items-center justify-between p-5 bg-bg-alt/30 border border-default/20 rounded-lg">
             <div>
               <h4 className="font-semibold text-sm text-default">Further Reading</h4>
               <p className="text-muted text-xs mt-0.5">Explore more on Grokipedia</p>

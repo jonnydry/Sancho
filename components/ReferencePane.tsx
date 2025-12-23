@@ -13,6 +13,7 @@ interface ReferencePaneProps {
     selectedTemplate: string | undefined;
     onSelectTemplate: (name: string) => void;
     onInsert?: (text: string) => void;
+    width?: number | string;
 }
 
 type Tab = 'saved' | 'search';
@@ -23,6 +24,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
     selectedTemplate,
     onSelectTemplate,
     onInsert,
+    width,
 }) => {
     const { pinnedItems, pinItem, unpinItem, isPinned } = usePinnedItems();
     const [activeTab, setActiveTab] = useState<Tab>(pinnedItems.length > 0 ? 'saved' : 'search');
@@ -76,7 +78,10 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
     };
 
     return (
-        <div className="w-full sm:w-80 border-l border-default bg-bg-alt/20 flex flex-col h-full animate-slide-in-right absolute sm:relative z-10 sm:z-0 right-0 top-0 bottom-0 shadow-xl sm:shadow-none">
+        <div 
+            className={`border-l border-default bg-bg-alt/20 flex flex-col h-full animate-slide-in-right absolute sm:relative z-10 sm:z-0 right-0 top-0 bottom-0 shadow-xl sm:shadow-none ${width ? '' : 'w-full sm:w-80'}`}
+            style={width ? { width } : undefined}
+        >
             {/* Header */}
             <div className="p-3 sm:p-4 border-b border-default flex items-center justify-between bg-bg">
                 <h3 className="text-sm font-bold text-default">Reference</h3>

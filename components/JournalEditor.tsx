@@ -18,6 +18,51 @@ const generateUUID = (): string => {
   });
 };
 
+interface ResizeHandleProps {
+  onResize: (delta: number) => void;
+  className?: string;
+}
+
+const ResizeHandle: React.FC<ResizeHandleProps> = ({ onResize, className }) => {
+  const [isDragging, setIsDragging] = useState(false);
+
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      onResize(e.movementX);
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isDragging, onResize]);
+
+  return (
+    <div
+      className={`w-1 hover:w-1.5 cursor-col-resize hover:bg-accent/50 transition-all z-10 flex flex-col justify-center items-center group relative ${isDragging ? 'bg-accent w-1.5' : 'bg-transparent'} ${className || ''}`}
+      onMouseDown={() => setIsDragging(true)}
+    >
+        {/* Visual indicator line */}
+        <div className={`w-0.5 h-8 rounded-full bg-border group-hover:bg-accent ${isDragging ? 'bg-accent' : ''}`} />
+    </div>
+  );
+};
+
 export const JournalEditor: React.FC = () => {
   const { pinnedItems } = usePinnedItems();
   const [entries, setEntries] = useState<JournalEntry[]>([]);
@@ -27,6 +72,10 @@ export const JournalEditor: React.FC = () => {
   const [showTemplate, setShowTemplate] = useState(false);
   const [activeTemplate, setActiveTemplate] = useState<string | undefined>(undefined);
   const [showSidebar, setShowSidebar] = useState(true);
+  
+  // Resizable Pane State
+  const [entryListWidth, setEntryListWidth] = useState(240);
+  const [referencePaneWidth, setReferencePaneWidth] = useState(320);
 
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const previousSelectedIdRef = useRef<string | null>(null);
@@ -36,6 +85,39 @@ export const JournalEditor: React.FC = () => {
     content: '',
     entries: []
   });
+
+  // Load widths from localStorage
+  useEffect(() => {
+    const savedEntryWidth = localStorage.getItem('journal_entry_width');
+    const savedRefWidth = localStorage.getItem('journal_ref_width');
+    if (savedEntryWidth) setEntryListWidth(parseInt(savedEntryWidth));
+    if (savedRefWidth) setReferencePaneWidth(parseInt(savedRefWidth));
+  }, []);
+
+  // Save widths to localStorage
+  useEffect(() => {
+    localStorage.setItem('journal_entry_width', entryListWidth.toString());
+    localStorage.setItem('journal_ref_width', referencePaneWidth.toString());
+  }, [entryListWidth, referencePaneWidth]);
+
+  // Handle Resizing
+  const handleResizeEntryList = useCallback((delta: number) => {
+    setEntryListWidth(prev => {
+      const newWidth = prev + delta;
+      if (newWidth < 160) return 160;
+      if (newWidth > 400) return 400;
+      return newWidth;
+    });
+  }, []);
+
+  const handleResizeReferencePane = useCallback((delta: number) => {
+    setReferencePaneWidth(prev => {
+      const newWidth = prev - delta; // Dragging left increases width
+      if (newWidth < 240) return 240;
+      if (newWidth > 600) return 600;
+      return newWidth;
+    });
+  }, []);
 
   // Keep ref in sync with state
   useEffect(() => {
@@ -203,20 +285,26 @@ export const JournalEditor: React.FC = () => {
 
   return (
     <div className="flex h-full overflow-hidden bg-bg relative">
+      {/* Left Pane: Entry List */}
       {showSidebar && (
-        <JournalEntryList
-          entries={entries}
-          selectedId={selectedId}
-          onSelect={(id) => {
-            const entry = entries.find(e => e.id === id);
-            if (entry) selectEntry(entry);
-          }}
-          onCreate={createNewEntry}
-          onDelete={deleteEntry}
-        />
+        <>
+          <JournalEntryList
+            entries={entries}
+            selectedId={selectedId}
+            onSelect={(id) => {
+              const entry = entries.find(e => e.id === id);
+              if (entry) selectEntry(entry);
+            }}
+            onCreate={createNewEntry}
+            onDelete={deleteEntry}
+            width={entryListWidth}
+          />
+          <ResizeHandle onResize={handleResizeEntryList} className="border-r border-default/50" />
+        </>
       )}
 
-      <div className="flex-1 flex flex-col min-w-0 transition-all duration-300">
+      {/* Middle Pane: Editor */}
+      <div className="flex-1 flex flex-col min-w-[300px] transition-all duration-300">
         {/* Toolbar */}
         <div className="flex items-center justify-between px-3 py-2 border-b border-default bg-bg/50 backdrop-blur-sm sticky top-0 z-10">
           <div className="flex items-center gap-3">
@@ -268,13 +356,20 @@ export const JournalEditor: React.FC = () => {
         </div>
       </div>
 
-      <ReferencePane
-        isOpen={showTemplate}
-        onClose={() => setShowTemplate(false)}
-        selectedTemplate={activeTemplate}
-        onSelectTemplate={setActiveTemplate}
-        onInsert={handleInsert}
-      />
+      {/* Right Pane: Reference */}
+      {showTemplate && (
+        <>
+          <ResizeHandle onResize={handleResizeReferencePane} className="border-l border-default/50" />
+          <ReferencePane
+            isOpen={showTemplate}
+            onClose={() => setShowTemplate(false)}
+            selectedTemplate={activeTemplate}
+            onSelectTemplate={setActiveTemplate}
+            onInsert={handleInsert}
+            width={referencePaneWidth}
+          />
+        </>
+      )}
     </div>
   );
 };
