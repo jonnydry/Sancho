@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { useAuth } from '../hooks/useAuth.js';
 import { BookPenIcon } from './icons/BookPenIcon';
+import { useTheme } from '../hooks/useTheme';
 const Notebook = lazy(() => import('./Notebook').then(module => ({ default: module.Notebook })));
 
 const NotebookFallback = () => (
@@ -14,6 +15,7 @@ const NotebookFallback = () => (
 
 export const Header: React.FC = () => {
   const { isAuthenticated, isLoading, user } = useAuth();
+  const { mode } = useTheme();
   const [isNotebookOpen, setIsNotebookOpen] = useState(false);
   const [isNotebookHovered, setIsNotebookHovered] = useState(false);
 
@@ -37,11 +39,12 @@ export const Header: React.FC = () => {
                 onClick={() => setIsNotebookOpen(true)}
                 onMouseEnter={() => setIsNotebookHovered(true)}
                 onMouseLeave={() => setIsNotebookHovered(false)}
-                className="flex items-center justify-center p-1.5 sm:p-2 rounded-full text-muted hover:bg-accent/10 hover:text-default transition-colors"
+                className={`flex items-center justify-center p-1.5 sm:p-2 rounded-full text-muted transition-colors ${mode === 'dark' ? 'hover:bg-accent/10 hover:text-white' : 'hover:bg-accent/10 hover:text-default'
+                  }`}
                 aria-label="Open Notebook"
                 title="Notebook"
               >
-                <BookPenIcon className="w-4 h-4 sm:w-5 sm:h-5" heartFilled={isNotebookHovered} />
+                <BookPenIcon className="w-4 h-4 sm:w-5 sm:h-5" heartFilled={isNotebookHovered && mode === 'dark'} />
               </button>
             )}
             <ThemeSwitcher />
