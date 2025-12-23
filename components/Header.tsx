@@ -15,6 +15,7 @@ const NotebookFallback = () => (
 export const Header: React.FC = () => {
   const { isAuthenticated, isLoading, user } = useAuth();
   const [isNotebookOpen, setIsNotebookOpen] = useState(false);
+  const [isNotebookHovered, setIsNotebookHovered] = useState(false);
 
   return (
     <>
@@ -34,11 +35,13 @@ export const Header: React.FC = () => {
             {isAuthenticated && (
               <button
                 onClick={() => setIsNotebookOpen(true)}
+                onMouseEnter={() => setIsNotebookHovered(true)}
+                onMouseLeave={() => setIsNotebookHovered(false)}
                 className="flex items-center justify-center p-1.5 sm:p-2 rounded-full text-muted hover:bg-accent/10 hover:text-default transition-colors"
                 aria-label="Open Notebook"
                 title="Notebook"
               >
-                <BookPenIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                <BookPenIcon className="w-4 h-4 sm:w-5 sm:h-5" heartFilled={isNotebookHovered} />
               </button>
             )}
             <ThemeSwitcher />
@@ -52,8 +55,8 @@ export const Header: React.FC = () => {
                   title="Click to logout"
                 >
                   {user.profileImageUrl ? (
-                    <img 
-                      src={user.profileImageUrl} 
+                    <img
+                      src={user.profileImageUrl}
                       alt={user.email || 'User profile'}
                       className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover ring-1 ring-transparent group-hover:ring-accent/50 transition-all"
                     />
