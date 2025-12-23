@@ -44,7 +44,7 @@ export const Header: React.FC = () => {
                 aria-label="Open Notebook"
                 title="Notebook"
               >
-                <BookPenIcon className="w-4 h-4 sm:w-5 sm:h-5" heartFilled={isNotebookHovered && mode === 'dark'} />
+                <BookPenIcon className="w-4 h-4 sm:w-5 sm:h-5" heartFilled={isNotebookHovered} />
               </button>
             )}
             <ThemeSwitcher />
