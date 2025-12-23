@@ -60,7 +60,7 @@ html {
 */
 
 /* --- THEME: Dark (Midnight Scholar) - Default --- */
-/* Identity: Electric Indigo */
+/* Identity: Light Blue (Sky) */
 :root {
   color-scheme: dark;
   --app-bg: 10 10 10; /* Shade 1: Absolute Black base */
@@ -71,10 +71,10 @@ html {
   --app-text: 237 237 237;
   --app-text-muted: 115 115 115;
   
-  /* Highlight: Indigo 500 */
-  --app-accent: 99 102 241;
-  --app-accent-hover: 129 140 248;
-  --app-accent-text: 255 255 255;
+  /* Highlight: Sky 400 */
+  --app-accent: 56 189 248;
+  --app-accent-hover: 14 165 233;
+  --app-accent-text: 15 23 42; /* Dark Navy for Contrast */
   
   /* Muted Tags */
   --app-tag-form: 115 115 115;
@@ -86,7 +86,7 @@ html {
 }
 
 /* --- THEME: Light (Canvas Theory) - Default --- */
-/* Identity: Deep Indigo (Unified with Dark Mode) */
+/* Identity: Light Blue (Sky) */
 .light { 
   color-scheme: light;
   --app-bg: 252 252 252; /* Shade 1: Pure Canvas */
@@ -97,9 +97,9 @@ html {
   --app-text: 17 24 39;
   --app-text-muted: 107 114 128;
   
-  /* Highlight: Indigo 600 */
-  --app-accent: 79 70 229;
-  --app-accent-hover: 67 56 202;
+  /* Highlight: Sky 600 */
+  --app-accent: 2 132 199;
+  --app-accent-hover: 3 105 161;
   --app-accent-text: 255 255 255;
   
   /* Muted Tags */
