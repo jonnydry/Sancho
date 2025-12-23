@@ -60,17 +60,18 @@ html {
 */
 
 /* --- THEME: Dark (Midnight Scholar) - Default --- */
+/* Identity: Electric Indigo */
 :root {
   color-scheme: dark;
   --app-bg: 10 10 10; /* Shade 1: Absolute Black base */
-  --app-bg-alt: 28 28 28; /* Shade 2: Lifted Charcoal surface (1C1C1C adjusted for contrast) */
+  --app-bg-alt: 28 28 28; /* Shade 2: Lifted Charcoal surface */
   --app-border: 45 45 45; /* Shade 3: Subtle structure */
   --app-scrollbar: 35 35 35; /* Dark scrollbar for dark mode */
 
   --app-text: 237 237 237;
   --app-text-muted: 115 115 115;
   
-  /* Highlight: Electric Indigo */
+  /* Highlight: Indigo 500 */
   --app-accent: 99 102 241;
   --app-accent-hover: 129 140 248;
   --app-accent-text: 255 255 255;
@@ -85,6 +86,7 @@ html {
 }
 
 /* --- THEME: Light (Canvas Theory) - Default --- */
+/* Identity: Deep Indigo (Unified with Dark Mode) */
 .light { 
   color-scheme: light;
   --app-bg: 252 252 252; /* Shade 1: Pure Canvas */
@@ -95,9 +97,9 @@ html {
   --app-text: 17 24 39;
   --app-text-muted: 107 114 128;
   
-  /* Highlight: Deep Emerald */
-  --app-accent: 5 150 105;
-  --app-accent-hover: 16 185 129;
+  /* Highlight: Indigo 600 */
+  --app-accent: 79 70 229;
+  --app-accent-hover: 67 56 202;
   --app-accent-text: 255 255 255;
   
   /* Muted Tags */
@@ -110,6 +112,7 @@ html {
 }
 
 /* --- THEME: Paper (Ancient Manuscript) - Premium --- */
+/* Identity: Warm Amber/Rust */
 .light.theme-paper,
 html.light.theme-paper {
   --app-bg: 253 250 245; /* Shade 1: Cream */
@@ -120,9 +123,9 @@ html.light.theme-paper {
   --app-text: 67 52 34; /* Deep Brown */
   --app-text-muted: 156 143 124;
   
-  /* Highlight: Rust/Sepia - Warm manuscript tone */
-  --app-accent: 159 89 45; /* Warm rust brown */
-  --app-accent-hover: 186 112 62;
+  /* Highlight: Rich Rust (Orange 700) */
+  --app-accent: 194 65 12;
+  --app-accent-hover: 154 52 18;
   --app-accent-text: 255 255 255;
 }
 
@@ -135,13 +138,14 @@ html.light.theme-paper {
   --app-text: 235 230 225;
   --app-text-muted: 170 160 150;
   
-  /* Highlight: Gold Leaf */
-  --app-accent: 217 119 6; /* Amber-600 */
-  --app-accent-hover: 245 158 11;
-  --app-accent-text: 30 25 20;
+  /* Highlight: Bright Gold (Amber 500) */
+  --app-accent: 245 158 11;
+  --app-accent-hover: 251 191 36;
+  --app-accent-text: 30 25 20; /* Dark Brown Text for Contrast on Gold */
 }
 
 /* --- THEME: Slate (Technical Blueprint) - Premium --- */
+/* Identity: Technical Cyan */
 .light.theme-slate {
   --app-bg: 248 250 252; /* Shade 1: Ice White */
   --app-bg-alt: 241 245 249; /* Shade 2: Mist Surface */
@@ -151,9 +155,9 @@ html.light.theme-paper {
   --app-text: 51 65 85; /* Slate 700 */
   --app-text-muted: 100 116 139;
   
-  /* Highlight: Navy Blue */
-  --app-accent: 15 23 42; /* Slate 900 */
-  --app-accent-hover: 51 65 85;
+  /* Highlight: Cyan 700 */
+  --app-accent: 14 116 144;
+  --app-accent-hover: 21 94 117;
   --app-accent-text: 255 255 255;
 }
 
@@ -166,10 +170,10 @@ html.light.theme-paper {
   --app-text: 226 232 240; /* Slate 200 */
   --app-text-muted: 148 163 184;
   
-  /* Highlight: Cyan */
-  --app-accent: 6 182 212; /* Cyan 500 */
-  --app-accent-hover: 34 211 238;
-  --app-accent-text: 15 23 42;
+  /* Highlight: Neon Cyan (Cyan 400) */
+  --app-accent: 34 211 238;
+  --app-accent-hover: 103 232 249;
+  --app-accent-text: 15 23 42; /* Dark Navy Text for Contrast on Cyan */
 }
 
 /* Custom Utilities */

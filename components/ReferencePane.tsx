@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { PoetryItem } from '../types';
 import { XIcon } from './icons/XIcon';
+import { ArrowDownIcon } from './icons/ArrowDownIcon';
+import { CheckIcon } from './icons/CheckIcon';
 import { usePinnedItems } from '../contexts/PinnedItemsContext';
 import { poetryData } from '../data/poetryData';
 import { poeticDevicesData } from '../data/poeticDevicesData';
@@ -10,6 +12,7 @@ interface ReferencePaneProps {
     onClose: () => void;
     selectedTemplate: string | undefined;
     onSelectTemplate: (name: string) => void;
+    onInsert?: (text: string) => void;
 }
 
 type Tab = 'saved' | 'search';
@@ -19,10 +22,12 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
     onClose,
     selectedTemplate,
     onSelectTemplate,
+    onInsert,
 }) => {
     const { pinnedItems, pinItem, unpinItem, isPinned } = usePinnedItems();
     const [activeTab, setActiveTab] = useState<Tab>(pinnedItems.length > 0 ? 'saved' : 'search');
     const [searchQuery, setSearchQuery] = useState('');
+    const [inserting, setInserting] = useState<string | null>(null);
 
     // Combine data sources for search
     const allItems = useMemo(() => {
@@ -62,8 +67,16 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
         }
     };
 
+    const handleInsert = (text: string, id: string) => {
+        if (onInsert) {
+            onInsert(text);
+            setInserting(id);
+            setTimeout(() => setInserting(null), 1000);
+        }
+    };
+
     return (
-        <div className="w-full sm:w-80 border-l border-default bg-bg-alt/20 flex flex-col h-full animate-slide-in-right absolute sm:relative z-10 sm:z-0 right-0 top-0 bottom-0 shadow-xl sm:shadow-none font-sans">
+        <div className="w-full sm:w-80 border-l border-default bg-bg-alt/20 flex flex-col h-full animate-slide-in-right absolute sm:relative z-10 sm:z-0 right-0 top-0 bottom-0 shadow-xl sm:shadow-none">
             {/* Header */}
             <div className="p-3 sm:p-4 border-b border-default flex items-center justify-between bg-bg">
                 <h3 className="text-sm font-bold text-default">Reference</h3>
@@ -81,7 +94,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                 <button
                     onClick={() => setActiveTab('saved')}
                     className={`flex-1 py-2 text-xs font-medium transition-colors relative ${activeTab === 'saved'
-                            ? 'text-default font-semibold'
+                            ? 'text-default font-bold'
                             : 'text-muted hover:text-default'
                         }`}
                 >
@@ -93,7 +106,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                 <button
                     onClick={() => setActiveTab('search')}
                     className={`flex-1 py-2 text-xs font-medium transition-colors relative ${activeTab === 'search'
-                            ? 'text-default font-semibold'
+                            ? 'text-default font-bold'
                             : 'text-muted hover:text-default'
                         }`}
                 >
@@ -207,9 +220,9 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                             <h4 className="font-bold text-sm text-default">{activeItem.name}</h4>
                             <button
                                 onClick={(e) => handlePinToggle(e, activeItem)}
-                                className={`text-xs flex items-center gap-1 transition-colors ${isPinned(activeItem.name)
-                                        ? 'text-accent hover:text-accent-hover'
-                                        : 'text-muted hover:text-default'
+                                className={`text-xs flex items-center gap-1 transition-colors px-2 py-1 rounded-md ${isPinned(activeItem.name)
+                                        ? 'bg-accent/10 text-accent hover:bg-accent/20'
+                                        : 'bg-bg-alt text-muted hover:text-default'
                                     }`}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill={isPinned(activeItem.name) ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -225,7 +238,19 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
 
                             {activeItem.structure && activeItem.structure.length > 0 && (
                                 <div>
-                                    <h5 className="font-semibold uppercase tracking-wider text-muted mb-1.5 text-[10px]">Structure</h5>
+                                    <div className="flex justify-between items-center mb-1.5">
+                                        <h5 className="font-semibold uppercase tracking-wider text-muted text-[10px]">Structure</h5>
+                                        {onInsert && (
+                                            <button 
+                                                onClick={() => handleInsert(activeItem.structure!.join('\n'), 'structure')}
+                                                className="flex items-center gap-1 text-[10px] bg-accent/10 hover:bg-accent hover:text-accent-text text-accent px-1.5 py-0.5 rounded transition-colors"
+                                                title="Insert structure into journal"
+                                            >
+                                                {inserting === 'structure' ? <CheckIcon className="w-3 h-3" /> : <ArrowDownIcon className="w-3 h-3" />}
+                                                {inserting === 'structure' ? 'Inserted' : 'Insert'}
+                                            </button>
+                                        )}
+                                    </div>
                                     <ul className="space-y-1 list-disc pl-4 text-default/80">
                                         {activeItem.structure.map((line, i) => (
                                             <li key={i}>{line}</li>
@@ -236,7 +261,19 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
 
                             {activeItem.exampleSnippet && (
                                 <div>
-                                    <h5 className="font-semibold uppercase tracking-wider text-muted mb-1.5 text-[10px]">Example</h5>
+                                    <div className="flex justify-between items-center mb-1.5">
+                                        <h5 className="font-semibold uppercase tracking-wider text-muted text-[10px]">Example</h5>
+                                        {onInsert && (
+                                            <button 
+                                                onClick={() => handleInsert(activeItem.exampleSnippet!, 'example')}
+                                                className="flex items-center gap-1 text-[10px] bg-accent/10 hover:bg-accent hover:text-accent-text text-accent px-1.5 py-0.5 rounded transition-colors"
+                                                title="Insert example into journal"
+                                            >
+                                                {inserting === 'example' ? <CheckIcon className="w-3 h-3" /> : <ArrowDownIcon className="w-3 h-3" />}
+                                                {inserting === 'example' ? 'Inserted' : 'Insert'}
+                                            </button>
+                                        )}
+                                    </div>
                                     <div className="p-2 bg-bg-alt/30 rounded border border-default/20 italic text-muted leading-relaxed">
                                         "{activeItem.exampleSnippet}"
                                     </div>

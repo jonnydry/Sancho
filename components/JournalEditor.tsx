@@ -3,6 +3,7 @@ import { JournalEntry, JournalStorage } from '../services/journalStorage';
 import { usePinnedItems } from '../contexts/PinnedItemsContext';
 import { JournalEntryList } from './JournalEntryList';
 import { ReferencePane } from './ReferencePane';
+import { GridIcon } from './icons/GridIcon';
 
 // UUID fallback for older browsers
 const generateUUID = (): string => {
@@ -25,9 +26,11 @@ export const JournalEditor: React.FC = () => {
   const [title, setTitle] = useState('');
   const [showTemplate, setShowTemplate] = useState(false);
   const [activeTemplate, setActiveTemplate] = useState<string | undefined>(undefined);
+  const [showSidebar, setShowSidebar] = useState(true);
 
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const previousSelectedIdRef = useRef<string | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const currentStateRef = useRef<{ title: string; content: string; activeTemplate?: string; entries: JournalEntry[] }>({
     title: '',
     content: '',
@@ -156,6 +159,31 @@ export const JournalEditor: React.FC = () => {
     setEntries(updatedEntries); // Refresh list to show updated titles/dates
   }, [selectedId, entries, title, content, activeTemplate]);
 
+  const handleInsert = useCallback((textToInsert: string) => {
+    if (textareaRef.current) {
+        const textarea = textareaRef.current;
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        
+        const before = content.substring(0, start);
+        const after = content.substring(end, content.length);
+        const newContent = before + textToInsert + after;
+        
+        setContent(newContent);
+        
+        // Wait for render to update cursor
+        requestAnimationFrame(() => {
+            if (textareaRef.current) {
+                textareaRef.current.focus();
+                const newCursorPos = start + textToInsert.length;
+                textareaRef.current.setSelectionRange(newCursorPos, newCursorPos);
+            }
+        });
+    } else {
+        setContent(prev => prev + '\n\n' + textToInsert);
+    }
+  }, [content]);
+
   // Debounced auto-save
   useEffect(() => {
     if (!selectedId) return;
@@ -175,52 +203,68 @@ export const JournalEditor: React.FC = () => {
 
   return (
     <div className="flex h-full overflow-hidden bg-bg relative">
-      <JournalEntryList
-        entries={entries}
-        selectedId={selectedId}
-        onSelect={(id) => {
-          const entry = entries.find(e => e.id === id);
-          if (entry) selectEntry(entry);
-        }}
-        onCreate={createNewEntry}
-        onDelete={deleteEntry}
-      />
+      {showSidebar && (
+        <JournalEntryList
+          entries={entries}
+          selectedId={selectedId}
+          onSelect={(id) => {
+            const entry = entries.find(e => e.id === id);
+            if (entry) selectEntry(entry);
+          }}
+          onCreate={createNewEntry}
+          onDelete={deleteEntry}
+        />
+      )}
 
-      <div className="flex-1 flex flex-col min-w-0">
-        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-default bg-bg/50">
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Untitled Note"
-            className="bg-transparent border-none text-sm font-bold text-default focus:ring-0 w-full outline-none placeholder:text-muted/50"
-          />
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowTemplate(!showTemplate)}
-              className={`px-2 py-1 rounded-md text-xs font-medium transition-colors ${showTemplate
-                ? 'bg-accent text-accent-text hover:bg-accent-hover'
-                : 'text-muted hover:bg-accent/10 hover:text-default'
-                }`}
-              title="Toggle Template Reference"
-              aria-label={showTemplate ? 'Hide template reference' : 'Show template reference'}
+      <div className="flex-1 flex flex-col min-w-0 transition-all duration-300">
+        {/* Toolbar */}
+        <div className="flex items-center justify-between px-3 py-2 border-b border-default bg-bg/50 backdrop-blur-sm sticky top-0 z-10">
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => setShowSidebar(!showSidebar)}
+              className={`p-1.5 rounded-md transition-colors ${!showSidebar ? 'bg-accent/10 text-accent' : 'text-muted hover:text-default hover:bg-bg-alt'}`}
+              title={showSidebar ? "Hide Sidebar (Focus Mode)" : "Show Sidebar"}
             >
-              {showTemplate ? 'Hide Reference' : 'Show Reference'}
+              <GridIcon className="w-4 h-4" />
             </button>
+            <span className="h-4 w-px bg-default/20 mx-1"></span>
+            <span className="text-xs text-muted font-mono">
+              {content.length} chars
+            </span>
           </div>
+
+          <button
+            onClick={() => setShowTemplate(!showTemplate)}
+            className={`px-2 py-1 rounded-md text-xs font-medium transition-colors border ${showTemplate
+              ? 'bg-accent text-accent-text border-accent hover:bg-accent-hover'
+              : 'bg-bg text-muted border-default/30 hover:text-default hover:border-default'
+            }`}
+            title="Toggle Reference Pane"
+          >
+            {showTemplate ? 'Hide Reference' : 'Reference'}
+          </button>
         </div>
 
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Start writing..."
-          className="flex-1 w-full p-4 sm:p-6 bg-transparent border-none resize-none focus:ring-0 outline-none font-mono text-sm leading-relaxed text-default"
-          spellCheck={false}
-        />
+        {/* Editor Area */}
+        <div className="flex-1 flex flex-col relative overflow-hidden">
+          <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-2">
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Untitled Note"
+              className="bg-transparent border-none text-lg sm:text-xl font-bold text-default focus:ring-0 w-full outline-none placeholder:text-muted/30"
+            />
+          </div>
 
-        <div className="px-4 py-2 text-xs text-muted border-t border-default/30 flex justify-between">
-          <span>{content.length} chars</span>
-          <span>{content.split(/\s+/).filter(w => w.length > 0).length} words</span>
+          <textarea
+            ref={textareaRef}
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Start writing..."
+            className="flex-1 w-full px-4 sm:px-6 py-2 bg-transparent border-none resize-none focus:ring-0 outline-none font-mono text-sm leading-relaxed text-default"
+            spellCheck={false}
+          />
         </div>
       </div>
 
@@ -229,8 +273,8 @@ export const JournalEditor: React.FC = () => {
         onClose={() => setShowTemplate(false)}
         selectedTemplate={activeTemplate}
         onSelectTemplate={setActiveTemplate}
+        onInsert={handleInsert}
       />
     </div>
   );
 };
-

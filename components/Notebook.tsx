@@ -121,7 +121,7 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
         <div className="flex items-center justify-between p-4 sm:p-6 border-b border-default">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <BookPenIcon className="w-6 h-6 text-default" />
+              <BookPenIcon className="w-6 h-6 text-default" heartFilled={true} />
               <h2 id="notebook-title" className="text-lg sm:text-xl font-bold text-default">
                 Notebook
               </h2>
@@ -133,8 +133,8 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
                 onClick={() => setActiveTab('saved')}
                 className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
                   activeTab === 'saved' 
-                    ? 'bg-bg shadow-sm text-default' 
-                    : 'text-muted hover:text-default'
+                    ? 'bg-accent text-accent-text shadow-sm' 
+                    : 'text-muted hover:text-default hover:bg-accent/10'
                 }`}
               >
                 Saved Items
@@ -148,8 +148,8 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
                 onClick={() => setActiveTab('journal')}
                 className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
                   activeTab === 'journal' 
-                    ? 'bg-bg shadow-sm text-default' 
-                    : 'text-muted hover:text-default'
+                    ? 'bg-accent text-accent-text shadow-sm' 
+                    : 'text-muted hover:text-default hover:bg-accent/10'
                 }`}
               >
                 Journal
