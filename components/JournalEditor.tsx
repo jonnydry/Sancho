@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { JournalEntry, JournalStorage } from '../services/journalStorage';
 import { usePinnedItems } from '../contexts/PinnedItemsContext';
 import { JournalEntryList } from './JournalEntryList';
-import { TemplatePanel } from './TemplatePanel';
+import { ReferencePane } from './ReferencePane';
 
 // UUID fallback for older browsers
 const generateUUID = (): string => {
@@ -25,7 +25,7 @@ export const JournalEditor: React.FC = () => {
   const [title, setTitle] = useState('');
   const [showTemplate, setShowTemplate] = useState(false);
   const [activeTemplate, setActiveTemplate] = useState<string | undefined>(undefined);
-  
+
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const previousSelectedIdRef = useRef<string | null>(null);
   const currentStateRef = useRef<{ title: string; content: string; activeTemplate?: string; entries: JournalEntry[] }>({
@@ -58,7 +58,7 @@ export const JournalEditor: React.FC = () => {
         clearTimeout(saveTimeoutRef.current);
         saveTimeoutRef.current = null;
       }
-      
+
       const state = currentStateRef.current;
       const currentEntry = state.entries.find(e => e.id === previousSelectedIdRef.current);
       if (currentEntry && (currentEntry.title !== state.title || currentEntry.content !== state.content || currentEntry.templateRef !== state.activeTemplate)) {
@@ -74,7 +74,7 @@ export const JournalEditor: React.FC = () => {
         setEntries(JournalStorage.getAll());
       }
     }
-    
+
     setSelectedId(entry.id);
     setTitle(entry.title);
     setContent(entry.content);
@@ -96,7 +96,7 @@ export const JournalEditor: React.FC = () => {
     JournalStorage.save(newEntry);
     const updatedEntries = JournalStorage.getAll();
     setEntries(updatedEntries);
-    
+
     // Directly set state instead of calling selectEntry to avoid circular dependency
     setSelectedId(newEntry.id);
     setTitle(newEntry.title);
@@ -111,7 +111,7 @@ export const JournalEditor: React.FC = () => {
       clearTimeout(saveTimeoutRef.current);
       saveTimeoutRef.current = null;
     }
-    
+
     JournalStorage.delete(id);
     const updatedEntries = JournalStorage.getAll();
     setEntries(updatedEntries);
@@ -129,10 +129,10 @@ export const JournalEditor: React.FC = () => {
 
   const handleSave = useCallback(() => {
     if (!selectedId) return;
-    
+
     const currentEntry = entries.find(e => e.id === selectedId);
     if (!currentEntry) return;
-    
+
     // Auto-generate title from first line if empty
     let entryTitle = title;
     if (!entryTitle.trim()) {
@@ -175,7 +175,7 @@ export const JournalEditor: React.FC = () => {
 
   return (
     <div className="flex h-full overflow-hidden bg-bg relative">
-      <JournalEntryList 
+      <JournalEntryList
         entries={entries}
         selectedId={selectedId}
         onSelect={(id) => {
@@ -185,7 +185,7 @@ export const JournalEditor: React.FC = () => {
         onCreate={createNewEntry}
         onDelete={deleteEntry}
       />
-      
+
       <div className="flex-1 flex flex-col min-w-0">
         <div className="flex items-center justify-between p-3 sm:p-4 border-b border-default bg-bg/50">
           <input
@@ -198,19 +198,18 @@ export const JournalEditor: React.FC = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowTemplate(!showTemplate)}
-              className={`px-2 py-1 rounded-md text-xs font-medium transition-colors ${
-                showTemplate 
-                  ? 'bg-accent text-accent-text hover:bg-accent-hover' 
-                  : 'text-muted hover:bg-accent/10 hover:text-default'
-              }`}
+              className={`px-2 py-1 rounded-md text-xs font-medium transition-colors ${showTemplate
+                ? 'bg-accent text-accent-text hover:bg-accent-hover'
+                : 'text-muted hover:bg-accent/10 hover:text-default'
+                }`}
               title="Toggle Template Reference"
               aria-label={showTemplate ? 'Hide template reference' : 'Show template reference'}
             >
-              {showTemplate ? 'Hide Template' : 'Show Template'}
+              {showTemplate ? 'Hide Reference' : 'Show Reference'}
             </button>
           </div>
         </div>
-        
+
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
@@ -218,17 +217,16 @@ export const JournalEditor: React.FC = () => {
           className="flex-1 w-full p-4 sm:p-6 bg-transparent border-none resize-none focus:ring-0 outline-none font-mono text-sm leading-relaxed text-default"
           spellCheck={false}
         />
-        
+
         <div className="px-4 py-2 text-xs text-muted border-t border-default/30 flex justify-between">
-           <span>{content.length} chars</span>
-           <span>{content.split(/\s+/).filter(w => w.length > 0).length} words</span>
+          <span>{content.length} chars</span>
+          <span>{content.split(/\s+/).filter(w => w.length > 0).length} words</span>
         </div>
       </div>
 
-      <TemplatePanel 
+      <ReferencePane
         isOpen={showTemplate}
         onClose={() => setShowTemplate(false)}
-        pinnedItems={pinnedItems}
         selectedTemplate={activeTemplate}
         onSelectTemplate={setActiveTemplate}
       />
