@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { JournalEntry, JournalStorage } from '../services/journalStorage';
 import { usePinnedItems } from '../contexts/PinnedItemsContext';
 import { JournalEntryList } from './JournalEntryList';
 import { ReferencePane } from './ReferencePane';
 import { GridIcon } from './icons/GridIcon';
+import Editor from 'react-simple-wysiwyg';
 
 // UUID fallback for older browsers
 const generateUUID = (): string => {
@@ -22,6 +23,74 @@ interface ResizeHandleProps {
   onResize: (delta: number) => void;
   className?: string;
 }
+
+const FloatingToolbar: React.FC = memo(() => {
+  const execCommand = (command: string, value?: string) => {
+    document.execCommand(command, false, value);
+  };
+
+  return (
+    <div className="absolute bottom-4 right-4 flex items-center gap-1 px-2 py-1.5 bg-bg/80 backdrop-blur-md border border-default/30 rounded-lg shadow-lg z-20">
+      <button
+        onClick={() => execCommand('bold')}
+        className="p-1.5 rounded hover:bg-accent/20 text-muted hover:text-default transition-colors"
+        title="Bold (Ctrl+B)"
+        type="button"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 4h8a4 4 0 014 4 4 4 0 01-4 4H6z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 12h9a4 4 0 014 4 4 4 0 01-4 4H6z" />
+        </svg>
+      </button>
+      <button
+        onClick={() => execCommand('italic')}
+        className="p-1.5 rounded hover:bg-accent/20 text-muted hover:text-default transition-colors"
+        title="Italic (Ctrl+I)"
+        type="button"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 4h4m-2 0l-4 16m0 0h4" />
+        </svg>
+      </button>
+      <span className="w-px h-4 bg-default/20 mx-0.5" />
+      <button
+        onClick={() => execCommand('formatBlock', 'h2')}
+        className="p-1.5 rounded hover:bg-accent/20 text-muted hover:text-default transition-colors"
+        title="Heading"
+        type="button"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h10" />
+        </svg>
+      </button>
+      <button
+        onClick={() => execCommand('insertUnorderedList')}
+        className="p-1.5 rounded hover:bg-accent/20 text-muted hover:text-default transition-colors"
+        title="Bullet List"
+        type="button"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h.01M8 6h12M4 12h.01M8 12h12M4 18h.01M8 18h12" />
+        </svg>
+      </button>
+      <button
+        onClick={() => {
+          const url = prompt('Enter URL:');
+          if (url) execCommand('createLink', url);
+        }}
+        className="p-1.5 rounded hover:bg-accent/20 text-muted hover:text-default transition-colors"
+        title="Insert Link"
+        type="button"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+        </svg>
+      </button>
+    </div>
+  );
+});
+
+FloatingToolbar.displayName = 'FloatingToolbar';
 
 const ResizeHandle: React.FC<ResizeHandleProps> = ({ onResize, className }) => {
   const [isDragging, setIsDragging] = useState(false);
@@ -79,12 +148,32 @@ export const JournalEditor: React.FC = () => {
 
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const previousSelectedIdRef = useRef<string | null>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const savedSelectionRef = useRef<Range | null>(null);
+  const editorContainerRef = useRef<HTMLDivElement>(null);
   const currentStateRef = useRef<{ title: string; content: string; activeTemplate?: string; entries: JournalEntry[] }>({
     title: '',
     content: '',
     entries: []
   });
+  
+  // Continuously save selection while editor has focus (captures before blur)
+  const handleSelectionChange = useCallback(() => {
+    const selection = window.getSelection();
+    const editorElement = editorContainerRef.current?.querySelector('[contenteditable="true"]');
+    
+    // Only save if selection is within our editor
+    if (selection && selection.rangeCount > 0 && editorElement && editorElement.contains(selection.anchorNode)) {
+      savedSelectionRef.current = selection.getRangeAt(0).cloneRange();
+    }
+  }, []);
+  
+  // Set up selectionchange listener for the document
+  useEffect(() => {
+    document.addEventListener('selectionchange', handleSelectionChange);
+    return () => {
+      document.removeEventListener('selectionchange', handleSelectionChange);
+    };
+  }, [handleSelectionChange]);
 
   // Load widths from localStorage
   useEffect(() => {
@@ -218,10 +307,11 @@ export const JournalEditor: React.FC = () => {
     const currentEntry = entries.find(e => e.id === selectedId);
     if (!currentEntry) return;
 
-    // Auto-generate title from first line if empty
+    // Auto-generate title from first line if empty (strip HTML tags)
     let entryTitle = title;
     if (!entryTitle.trim()) {
-      const firstLine = content.split('\n')[0].trim();
+      const textContent = content.replace(/<[^>]*>/g, '').trim();
+      const firstLine = textContent.split('\n')[0].trim();
       entryTitle = firstLine.substring(0, 30) || 'Untitled';
       if (firstLine.length > 30) entryTitle += '...';
       setTitle(entryTitle);
@@ -242,29 +332,60 @@ export const JournalEditor: React.FC = () => {
   }, [selectedId, entries, title, content, activeTemplate]);
 
   const handleInsert = useCallback((textToInsert: string) => {
-    if (textareaRef.current) {
-        const textarea = textareaRef.current;
-        const start = textarea.selectionStart;
-        const end = textarea.selectionEnd;
-        
-        const before = content.substring(0, start);
-        const after = content.substring(end, content.length);
-        const newContent = before + textToInsert + after;
-        
-        setContent(newContent);
-        
-        // Wait for render to update cursor
-        requestAnimationFrame(() => {
-            if (textareaRef.current) {
-                textareaRef.current.focus();
-                const newCursorPos = start + textToInsert.length;
-                textareaRef.current.setSelectionRange(newCursorPos, newCursorPos);
-            }
-        });
-    } else {
-        setContent(prev => prev + '\n\n' + textToInsert);
+    // Get editor element within our container
+    const editorElement = editorContainerRef.current?.querySelector('[contenteditable="true"]') as HTMLElement;
+    
+    if (!editorElement) {
+      // Fallback: append to content
+      setContent(prev => prev + '<br><br>' + textToInsert);
+      return;
     }
-  }, [content]);
+    
+    // Focus the editor first
+    editorElement.focus();
+    
+    // Restore saved selection if available
+    const selection = window.getSelection();
+    if (selection && savedSelectionRef.current) {
+      try {
+        selection.removeAllRanges();
+        selection.addRange(savedSelectionRef.current);
+      } catch (e) {
+        // Selection restoration failed, will fall back to end of content
+      }
+    }
+    
+    // Check if we have a valid selection inside the editor
+    if (selection && selection.rangeCount > 0 && editorElement.contains(selection.anchorNode)) {
+      const range = selection.getRangeAt(0);
+      range.deleteContents();
+      
+      // Create a temporary container to parse the HTML
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = '<br><br>' + textToInsert;
+      
+      // Insert nodes
+      const fragment = document.createDocumentFragment();
+      while (tempDiv.firstChild) {
+        fragment.appendChild(tempDiv.firstChild);
+      }
+      range.insertNode(fragment);
+      
+      // Move cursor to end of inserted content
+      range.collapse(false);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      
+      // Update React state with the new HTML content
+      setContent(editorElement.innerHTML);
+      
+      // Clear saved selection
+      savedSelectionRef.current = null;
+    } else {
+      // Fallback: append to content
+      setContent(prev => prev + '<br><br>' + textToInsert);
+    }
+  }, []);
 
   // Debounced auto-save
   useEffect(() => {
@@ -276,7 +397,7 @@ export const JournalEditor: React.FC = () => {
 
     saveTimeoutRef.current = setTimeout(() => {
       handleSave();
-    }, 1000);
+    }, 500);
 
     return () => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
@@ -317,7 +438,7 @@ export const JournalEditor: React.FC = () => {
             </button>
             <span className="h-4 w-px bg-default/20 mx-1"></span>
             <span className="text-xs text-muted font-mono">
-              {content.length} chars
+              {content.replace(/<[^>]*>/g, '').length} chars
             </span>
           </div>
 
@@ -345,14 +466,32 @@ export const JournalEditor: React.FC = () => {
             />
           </div>
 
-          <textarea
-            ref={textareaRef}
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Start writing..."
-            className="flex-1 w-full px-4 sm:px-6 py-2 bg-transparent border-none resize-none focus:ring-0 outline-none font-mono text-sm leading-relaxed text-default"
-            spellCheck={false}
-          />
+          <div 
+            ref={editorContainerRef}
+            className="flex-1 relative overflow-auto px-4 sm:px-6 py-2"
+          >
+            <Editor
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              containerProps={{
+                style: {
+                  minHeight: '100%',
+                  border: 'none',
+                  background: 'transparent',
+                }
+              }}
+              style={{
+                minHeight: '100%',
+                border: 'none',
+                background: 'transparent',
+                outline: 'none',
+                fontSize: '0.875rem',
+                lineHeight: '1.625',
+                color: 'inherit',
+              }}
+            />
+            <FloatingToolbar />
+          </div>
         </div>
       </div>
 
