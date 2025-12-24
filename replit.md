@@ -68,6 +68,13 @@ The project utilizes a dual-server architecture with a React frontend (Vite, Por
 
 ### Recent Updates
 
+#### 2025-12-24 - Journal WYSIWYG Editor Upgrade
+- **Rich Text Editor**: Replaced plain textarea with WYSIWYG editor using react-simple-wysiwyg for live formatting
+- **Floating Toolbar**: Semi-transparent toolbar at bottom-right with bold, italic, heading, bullet list, and link buttons
+- **Cursor-Aware Insertion**: Snippets from ReferencePane insert at cursor position using Range API and selectionchange listener
+- **Performance Optimizations**: Reduced auto-save debounce to 500ms, memoized FloatingToolbar component
+- **Selection Tracking**: Document-level selectionchange listener preserves cursor position even when clicking outside editor
+
 #### 2025-12-11 - Account Deletion Feature
 - **Delete Account Option**: Users can now delete their account from the Notebook panel
 - **Confirmation Dialog**: Two-step confirmation prevents accidental deletion
