@@ -75,7 +75,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
     const [inserting, setInserting] = useState<string | null>(null);
     const [savedListHeight, setSavedListHeight] = useState(() => {
         const saved = localStorage.getItem('journal_saved_list_height');
-        return saved ? parseInt(saved) : 160;
+        return saved ? parseInt(saved) : 100;
     });
 
     useEffect(() => {
