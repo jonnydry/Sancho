@@ -208,15 +208,22 @@ export const JournalEditor: React.FC = () => {
       createdAt: Date.now(),
       updatedAt: Date.now()
     };
-    await JournalStorage.save(newEntry);
-    const updatedEntries = await JournalStorage.getAll();
-    setEntries(updatedEntries);
-
+    
+    // Optimistic UI update - show new entry immediately
+    setEntries(prev => [newEntry, ...prev]);
     setSelectedId(newEntry.id);
     setTitle(newEntry.title);
     setContent(newEntry.content);
     setActiveTemplate(newEntry.templateRef);
     previousSelectedIdRef.current = newEntry.id;
+    
+    // Save to server in background
+    try {
+      await JournalStorage.save(newEntry);
+    } catch (error) {
+      console.error('Failed to save new entry:', error);
+      // Entry is already in UI, will be saved on next content change
+    }
   }, []);
 
   const deleteEntry = useCallback(async (id: string) => {
