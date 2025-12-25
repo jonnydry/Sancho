@@ -4,25 +4,88 @@ export interface JournalEntry {
   content: string;
   createdAt: number;
   updatedAt: number;
-  templateRef?: string; // Name of the pinned item (form/meter) being referenced
+  templateRef?: string;
 }
 
-const STORAGE_KEY = 'sancho_journal_entries';
+const LOCAL_STORAGE_KEY = 'sancho_journal_entries';
+const MIGRATION_FLAG_KEY = 'sancho_journal_migrated';
+
+async function fetchWithAuth(url: string, options: RequestInit = {}) {
+  const response = await fetch(url, {
+    ...options,
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+    throw new Error(error.error || `Request failed with status ${response.status}`);
+  }
+  
+  return response.json();
+}
 
 export const JournalStorage = {
-  getAll: (): JournalEntry[] => {
+  getAll: async (): Promise<JournalEntry[]> => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
+      const data = await fetchWithAuth('/api/journal');
+      return data.entries || [];
+    } catch (error) {
+      console.error('Error fetching journal entries from server:', error);
+      return JournalStorage.getLocalEntries();
+    }
+  },
+
+  getLocalEntries: (): JournalEntry[] => {
+    try {
+      const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
       return stored ? JSON.parse(stored) : [];
     } catch (error) {
-      console.error('Error reading journal entries from storage:', error);
+      console.error('Error reading local journal entries:', error);
       return [];
     }
   },
 
-  save: (entry: JournalEntry): void => {
+  save: async (entry: JournalEntry): Promise<void> => {
     try {
-      const entries = JournalStorage.getAll();
+      await fetchWithAuth(`/api/journal/${entry.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          title: entry.title,
+          content: entry.content,
+          templateRef: entry.templateRef,
+        }),
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error && error.message.includes('404')) {
+        try {
+          await fetchWithAuth('/api/journal', {
+            method: 'POST',
+            body: JSON.stringify({
+              id: entry.id,
+              title: entry.title,
+              content: entry.content,
+              templateRef: entry.templateRef,
+            }),
+          });
+          return;
+        } catch (createError) {
+          console.error('Error creating journal entry on server:', createError);
+          JournalStorage.saveLocal(entry);
+          return;
+        }
+      }
+      console.error('Error saving journal entry to server:', error);
+      JournalStorage.saveLocal(entry);
+    }
+  },
+
+  saveLocal: (entry: JournalEntry): void => {
+    try {
+      const entries = JournalStorage.getLocalEntries();
       const index = entries.findIndex(e => e.id === entry.id);
       
       if (index >= 0) {
@@ -31,28 +94,70 @@ export const JournalStorage = {
         entries.push({ ...entry, createdAt: Date.now(), updatedAt: Date.now() });
       }
       
-      // Sort by updated date desc
       entries.sort((a, b) => b.updatedAt - a.updatedAt);
-      
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(entries));
     } catch (error) {
-      console.error('Error saving journal entry:', error);
+      console.error('Error saving journal entry locally:', error);
     }
   },
 
-  delete: (id: string): void => {
+  delete: async (id: string): Promise<void> => {
     try {
-      const entries = JournalStorage.getAll();
-      const filtered = entries.filter(e => e.id !== id);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+      await fetchWithAuth(`/api/journal/${id}`, {
+        method: 'DELETE',
+      });
     } catch (error) {
-      console.error('Error deleting journal entry:', error);
+      console.error('Error deleting journal entry from server:', error);
+      JournalStorage.deleteLocal(id);
     }
   },
 
-  getById: (id: string): JournalEntry | undefined => {
-    const entries = JournalStorage.getAll();
-    return entries.find(e => e.id === id);
-  }
-};
+  deleteLocal: (id: string): void => {
+    try {
+      const entries = JournalStorage.getLocalEntries();
+      const filtered = entries.filter(e => e.id !== id);
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(filtered));
+    } catch (error) {
+      console.error('Error deleting local journal entry:', error);
+    }
+  },
 
+  getById: async (id: string): Promise<JournalEntry | undefined> => {
+    const entries = await JournalStorage.getAll();
+    return entries.find(e => e.id === id);
+  },
+
+  needsMigration: (): boolean => {
+    const migrated = localStorage.getItem(MIGRATION_FLAG_KEY);
+    const localEntries = JournalStorage.getLocalEntries();
+    return !migrated && localEntries.length > 0;
+  },
+
+  migrateToServer: async (): Promise<{ success: boolean; migrated: number }> => {
+    try {
+      const localEntries = JournalStorage.getLocalEntries();
+      
+      if (localEntries.length === 0) {
+        localStorage.setItem(MIGRATION_FLAG_KEY, 'true');
+        return { success: true, migrated: 0 };
+      }
+
+      const data = await fetchWithAuth('/api/journal/migrate', {
+        method: 'POST',
+        body: JSON.stringify({ entries: localEntries }),
+      });
+
+      localStorage.setItem(MIGRATION_FLAG_KEY, 'true');
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      
+      return { success: true, migrated: data.migrated || 0 };
+    } catch (error) {
+      console.error('Error migrating journal entries to server:', error);
+      return { success: false, migrated: 0 };
+    }
+  },
+
+  clearMigrationFlag: (): void => {
+    localStorage.removeItem(MIGRATION_FLAG_KEY);
+  },
+};

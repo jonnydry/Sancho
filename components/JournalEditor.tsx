@@ -118,16 +118,33 @@ export const JournalEditor: React.FC = () => {
   }, [title, content, activeTemplate, entries]);
 
   useEffect(() => {
-    const loadedEntries = JournalStorage.getAll();
-    setEntries(loadedEntries);
-    if (loadedEntries.length > 0) {
-      selectEntry(loadedEntries[0]);
-    } else {
-      createNewEntry();
-    }
+    const loadEntries = async () => {
+      if (JournalStorage.needsMigration()) {
+        await JournalStorage.migrateToServer();
+      }
+      const loadedEntries = await JournalStorage.getAll();
+      setEntries(loadedEntries);
+      if (loadedEntries.length > 0) {
+        selectEntryDirect(loadedEntries[0]);
+      } else {
+        createNewEntryDirect();
+      }
+    };
+    loadEntries();
   }, []);
 
-  const selectEntry = useCallback((entry: JournalEntry) => {
+  const selectEntryDirect = (entry: JournalEntry) => {
+    setSelectedId(entry.id);
+    setTitle(entry.title);
+    setContent(entry.content);
+    setActiveTemplate(entry.templateRef);
+    if (entry.templateRef) {
+      setShowTemplate(true);
+    }
+    previousSelectedIdRef.current = entry.id;
+  };
+
+  const selectEntry = useCallback(async (entry: JournalEntry) => {
     if (previousSelectedIdRef.current && previousSelectedIdRef.current !== entry.id) {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
@@ -144,22 +161,16 @@ export const JournalEditor: React.FC = () => {
           updatedAt: Date.now(),
           templateRef: state.activeTemplate
         };
-        JournalStorage.save(entryToSave);
-        setEntries(JournalStorage.getAll());
+        await JournalStorage.save(entryToSave);
+        const updatedEntries = await JournalStorage.getAll();
+        setEntries(updatedEntries);
       }
     }
 
-    setSelectedId(entry.id);
-    setTitle(entry.title);
-    setContent(entry.content);
-    setActiveTemplate(entry.templateRef);
-    if (entry.templateRef) {
-      setShowTemplate(true);
-    }
-    previousSelectedIdRef.current = entry.id;
+    selectEntryDirect(entry);
   }, []);
 
-  const createNewEntry = useCallback(() => {
+  const createNewEntryDirect = () => {
     const newEntry: JournalEntry = {
       id: generateUUID(),
       title: '',
@@ -167,8 +178,25 @@ export const JournalEditor: React.FC = () => {
       createdAt: Date.now(),
       updatedAt: Date.now()
     };
+    setEntries(prev => [newEntry, ...prev]);
+    setSelectedId(newEntry.id);
+    setTitle(newEntry.title);
+    setContent(newEntry.content);
+    setActiveTemplate(newEntry.templateRef);
+    previousSelectedIdRef.current = newEntry.id;
     JournalStorage.save(newEntry);
-    const updatedEntries = JournalStorage.getAll();
+  };
+
+  const createNewEntry = useCallback(async () => {
+    const newEntry: JournalEntry = {
+      id: generateUUID(),
+      title: '',
+      content: '',
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+    await JournalStorage.save(newEntry);
+    const updatedEntries = await JournalStorage.getAll();
     setEntries(updatedEntries);
 
     setSelectedId(newEntry.id);
@@ -178,14 +206,14 @@ export const JournalEditor: React.FC = () => {
     previousSelectedIdRef.current = newEntry.id;
   }, []);
 
-  const deleteEntry = useCallback((id: string) => {
+  const deleteEntry = useCallback(async (id: string) => {
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
       saveTimeoutRef.current = null;
     }
 
-    JournalStorage.delete(id);
-    const updatedEntries = JournalStorage.getAll();
+    await JournalStorage.delete(id);
+    const updatedEntries = await JournalStorage.getAll();
     setEntries(updatedEntries);
     if (updatedEntries.length > 0) {
       const nextEntry = updatedEntries[0];
@@ -195,11 +223,11 @@ export const JournalEditor: React.FC = () => {
       setActiveTemplate(nextEntry.templateRef);
       previousSelectedIdRef.current = nextEntry.id;
     } else {
-      createNewEntry();
+      await createNewEntry();
     }
   }, [createNewEntry]);
 
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback(async () => {
     if (!selectedId) return;
 
     const currentEntry = entries.find(e => e.id === selectedId);
@@ -222,8 +250,8 @@ export const JournalEditor: React.FC = () => {
       templateRef: activeTemplate
     };
 
-    JournalStorage.save(entry);
-    const updatedEntries = JournalStorage.getAll();
+    await JournalStorage.save(entry);
+    const updatedEntries = await JournalStorage.getAll();
     setEntries(updatedEntries);
   }, [selectedId, entries, title, content, activeTemplate]);
 
