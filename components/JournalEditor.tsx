@@ -421,8 +421,10 @@ export const JournalEditor: React.FC = () => {
     // Update local state optimistically (preserve order)
     setEntries(prev => prev.map(e => e.id === selectedId ? updatedEntry : e));
 
-    // Update sync status
-    setSyncStatus('syncing');
+    // Only show "syncing" status for manual saves (less distracting)
+    if (isManual) {
+      setSyncStatus('syncing');
+    }
 
     // Save to server in background
     try {
@@ -544,7 +546,7 @@ export const JournalEditor: React.FC = () => {
 
     saveTimeoutRef.current = setTimeout(() => {
       handleSave(false);
-    }, 500);
+    }, 2000);
 
     return () => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
