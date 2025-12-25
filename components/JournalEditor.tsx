@@ -304,12 +304,8 @@ export const JournalEditor: React.FC = () => {
       templateRef: activeTemplate
     };
 
-    // Update local state optimistically
-    setEntries(prev => {
-      const updated = prev.map(e => e.id === selectedId ? updatedEntry : e);
-      // Sort by updatedAt descending
-      return updated.sort((a, b) => b.updatedAt - a.updatedAt);
-    });
+    // Update local state optimistically (preserve order)
+    setEntries(prev => prev.map(e => e.id === selectedId ? updatedEntry : e));
 
     // Save to server in background
     try {
