@@ -232,20 +232,54 @@ export const JournalEditor: React.FC = () => {
       saveTimeoutRef.current = null;
     }
 
-    await JournalStorage.delete(id);
-    const updatedEntries = await JournalStorage.getAll();
-    setEntries(updatedEntries);
-    if (updatedEntries.length > 0) {
-      const nextEntry = updatedEntries[0];
-      setSelectedId(nextEntry.id);
-      setTitle(nextEntry.title);
-      setContent(nextEntry.content);
-      setActiveTemplate(nextEntry.templateRef);
-      previousSelectedIdRef.current = nextEntry.id;
+    // Get current entries and compute remaining
+    const currentEntries = currentStateRef.current.entries;
+    const remaining = currentEntries.filter(e => e.id !== id);
+    
+    if (remaining.length > 0) {
+      // Update local state with remaining entries
+      setEntries(remaining);
+      
+      // Select next entry if we deleted the currently selected one
+      if (selectedId === id) {
+        const nextEntry = remaining[0];
+        setSelectedId(nextEntry.id);
+        setTitle(nextEntry.title);
+        setContent(nextEntry.content);
+        setActiveTemplate(nextEntry.templateRef);
+        previousSelectedIdRef.current = nextEntry.id;
+      }
     } else {
-      await createNewEntry();
+      // No entries left - create a new blank one
+      const newEntry: JournalEntry = {
+        id: generateUUID(),
+        title: '',
+        content: '',
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+      };
+      setEntries([newEntry]);
+      setSelectedId(newEntry.id);
+      setTitle('');
+      setContent('');
+      setActiveTemplate(undefined);
+      previousSelectedIdRef.current = newEntry.id;
+      
+      // Save new entry to server
+      try {
+        await JournalStorage.save(newEntry);
+      } catch (error) {
+        console.error('Failed to save new entry:', error);
+      }
     }
-  }, [createNewEntry]);
+
+    // Delete from server in background
+    try {
+      await JournalStorage.delete(id);
+    } catch (error) {
+      console.error('Failed to delete entry from server:', error);
+    }
+  }, [selectedId]);
 
   const handleSave = useCallback(async () => {
     if (!selectedId) return;
