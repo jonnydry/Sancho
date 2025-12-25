@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { JournalEntry } from '../services/journalStorage';
 import { SearchSparkleIcon } from './icons/SearchSparkleIcon';
 import { XIcon } from './icons/XIcon';
@@ -21,6 +21,22 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
   width,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const confirmTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Auto-cancel confirmation after 2 seconds
+  useEffect(() => {
+    if (pendingDeleteId) {
+      confirmTimeoutRef.current = setTimeout(() => {
+        setPendingDeleteId(null);
+      }, 2000);
+    }
+    return () => {
+      if (confirmTimeoutRef.current) {
+        clearTimeout(confirmTimeoutRef.current);
+      }
+    };
+  }, [pendingDeleteId]);
 
   const filteredEntries = useMemo(() => {
     if (!searchQuery.trim()) return entries;
@@ -116,19 +132,30 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
                 <span className="text-[10px] text-muted">
                   {new Date(entry.updatedAt).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' })}
                 </span>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (window.confirm('Delete this entry?')) {
+                {pendingDeleteId === entry.id ? (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPendingDeleteId(null);
                       onDelete(entry.id);
-                    }
-                  }}
-                  className="p-1 rounded transition-all duration-200 opacity-0 group-hover:opacity-100 text-muted/50 hover:text-red-500 hover:bg-red-500/15 hover:shadow-[0_0_6px_rgba(239,68,68,0.25)]"
-                  title="Delete entry"
-                  aria-label={`Delete entry: ${entry.title || 'Untitled'}`}
-                >
-                  <XIcon className="w-3.5 h-3.5" />
-                </button>
+                    }}
+                    className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-500 text-white hover:bg-red-600 transition-colors animate-pulse"
+                  >
+                    Confirm
+                  </button>
+                ) : (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPendingDeleteId(entry.id);
+                    }}
+                    className="p-1 rounded transition-all duration-200 opacity-0 group-hover:opacity-100 text-muted/50 hover:text-red-500 hover:bg-red-500/15 hover:shadow-[0_0_6px_rgba(239,68,68,0.25)]"
+                    title="Delete entry"
+                    aria-label={`Delete entry: ${entry.title || 'Untitled'}`}
+                  >
+                    <XIcon className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
             </div>
           ))
