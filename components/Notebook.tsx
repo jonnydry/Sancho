@@ -1,17 +1,31 @@
-import React, { useState, useEffect, lazy, Suspense, useRef, useCallback, useMemo } from 'react';
-import { usePinnedItems } from '../contexts/PinnedItemsContext';
-import { useNotification } from '../contexts/NotificationContext';
-import { PoetryItem } from '../types';
-import { XIcon } from './icons/XIcon';
-import { BookPenIcon } from './icons/BookPenIcon';
-import { PoetryCard } from './PoetryCard';
-import { JournalEditor } from './JournalEditor';
+import React, {
+  useState,
+  useEffect,
+  lazy,
+  Suspense,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
+import { usePinnedItems } from "../contexts/PinnedItemsContext";
+import { useNotification } from "../contexts/NotificationContext";
+import { PoetryItem } from "../types";
+import { XIcon } from "./icons/XIcon";
+import { BookPenIcon } from "./icons/BookPenIcon";
+import { PoetryCard } from "./PoetryCard";
+import { JournalEditor, JournalEditorRef } from "./JournalEditor";
 
-const PoetryDetailModal = lazy(() => import('./PoetryDetailModal').then(module => ({ default: module.PoetryDetailModal })));
+const PoetryDetailModal = lazy(() =>
+  import("./PoetryDetailModal").then((module) => ({
+    default: module.PoetryDetailModal,
+  })),
+);
 
 const ModalFallback = () => (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-bg/70">
-    <p className="text-muted font-mono text-sm animate-pulse">Loading context...</p>
+    <p className="text-muted font-mono text-sm animate-pulse">
+      Loading context...
+    </p>
   </div>
 );
 
@@ -20,7 +34,7 @@ interface NotebookProps {
   onClose: () => void;
 }
 
-type Tab = 'saved' | 'journal';
+type Tab = "saved" | "journal";
 
 export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
   const { pinnedItems, isLoading, unpinItem } = usePinnedItems();
@@ -28,57 +42,90 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
   const [selectedItem, setSelectedItem] = useState<PoetryItem | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [activeTab, setActiveTab] = useState<Tab>('saved');
+  const [activeTab, setActiveTab] = useState<Tab>("saved");
+  const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
   const previousOverflow = useRef<string | null>(null);
+  const journalEditorRef = useRef<JournalEditorRef>(null);
 
   const restoreOverflow = useCallback(() => {
-    if (typeof document === 'undefined') return;
+    if (typeof document === "undefined") return;
     if (previousOverflow.current === null) return;
     document.body.style.overflow = previousOverflow.current;
     previousOverflow.current = null;
   }, []);
 
+  const handleClose = useCallback(() => {
+    // Check for unsaved changes in journal tab
+    if (
+      activeTab === "journal" &&
+      journalEditorRef.current?.hasUnsavedChanges()
+    ) {
+      setShowUnsavedWarning(true);
+      return;
+    }
+    onClose();
+  }, [activeTab, onClose]);
+
+  const handleConfirmClose = useCallback(async () => {
+    if (journalEditorRef.current) {
+      try {
+        await journalEditorRef.current.saveCurrentEntry();
+      } catch (error) {
+        console.error("Failed to save before closing:", error);
+      }
+    }
+    setShowUnsavedWarning(false);
+    onClose();
+  }, [onClose]);
+
+  const handleDiscardAndClose = useCallback(() => {
+    setShowUnsavedWarning(false);
+    onClose();
+  }, [onClose]);
+
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && isOpen) {
-        onClose();
+      if (event.key === "Escape" && isOpen) {
+        handleClose();
       }
     };
 
     if (isOpen) {
-      window.addEventListener('keydown', handleEsc);
-      if (typeof document !== 'undefined') {
+      window.addEventListener("keydown", handleEsc);
+      if (typeof document !== "undefined") {
         if (previousOverflow.current === null) {
-          previousOverflow.current = document.body.style.overflow || '';
+          previousOverflow.current = document.body.style.overflow || "";
         }
-        document.body.style.overflow = 'hidden';
+        document.body.style.overflow = "hidden";
       }
     } else {
       restoreOverflow();
     }
 
     return () => {
-      window.removeEventListener('keydown', handleEsc);
+      window.removeEventListener("keydown", handleEsc);
       restoreOverflow();
     };
-  }, [isOpen, onClose, restoreOverflow]);
+  }, [isOpen, handleClose, restoreOverflow]);
 
   const handleCardClick = useCallback((item: PoetryItem) => {
     setSelectedItem(item);
   }, []);
 
-  const savedItemsList = useMemo(() => (
-    pinnedItems.map((item, index) => (
-      <div key={item.name} className="relative">
-        <PoetryCard
-          item={item}
-          onSelect={handleCardClick}
-          animationIndex={index}
-          variant="matte"
-        />
-      </div>
-    ))
-  ), [pinnedItems, handleCardClick]);
+  const savedItemsList = useMemo(
+    () =>
+      pinnedItems.map((item, index) => (
+        <div key={item.name} className="relative">
+          <PoetryCard
+            item={item}
+            onSelect={handleCardClick}
+            animationIndex={index}
+            variant="matte"
+          />
+        </div>
+      )),
+    [pinnedItems, handleCardClick],
+  );
 
   const handleCloseModal = () => {
     setSelectedItem(null);
@@ -87,23 +134,23 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
   const handleDeleteAccount = async () => {
     setIsDeleting(true);
     try {
-      const response = await fetch('/api/auth/delete-account', {
-        method: 'DELETE',
-        credentials: 'include',
+      const response = await fetch("/api/auth/delete-account", {
+        method: "DELETE",
+        credentials: "include",
       });
-      
+
       if (response.ok) {
-        showNotification('Account deleted successfully. Goodbye!', 'success');
+        showNotification("Account deleted successfully. Goodbye!", "success");
         // Redirect to home after a short delay
         setTimeout(() => {
-          window.location.href = '/';
+          window.location.href = "/";
         }, 1500);
       } else {
         const data = await response.json();
-        showNotification(data.error || 'Failed to delete account', 'error');
+        showNotification(data.error || "Failed to delete account", "error");
       }
     } catch (error) {
-      showNotification('Failed to delete account. Please try again.', 'error');
+      showNotification("Failed to delete account. Please try again.", "error");
     } finally {
       setIsDeleting(false);
       setShowDeleteConfirm(false);
@@ -111,26 +158,28 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div 
-      className={`${isOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}
+    <div
+      className={`${isOpen ? "pointer-events-auto" : "pointer-events-none"}`}
       aria-hidden={!isOpen}
-      inert={!isOpen}
+      {...(!isOpen && { inert: "" })}
     >
       {/* Backdrop */}
       <div
         className={`fixed inset-0 bg-bg/50 backdrop-blur-sm z-40 transition-opacity duration-300 ${
-          isOpen ? 'opacity-100' : 'opacity-0'
+          isOpen ? "opacity-100" : "opacity-0"
         }`}
-        onClick={onClose}
+        onClick={handleClose}
         aria-hidden="true"
       />
 
       {/* Sidebar */}
       <div
         className={`fixed top-0 right-0 h-full w-full bg-bg/80 backdrop-blur-md backdrop-brightness-150 dark:backdrop-brightness-100 z-50 shadow-2xl flex flex-col transition-all duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
+          isOpen ? "translate-x-0" : "translate-x-full"
         } ${
-          activeTab === 'journal' ? 'max-w-none border-l-0' : 'max-w-md border-l border-default'
+          activeTab === "journal"
+            ? "max-w-none border-l-0"
+            : "max-w-md border-l border-default"
         }`}
         role="dialog"
         aria-modal="true"
@@ -140,44 +189,50 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
         <div className="flex items-center justify-between p-4 sm:p-6 border-b border-default">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <BookPenIcon className="w-6 h-6 text-default" heartFilled={true} />
-              <h2 id="notebook-title" className="text-lg sm:text-xl font-bold text-default">
+              <BookPenIcon
+                className="w-6 h-6 text-default"
+                heartFilled={true}
+              />
+              <h2
+                id="notebook-title"
+                className="text-lg sm:text-xl font-bold text-default"
+              >
                 Notebook
               </h2>
             </div>
-            
+
             {/* Tabs */}
             <div className="flex bg-bg-alt/50 rounded-lg p-1 ml-4">
               <button
-                onClick={() => setActiveTab('saved')}
+                onClick={() => setActiveTab("saved")}
                 className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
-                  activeTab === 'saved' 
-                    ? 'bg-accent text-accent-text shadow-sm' 
-                    : 'text-muted hover:text-default hover:bg-accent/10'
+                  activeTab === "saved"
+                    ? "bg-accent text-accent-text shadow-sm"
+                    : "text-muted hover:text-default hover:bg-accent/10"
                 }`}
               >
                 Saved Items
-                {pinnedItems.length > 0 && activeTab !== 'saved' && (
+                {pinnedItems.length > 0 && activeTab !== "saved" && (
                   <span className="ml-1.5 text-[10px] bg-accent/20 text-accent px-1.5 py-0.5 rounded-full">
                     {pinnedItems.length}
                   </span>
                 )}
               </button>
               <button
-                onClick={() => setActiveTab('journal')}
+                onClick={() => setActiveTab("journal")}
                 className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
-                  activeTab === 'journal' 
-                    ? 'bg-accent text-accent-text shadow-sm' 
-                    : 'text-muted hover:text-default hover:bg-accent/10'
+                  activeTab === "journal"
+                    ? "bg-accent text-accent-text shadow-sm"
+                    : "text-muted hover:text-default hover:bg-accent/10"
                 }`}
               >
                 Journal
               </button>
             </div>
           </div>
-          
+
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="text-muted hover:text-default transition-colors"
             aria-label="Close Notebook"
           >
@@ -186,7 +241,7 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Content */}
-        {activeTab === 'saved' ? (
+        {activeTab === "saved" ? (
           <>
             <div className="flex-1 overflow-y-auto p-4 sm:p-6">
               {isLoading ? (
@@ -196,15 +251,16 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
               ) : pinnedItems.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center py-12">
                   <BookPenIcon className="w-12 h-12 text-muted/30 mb-4" />
-                  <h3 className="text-lg font-semibold text-default mb-2">Your notebook is empty</h3>
+                  <h3 className="text-lg font-semibold text-default mb-2">
+                    Your notebook is empty
+                  </h3>
                   <p className="text-sm text-muted max-w-xs">
-                    Pin poetry entries you want to save for later by clicking the pin icon on any card.
+                    Pin poetry entries you want to save for later by clicking
+                    the pin icon on any card.
                   </p>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {savedItemsList}
-                </div>
+                <div className="space-y-4">{savedItemsList}</div>
               )}
             </div>
 
@@ -223,22 +279,25 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
           </>
         ) : (
           <div className="flex-1 overflow-hidden">
-            <JournalEditor />
+            <JournalEditor ref={journalEditorRef} />
           </div>
         )}
       </div>
 
       {/* Delete Confirmation Dialog */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div 
+        <div className="fixed inset-0  z-[60] flex items-center justify-center p-4">
+          <div
             className="absolute inset-0 bg-bg/70 backdrop-blur-sm"
             onClick={() => !isDeleting && setShowDeleteConfirm(false)}
           />
           <div className="relative bg-bg-alt border border-default rounded-lg p-6 max-w-sm w-full shadow-2xl animate-modal-in">
-            <h3 className="text-lg font-bold text-default mb-2">Delete Account?</h3>
+            <h3 className="text-lg font-bold text-default mb-2">
+              Delete Account?
+            </h3>
             <p className="text-sm text-muted mb-6">
-              This will permanently delete your account and all saved notebook items. This action cannot be undone.
+              This will permanently delete your account and all saved notebook
+              items. This action cannot be undone.
             </p>
             <div className="flex gap-3">
               <button
@@ -253,7 +312,53 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
                 disabled={isDeleting}
                 className="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700 transition-colors disabled:opacity-50"
               >
-                {isDeleting ? 'Deleting...' : 'Delete'}
+                {isDeleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Unsaved Changes Warning */}
+      {showUnsavedWarning && (
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]"
+          role="dialog"
+          aria-labelledby="notebook-unsaved-dialog-title"
+          aria-modal="true"
+        >
+          <div className="bg-bg border border-default rounded-lg p-6 max-w-sm mx-4 shadow-xl">
+            <h3
+              id="notebook-unsaved-dialog-title"
+              className="text-lg font-semibold text-default mb-2"
+            >
+              Unsaved Changes
+            </h3>
+            <p className="text-sm text-muted mb-4">
+              You have unsaved changes in your journal. Do you want to save
+              before closing?
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowUnsavedWarning(false)}
+                className="px-3 py-1.5 rounded-md text-sm font-medium bg-bg-alt text-default border border-default hover:bg-bg-alt/80 transition-colors"
+                aria-label="Cancel close"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDiscardAndClose}
+                className="px-3 py-1.5 rounded-md text-sm font-medium bg-bg text-default border border-default hover:bg-bg-alt transition-colors"
+                aria-label="Discard changes and close"
+              >
+                Discard
+              </button>
+              <button
+                onClick={handleConfirmClose}
+                className="px-3 py-1.5 rounded-md text-sm font-medium bg-accent text-accent-text hover:bg-accent-hover transition-colors"
+                aria-label="Save and close"
+              >
+                Save & Close
               </button>
             </div>
           </div>
