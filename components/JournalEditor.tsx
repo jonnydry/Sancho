@@ -261,7 +261,7 @@ export const JournalEditor: React.FC = () => {
       setTitle(entryTitle);
     }
 
-    const entry: JournalEntry = {
+    const updatedEntry: JournalEntry = {
       id: selectedId,
       title: entryTitle,
       content,
@@ -270,9 +270,20 @@ export const JournalEditor: React.FC = () => {
       templateRef: activeTemplate
     };
 
-    await JournalStorage.save(entry);
-    const updatedEntries = await JournalStorage.getAll();
-    setEntries(updatedEntries);
+    // Update local state optimistically
+    setEntries(prev => {
+      const updated = prev.map(e => e.id === selectedId ? updatedEntry : e);
+      // Sort by updatedAt descending
+      return updated.sort((a, b) => b.updatedAt - a.updatedAt);
+    });
+
+    // Save to server in background
+    try {
+      await JournalStorage.save(updatedEntry);
+    } catch (error) {
+      console.error('Failed to save entry:', error);
+      // Entry is already updated in UI, will retry on next change
+    }
   }, [selectedId, entries, title, content, activeTemplate]);
 
   const handleManualSave = useCallback(async () => {
