@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { PoetryItem } from '../types';
 import { XIcon } from './icons/XIcon';
 import { ArrowDownIcon } from './icons/ArrowDownIcon';
@@ -6,6 +6,49 @@ import { CheckIcon } from './icons/CheckIcon';
 import { usePinnedItems } from '../contexts/PinnedItemsContext';
 import { poetryData } from '../data/poetryData';
 import { poeticDevicesData } from '../data/poeticDevicesData';
+
+interface VerticalResizeHandleProps {
+  onResize: (delta: number) => void;
+}
+
+const VerticalResizeHandle: React.FC<VerticalResizeHandleProps> = ({ onResize }) => {
+  const [isDragging, setIsDragging] = useState(false);
+
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      onResize(e.movementY);
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    document.body.style.cursor = 'row-resize';
+    document.body.style.userSelect = 'none';
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isDragging, onResize]);
+
+  return (
+    <div
+      className={`h-[3px] cursor-row-resize z-10 flex justify-center items-center group relative ${isDragging ? 'bg-accent/40' : 'bg-transparent hover:bg-accent/30'}`}
+      onMouseDown={() => setIsDragging(true)}
+    >
+      <div className={`h-px w-5 rounded-full ${isDragging ? 'bg-accent' : 'bg-border/40 group-hover:bg-accent/60'}`} />
+    </div>
+  );
+};
 
 interface ReferencePaneProps {
     isOpen: boolean;
@@ -30,6 +73,23 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
     const [activeTab, setActiveTab] = useState<Tab>(pinnedItems.length > 0 ? 'saved' : 'search');
     const [searchQuery, setSearchQuery] = useState('');
     const [inserting, setInserting] = useState<string | null>(null);
+    const [detailHeight, setDetailHeight] = useState(() => {
+        const saved = localStorage.getItem('journal_detail_height');
+        return saved ? parseInt(saved) : 200;
+    });
+
+    useEffect(() => {
+        localStorage.setItem('journal_detail_height', detailHeight.toString());
+    }, [detailHeight]);
+
+    const handleResizeDetail = useCallback((delta: number) => {
+        setDetailHeight(prev => {
+            const newHeight = prev - delta;
+            if (newHeight < 120) return 120;
+            if (newHeight > 400) return 400;
+            return newHeight;
+        });
+    }, []);
 
     // Combine data sources for search
     const allItems = useMemo(() => {
@@ -220,7 +280,12 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
 
                 {/* Selected Item Details (Bottom Panel) */}
                 {activeItem && (
-                    <div className="h-1/2 min-h-[200px] border-t border-default bg-bg p-4 overflow-y-auto">
+                    <>
+                    <VerticalResizeHandle onResize={handleResizeDetail} />
+                    <div 
+                        className="border-t border-default bg-bg p-4 overflow-y-auto flex-shrink-0"
+                        style={{ height: detailHeight }}
+                    >
                         <div className="flex justify-between items-start mb-3">
                             <h4 className="font-bold text-sm text-default">{activeItem.name}</h4>
                             <button
@@ -286,6 +351,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                             )}
                         </div>
                     </div>
+                    </>
                 )}
             </div>
         </div>
