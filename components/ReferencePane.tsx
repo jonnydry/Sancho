@@ -75,7 +75,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
     const [inserting, setInserting] = useState<string | null>(null);
     const [detailHeight, setDetailHeight] = useState(() => {
         const saved = localStorage.getItem('journal_detail_height');
-        return saved ? parseInt(saved) : 200;
+        return saved ? parseInt(saved) : 320;
     });
 
     useEffect(() => {
@@ -86,7 +86,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
         setDetailHeight(prev => {
             const newHeight = prev - delta;
             if (newHeight < 120) return 120;
-            if (newHeight > 400) return 400;
+            if (newHeight > 500) return 500;
             return newHeight;
         });
     }, []);
