@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, Suspense, useRef, useCallback } from 'react';
+import React, { useState, useEffect, lazy, Suspense, useRef, useCallback, useMemo } from 'react';
 import { usePinnedItems } from '../contexts/PinnedItemsContext';
 import { useNotification } from '../contexts/NotificationContext';
 import { PoetryItem } from '../types';
@@ -63,9 +63,22 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
     };
   }, [isOpen, onClose, restoreOverflow]);
 
-  const handleCardClick = (item: PoetryItem) => {
+  const handleCardClick = useCallback((item: PoetryItem) => {
     setSelectedItem(item);
-  };
+  }, []);
+
+  const savedItemsList = useMemo(() => (
+    pinnedItems.map((item, index) => (
+      <div key={item.name} className="relative">
+        <PoetryCard
+          item={item}
+          onSelect={handleCardClick}
+          animationIndex={index}
+          variant="matte"
+        />
+      </div>
+    ))
+  ), [pinnedItems, handleCardClick]);
 
   const handleCloseModal = () => {
     setSelectedItem(null);
@@ -97,20 +110,26 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <>
+    <div 
+      className={`${isOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}
+      aria-hidden={!isOpen}
+      inert={!isOpen}
+    >
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-bg/50 backdrop-blur-sm z-40 animate-fade-in-fast"
+        className={`fixed inset-0 bg-bg/50 backdrop-blur-sm z-40 transition-opacity duration-300 ${
+          isOpen ? 'opacity-100' : 'opacity-0'
+        }`}
         onClick={onClose}
         aria-hidden="true"
       />
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 right-0 h-full w-full bg-bg/80 backdrop-blur-md backdrop-brightness-150 dark:backdrop-brightness-100 z-50 shadow-2xl flex flex-col animate-slide-in-right transition-all duration-300 ease-in-out ${
+        className={`fixed top-0 right-0 h-full w-full bg-bg/80 backdrop-blur-md backdrop-brightness-150 dark:backdrop-brightness-100 z-50 shadow-2xl flex flex-col transition-all duration-300 ease-in-out ${
+          isOpen ? 'translate-x-0' : 'translate-x-full'
+        } ${
           activeTab === 'journal' ? 'max-w-none border-l-0' : 'max-w-md border-l border-default'
         }`}
         role="dialog"
@@ -184,16 +203,7 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {pinnedItems.map((item, index) => (
-                    <div key={item.name} className="relative">
-                      <PoetryCard
-                        item={item}
-                        onSelect={handleCardClick}
-                        animationIndex={index}
-                        variant="matte"
-                      />
-                    </div>
-                  ))}
+                  {savedItemsList}
                 </div>
               )}
             </div>
@@ -256,6 +266,6 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
           <PoetryDetailModal item={selectedItem} onClose={handleCloseModal} />
         </Suspense>
       )}
-    </>
+    </div>
   );
 };
