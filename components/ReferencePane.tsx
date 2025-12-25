@@ -281,12 +281,12 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                     </div>
                 )}
 
-                {/* Selected Item Details (Bottom Panel) - expands to fill space */}
+                {/* Selected Item Details (Bottom Panel) - fits content */}
                 {activeItem && (
                     <>
                     <VerticalResizeHandle onResize={handleResizeSavedList} />
                     <div 
-                        className="border-t border-default bg-bg p-4 overflow-y-auto flex-1 min-h-[200px]"
+                        className="border-t border-default bg-bg p-4 overflow-y-auto"
                     >
                         <div className="flex justify-between items-start mb-3">
                             <h4 className="font-bold text-sm text-default">{activeItem.name}</h4>
