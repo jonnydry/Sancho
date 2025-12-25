@@ -96,9 +96,9 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
                 className="flex-1 w-full overflow-hidden"
               >
                 {/* Title & Date */}
-                <div className="flex justify-between items-baseline gap-2 mb-1">
+                <div className="flex justify-between items-baseline gap-2 mb-1 pr-6 group-hover:pr-0">
                   <div className="font-medium text-sm text-default truncate flex-1">{entry.title || 'Untitled'}</div>
-                  <div className="hidden sm:block text-[10px] text-muted whitespace-nowrap">
+                  <div className="hidden sm:block text-[10px] text-muted whitespace-nowrap group-hover:hidden">
                     {new Date(entry.updatedAt).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' })}
                   </div>
                 </div>
