@@ -73,20 +73,20 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
     const [activeTab, setActiveTab] = useState<Tab>(pinnedItems.length > 0 ? 'saved' : 'search');
     const [searchQuery, setSearchQuery] = useState('');
     const [inserting, setInserting] = useState<string | null>(null);
-    const [detailHeight, setDetailHeight] = useState(() => {
-        const saved = localStorage.getItem('journal_detail_height');
-        return saved ? parseInt(saved) : 320;
+    const [savedListHeight, setSavedListHeight] = useState(() => {
+        const saved = localStorage.getItem('journal_saved_list_height');
+        return saved ? parseInt(saved) : 160;
     });
 
     useEffect(() => {
-        localStorage.setItem('journal_detail_height', detailHeight.toString());
-    }, [detailHeight]);
+        localStorage.setItem('journal_saved_list_height', savedListHeight.toString());
+    }, [savedListHeight]);
 
-    const handleResizeDetail = useCallback((delta: number) => {
-        setDetailHeight(prev => {
-            const newHeight = prev - delta;
-            if (newHeight < 120) return 120;
-            if (newHeight > 500) return 500;
+    const handleResizeSavedList = useCallback((delta: number) => {
+        setSavedListHeight(prev => {
+            const newHeight = prev + delta;
+            if (newHeight < 80) return 80;
+            if (newHeight > 300) return 300;
             return newHeight;
         });
     }, []);
@@ -184,8 +184,11 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
 
             <div className="flex-1 flex flex-col overflow-hidden">
                 {activeTab === 'saved' ? (
-                    /* Saved Items View */
-                    <div className="flex-1 overflow-y-auto p-4">
+                    /* Saved Items View - compact, resizable */
+                    <div 
+                        className="shrink-0 overflow-y-auto p-4"
+                        style={{ maxHeight: savedListHeight }}
+                    >
                         {pinnedItems.length > 0 ? (
                             <div className="space-y-2">
                                 <p className="text-xs text-muted mb-3 uppercase tracking-wider font-bold">Your Saved Items</p>
@@ -206,7 +209,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                                 ))}
                             </div>
                         ) : (
-                            <div className="text-center py-12 text-muted text-xs px-6">
+                            <div className="text-center py-8 text-muted text-xs px-6">
                                 <p className="mb-2">No saved items yet.</p>
                                 <button
                                     onClick={() => setActiveTab('search')}
@@ -278,13 +281,12 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                     </div>
                 )}
 
-                {/* Selected Item Details (Bottom Panel) */}
+                {/* Selected Item Details (Bottom Panel) - expands to fill space */}
                 {activeItem && (
                     <>
-                    <VerticalResizeHandle onResize={handleResizeDetail} />
+                    <VerticalResizeHandle onResize={handleResizeSavedList} />
                     <div 
-                        className="border-t border-default bg-bg p-4 overflow-y-auto flex-shrink-0"
-                        style={{ height: detailHeight }}
+                        className="border-t border-default bg-bg p-4 overflow-y-auto flex-1 min-h-[200px]"
                     >
                         <div className="flex justify-between items-start mb-3">
                             <h4 className="font-bold text-sm text-default">{activeItem.name}</h4>
