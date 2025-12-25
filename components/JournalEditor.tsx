@@ -23,6 +23,7 @@ interface ResizeHandleProps {
 
 const ResizeHandle: React.FC<ResizeHandleProps> = ({ onResize, className }) => {
   const [isDragging, setIsDragging] = useState(false);
+  const startPosRef = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     if (!isDragging) return;
@@ -31,31 +32,92 @@ const ResizeHandle: React.FC<ResizeHandleProps> = ({ onResize, className }) => {
       onResize(e.movementX);
     };
 
+    const handleTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+      if (!startPosRef.current) return;
+      const touch = e.touches[0];
+      const delta = touch.clientX - startPosRef.current.x;
+      onResize(delta);
+      startPosRef.current.x = touch.clientX;
+    };
+
     const handleMouseUp = () => {
       setIsDragging(false);
+      startPosRef.current = null;
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
     };
 
+    const handleTouchEnd = () => {
+      setIsDragging(false);
+      startPosRef.current = null;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isDragging) return;
+      if (e.key === 'Escape') {
+        setIsDragging(false);
+        startPosRef.current = null;
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+        return;
+      }
+      const step = e.shiftKey ? 10 : 1;
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        onResize(-step);
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        onResize(step);
+      }
+    };
+
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd);
+    document.addEventListener('keydown', handleKeyDown);
     document.body.style.cursor = 'col-resize';
     document.body.style.userSelect = 'none';
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+      document.removeEventListener('keydown', handleKeyDown);
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
     };
   }, [isDragging, onResize]);
 
+  const handleStart = (clientX: number) => {
+    setIsDragging(true);
+    startPosRef.current = { x: clientX, y: 0 };
+  };
+
   return (
     <div
       className={`w-[3px] cursor-col-resize z-10 flex flex-col justify-center items-center group relative ${isDragging ? 'bg-accent/40' : 'bg-transparent hover:bg-accent/30'} ${className || ''}`}
-      onMouseDown={() => setIsDragging(true)}
+      onMouseDown={(e) => handleStart(e.clientX)}
+      onTouchStart={(e) => {
+        const touch = e.touches[0];
+        handleStart(touch.clientX);
+      }}
+      role="separator"
+      aria-orientation="vertical"
+      aria-label="Resize panel"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          setIsDragging(true);
+        }
+      }}
     >
-        <div className={`w-px h-5 rounded-full ${isDragging ? 'bg-accent' : 'bg-border/40 group-hover:bg-accent/60'}`} />
+      <div className={`w-px h-5 rounded-full ${isDragging ? 'bg-accent' : 'bg-border/40 group-hover:bg-accent/60'}`} />
     </div>
   );
 };
@@ -73,7 +135,12 @@ export const JournalEditor: React.FC = () => {
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   const [showSaveError, setShowSaveError] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+  const [pendingEntrySwitch, setPendingEntrySwitch] = useState<JournalEntry | null>(null);
+  const [autosaveError, setAutosaveError] = useState<string | null>(null);
+  const [syncStatus, setSyncStatus] = useState<'synced' | 'syncing' | 'local' | 'error'>('synced');
   const saveConfirmTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const autosaveErrorTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   const [entryListWidth, setEntryListWidth] = useState(240);
   const [referencePaneWidth, setReferencePaneWidth] = useState(320);
@@ -104,6 +171,9 @@ export const JournalEditor: React.FC = () => {
     return () => {
       if (saveConfirmTimeoutRef.current) {
         clearTimeout(saveConfirmTimeoutRef.current);
+      }
+      if (autosaveErrorTimeoutRef.current) {
+        clearTimeout(autosaveErrorTimeoutRef.current);
       }
     };
   }, []);
@@ -140,7 +210,7 @@ export const JournalEditor: React.FC = () => {
       if (loadedEntries.length > 0) {
         selectEntryDirect(loadedEntries[0]);
       } else {
-        createNewEntryDirect();
+        await createNewEntryDirect();
       }
     };
     loadEntries();
@@ -166,24 +236,57 @@ export const JournalEditor: React.FC = () => {
 
       const state = currentStateRef.current;
       const currentEntry = state.entries.find(e => e.id === previousSelectedIdRef.current);
-      if (currentEntry && (currentEntry.title !== state.title || currentEntry.content !== state.content || currentEntry.templateRef !== state.activeTemplate)) {
-        const entryToSave: JournalEntry = {
-          ...currentEntry,
-          title: state.title || currentEntry.title,
-          content: state.content || currentEntry.content,
-          updatedAt: Date.now(),
-          templateRef: state.activeTemplate
-        };
-        await JournalStorage.save(entryToSave);
-        const updatedEntries = await JournalStorage.getAll();
-        setEntries(updatedEntries);
+      const hasUnsavedChanges = currentEntry && (
+        currentEntry.title !== state.title || 
+        currentEntry.content !== state.content || 
+        currentEntry.templateRef !== state.activeTemplate
+      );
+
+      if (hasUnsavedChanges) {
+        // Check if user wants to save before switching
+        setPendingEntrySwitch(entry);
+        setShowUnsavedWarning(true);
+        return;
       }
     }
 
     selectEntryDirect(entry);
   }, []);
 
-  const createNewEntryDirect = () => {
+  const handleUnsavedWarningConfirm = useCallback(async () => {
+    setShowUnsavedWarning(false);
+    if (!pendingEntrySwitch) return;
+
+    // Save current entry before switching
+    const state = currentStateRef.current;
+    const currentEntry = state.entries.find(e => e.id === previousSelectedIdRef.current);
+    if (currentEntry) {
+      const entryToSave: JournalEntry = {
+        ...currentEntry,
+        title: state.title || currentEntry.title,
+        content: state.content || currentEntry.content,
+        updatedAt: Date.now(),
+        templateRef: state.activeTemplate
+      };
+      try {
+        await JournalStorage.save(entryToSave);
+        const updatedEntries = await JournalStorage.getAll();
+        setEntries(updatedEntries);
+      } catch (error) {
+        console.error('Failed to save entry before switching:', error);
+      }
+    }
+
+    selectEntryDirect(pendingEntrySwitch);
+    setPendingEntrySwitch(null);
+  }, [pendingEntrySwitch]);
+
+  const handleUnsavedWarningCancel = useCallback(() => {
+    setShowUnsavedWarning(false);
+    setPendingEntrySwitch(null);
+  }, []);
+
+  const createNewEntryDirect = async () => {
     const newEntry: JournalEntry = {
       id: generateUUID(),
       title: '',
@@ -197,7 +300,11 @@ export const JournalEditor: React.FC = () => {
     setContent(newEntry.content);
     setActiveTemplate(newEntry.templateRef);
     previousSelectedIdRef.current = newEntry.id;
-    JournalStorage.save(newEntry);
+    try {
+      await JournalStorage.save(newEntry);
+    } catch (error) {
+      console.error('Failed to save new entry:', error);
+    }
   };
 
   const createNewEntry = useCallback(async () => {
@@ -232,45 +339,52 @@ export const JournalEditor: React.FC = () => {
       saveTimeoutRef.current = null;
     }
 
-    // Get current entries and compute remaining
-    const currentEntries = currentStateRef.current.entries;
-    const remaining = currentEntries.filter(e => e.id !== id);
-    
-    if (remaining.length > 0) {
-      // Update local state with remaining entries
-      setEntries(remaining);
+    // Use functional update to ensure we have the latest entries state
+    let nextEntryToSelect: JournalEntry | null = null;
+    let shouldCreateNew = false;
+    let newEntryToCreate: JournalEntry | null = null;
+
+    setEntries(prevEntries => {
+      const remaining = prevEntries.filter(e => e.id !== id);
       
-      // Select next entry if we deleted the currently selected one
-      if (selectedId === id) {
-        const nextEntry = remaining[0];
-        setSelectedId(nextEntry.id);
-        setTitle(nextEntry.title);
-        setContent(nextEntry.content);
-        setActiveTemplate(nextEntry.templateRef);
-        previousSelectedIdRef.current = nextEntry.id;
+      if (remaining.length > 0) {
+        // Select next entry if we deleted the currently selected one
+        if (selectedId === id) {
+          nextEntryToSelect = remaining[0];
+        }
+        return remaining;
+      } else {
+        // No entries left - create a new blank one
+        shouldCreateNew = true;
+        newEntryToCreate = {
+          id: generateUUID(),
+          title: '',
+          content: '',
+          createdAt: Date.now(),
+          updatedAt: Date.now()
+        };
+        return [newEntryToCreate];
       }
-    } else {
-      // No entries left - create a new blank one
-      const newEntry: JournalEntry = {
-        id: generateUUID(),
-        title: '',
-        content: '',
-        createdAt: Date.now(),
-        updatedAt: Date.now()
-      };
-      setEntries([newEntry]);
-      setSelectedId(newEntry.id);
+    });
+
+    // Handle selection outside of setEntries callback
+    if (nextEntryToSelect) {
+      setSelectedId(nextEntryToSelect.id);
+      setTitle(nextEntryToSelect.title);
+      setContent(nextEntryToSelect.content);
+      setActiveTemplate(nextEntryToSelect.templateRef);
+      previousSelectedIdRef.current = nextEntryToSelect.id;
+    } else if (shouldCreateNew && newEntryToCreate) {
+      setSelectedId(newEntryToCreate.id);
       setTitle('');
       setContent('');
       setActiveTemplate(undefined);
-      previousSelectedIdRef.current = newEntry.id;
+      previousSelectedIdRef.current = newEntryToCreate.id;
       
       // Save new entry to server
-      try {
-        await JournalStorage.save(newEntry);
-      } catch (error) {
+      JournalStorage.save(newEntryToCreate).catch(error => {
         console.error('Failed to save new entry:', error);
-      }
+      });
     }
 
     // Delete from server in background
@@ -281,7 +395,7 @@ export const JournalEditor: React.FC = () => {
     }
   }, [selectedId]);
 
-  const handleSave = useCallback(async () => {
+  const handleSave = useCallback(async (isManual = false) => {
     if (!selectedId) return;
 
     const currentEntry = entries.find(e => e.id === selectedId);
@@ -307,20 +421,45 @@ export const JournalEditor: React.FC = () => {
     // Update local state optimistically (preserve order)
     setEntries(prev => prev.map(e => e.id === selectedId ? updatedEntry : e));
 
+    // Update sync status
+    setSyncStatus('syncing');
+
     // Save to server in background
     try {
       await JournalStorage.save(updatedEntry);
+      setSyncStatus('synced');
+      if (autosaveError) {
+        setAutosaveError(null);
+        if (autosaveErrorTimeoutRef.current) {
+          clearTimeout(autosaveErrorTimeoutRef.current);
+        }
+      }
     } catch (error) {
       console.error('Failed to save entry:', error);
-      // Entry is already updated in UI, will retry on next change
+      setSyncStatus('error');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to save';
+      setAutosaveError(errorMessage);
+      
+      // Clear error message after 5 seconds
+      if (autosaveErrorTimeoutRef.current) {
+        clearTimeout(autosaveErrorTimeoutRef.current);
+      }
+      autosaveErrorTimeoutRef.current = setTimeout(() => {
+        setAutosaveError(null);
+      }, 5000);
+
+      // If manual save, also show error in UI
+      if (isManual) {
+        throw error;
+      }
     }
-  }, [selectedId, entries, title, content, activeTemplate]);
+  }, [selectedId, entries, title, content, activeTemplate, autosaveError]);
 
   const handleManualSave = useCallback(async () => {
     setIsSaving(true);
     setShowSaveError(false);
     try {
-      await handleSave();
+      await handleSave(true);
       setShowSaveConfirm(true);
       if (saveConfirmTimeoutRef.current) {
         clearTimeout(saveConfirmTimeoutRef.current);
@@ -337,6 +476,11 @@ export const JournalEditor: React.FC = () => {
     } finally {
       setIsSaving(false);
     }
+  }, [handleSave]);
+
+  const handleRetrySave = useCallback(async () => {
+    setAutosaveError(null);
+    await handleSave();
   }, [handleSave]);
 
   const handleDeleteCurrent = useCallback(async () => {
@@ -389,18 +533,23 @@ export const JournalEditor: React.FC = () => {
   useEffect(() => {
     if (!selectedId) return;
 
+    // Set sync status to 'local' when content changes
+    if (syncStatus === 'synced') {
+      setSyncStatus('local');
+    }
+
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
 
     saveTimeoutRef.current = setTimeout(() => {
-      handleSave();
+      handleSave(false);
     }, 500);
 
     return () => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     };
-  }, [content, title, activeTemplate, selectedId, handleSave]);
+  }, [content, title, activeTemplate, selectedId, handleSave, syncStatus]);
 
   return (
     <div className="flex h-full overflow-hidden bg-bg relative">
@@ -440,6 +589,27 @@ export const JournalEditor: React.FC = () => {
             )}
             {showSaveError && (
               <span className="text-xs text-red-500 font-medium">Save failed</span>
+            )}
+            {autosaveError && !showSaveError && (
+              <div className="flex items-center gap-1">
+                <span className="text-xs text-red-500 font-medium">Auto-save failed</span>
+                <button
+                  onClick={handleRetrySave}
+                  className="text-xs text-red-500 hover:text-red-600 underline"
+                  title="Retry save"
+                >
+                  Retry
+                </button>
+              </div>
+            )}
+            {!autosaveError && !showSaveError && syncStatus === 'synced' && (
+              <span className="text-xs text-green-500/70 font-medium" title="Synced to server">●</span>
+            )}
+            {syncStatus === 'syncing' && (
+              <span className="text-xs text-muted font-medium animate-pulse" title="Syncing...">Syncing...</span>
+            )}
+            {syncStatus === 'local' && (
+              <span className="text-xs text-yellow-500/70 font-medium" title="Local changes">○</span>
             )}
           </div>
 
@@ -535,6 +705,43 @@ export const JournalEditor: React.FC = () => {
                 className="px-3 py-1.5 rounded-md text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors"
               >
                 Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showUnsavedWarning && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-bg border border-default rounded-lg p-6 max-w-sm mx-4 shadow-xl">
+            <h3 className="text-lg font-semibold text-default mb-2">Unsaved Changes</h3>
+            <p className="text-sm text-muted mb-4">
+              You have unsaved changes. Do you want to save before switching entries?
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={handleUnsavedWarningCancel}
+                className="px-3 py-1.5 rounded-md text-sm font-medium bg-bg-alt text-default border border-default hover:bg-bg-alt/80 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setShowUnsavedWarning(false);
+                  if (pendingEntrySwitch) {
+                    selectEntryDirect(pendingEntrySwitch);
+                    setPendingEntrySwitch(null);
+                  }
+                }}
+                className="px-3 py-1.5 rounded-md text-sm font-medium bg-bg text-default border border-default hover:bg-bg-alt transition-colors"
+              >
+                Discard
+              </button>
+              <button
+                onClick={handleUnsavedWarningConfirm}
+                className="px-3 py-1.5 rounded-md text-sm font-medium bg-accent text-accent-text hover:bg-accent-hover transition-colors"
+              >
+                Save & Switch
               </button>
             </div>
           </div>

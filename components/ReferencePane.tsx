@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { PoetryItem } from '../types';
 import { XIcon } from './icons/XIcon';
 import { ArrowDownIcon } from './icons/ArrowDownIcon';
@@ -13,6 +13,7 @@ interface VerticalResizeHandleProps {
 
 const VerticalResizeHandle: React.FC<VerticalResizeHandleProps> = ({ onResize }) => {
   const [isDragging, setIsDragging] = useState(false);
+  const startPosRef = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     if (!isDragging) return;
@@ -21,29 +22,90 @@ const VerticalResizeHandle: React.FC<VerticalResizeHandleProps> = ({ onResize })
       onResize(e.movementY);
     };
 
+    const handleTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+      if (!startPosRef.current) return;
+      const touch = e.touches[0];
+      const delta = touch.clientY - startPosRef.current.y;
+      onResize(delta);
+      startPosRef.current.y = touch.clientY;
+    };
+
     const handleMouseUp = () => {
       setIsDragging(false);
+      startPosRef.current = null;
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
     };
 
+    const handleTouchEnd = () => {
+      setIsDragging(false);
+      startPosRef.current = null;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isDragging) return;
+      if (e.key === 'Escape') {
+        setIsDragging(false);
+        startPosRef.current = null;
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+        return;
+      }
+      const step = e.shiftKey ? 10 : 1;
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        onResize(-step);
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        onResize(step);
+      }
+    };
+
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd);
+    document.addEventListener('keydown', handleKeyDown);
     document.body.style.cursor = 'row-resize';
     document.body.style.userSelect = 'none';
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+      document.removeEventListener('keydown', handleKeyDown);
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
     };
   }, [isDragging, onResize]);
 
+  const handleStart = (clientY: number) => {
+    setIsDragging(true);
+    startPosRef.current = { x: 0, y: clientY };
+  };
+
   return (
     <div
       className={`h-[3px] cursor-row-resize z-10 flex justify-center items-center group relative ${isDragging ? 'bg-accent/40' : 'bg-transparent hover:bg-accent/30'}`}
-      onMouseDown={() => setIsDragging(true)}
+      onMouseDown={(e) => handleStart(e.clientY)}
+      onTouchStart={(e) => {
+        const touch = e.touches[0];
+        handleStart(touch.clientY);
+      }}
+      role="separator"
+      aria-orientation="horizontal"
+      aria-label="Resize panel"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          setIsDragging(true);
+        }
+      }}
     >
       <div className={`h-px w-5 rounded-full ${isDragging ? 'bg-accent' : 'bg-border/40 group-hover:bg-accent/60'}`} />
     </div>

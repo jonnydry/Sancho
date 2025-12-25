@@ -21,8 +21,26 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
   width,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const confirmTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Debounce search query (300ms delay)
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    searchTimeoutRef.current = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [searchQuery]);
 
   // Auto-cancel confirmation after 2 seconds
   useEffect(() => {
@@ -38,14 +56,26 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
     };
   }, [pendingDeleteId]);
 
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (confirmTimeoutRef.current) {
+        clearTimeout(confirmTimeoutRef.current);
+      }
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const filteredEntries = useMemo(() => {
-    if (!searchQuery.trim()) return entries;
-    const query = searchQuery.toLowerCase();
+    if (!debouncedSearchQuery.trim()) return entries;
+    const query = debouncedSearchQuery.toLowerCase();
     return entries.filter(entry => 
       (entry.title?.toLowerCase() || '').includes(query) || 
       (entry.content?.toLowerCase() || '').includes(query)
     );
-  }, [entries, searchQuery]);
+  }, [entries, debouncedSearchQuery]);
 
   return (
     <div 
