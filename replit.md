@@ -68,10 +68,15 @@ The project utilizes a dual-server architecture with a React frontend (Vite, Por
 
 ### Recent Updates
 
-#### 2025-12-25 - Simplified Journal Editor
+#### 2025-12-25 - Journal & Notebook Performance Improvements
 - **Lightweight Textarea**: Reverted from WYSIWYG to simple textarea for cleaner, more lightweight experience
 - **Cursor-Aware Insertion**: Snippets from ReferencePane still insert at cursor position using textarea selection API
 - **Fast Auto-Save**: 500ms debounced auto-save for responsive saving
+- **Notebook Preloading**: Module preloads when user authenticates, eliminating first-open lag
+- **Always-Mounted Notebook**: Stays rendered (hidden via CSS) for instant open/close
+- **Thinner Resize Handles**: Reduced from 4-6px to 3px with 1px indicator line (was 2px × 32px, now 1px × 20px)
+- **Instant Resize Response**: Removed transition animations for immediate drag feedback
+- **Standardized Dividers**: Both panel dividers now use identical styling for consistent feel
 
 #### 2025-12-11 - Account Deletion Feature
 - **Delete Account Option**: Users can now delete their account from the Notebook panel
