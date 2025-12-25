@@ -87,7 +87,7 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
           filteredEntries.map(entry => (
             <div 
               key={entry.id}
-              className={`group p-3 cursor-pointer border-l-2 transition-all duration-200 hover:bg-bg-alt/50 relative ${
+              className={`group p-3 cursor-pointer border-l-2 transition-all duration-200 hover:bg-bg-alt/50 ${
                 selectedId === entry.id ? 'border-accent bg-bg-alt' : 'border-transparent'
               }`}
             >
@@ -95,16 +95,13 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
                 onClick={() => onSelect(entry.id)}
                 className="flex-1 w-full overflow-hidden"
               >
-                {/* Title & Date */}
-                <div className="flex justify-between items-baseline gap-2 mb-1 pr-6 group-hover:pr-0">
-                  <div className="font-medium text-sm text-default truncate flex-1">{entry.title || 'Untitled'}</div>
-                  <div className="hidden sm:block text-[10px] text-muted whitespace-nowrap group-hover:hidden">
-                    {new Date(entry.updatedAt).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' })}
-                  </div>
+                {/* Title */}
+                <div className="font-medium text-sm text-default truncate mb-1">
+                  {entry.title || 'Untitled'}
                 </div>
                 
                 {/* Content Preview (Desktop) */}
-                <div className="hidden sm:block text-xs text-muted/70 line-clamp-2 h-8 leading-4">
+                <div className="hidden sm:block text-xs text-muted/70 line-clamp-2 leading-4 mb-2">
                   {entry.content?.slice(0, 150) || <span className="italic opacity-50">Empty note...</span>}
                 </div>
 
@@ -114,20 +111,25 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
                 </div>
               </div>
 
-              {/* Delete Button */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (window.confirm('Delete this entry?')) {
-                    onDelete(entry.id);
-                  }
-                }}
-                className="hidden sm:block absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity text-muted hover:text-red-500 p-1"
-                title="Delete entry"
-                aria-label={`Delete entry: ${entry.title || 'Untitled'}`}
-              >
-                <XIcon className="w-3 h-3" />
-              </button>
+              {/* Footer: Date & Delete */}
+              <div className="hidden sm:flex items-center justify-between mt-1">
+                <span className="text-[10px] text-muted">
+                  {new Date(entry.updatedAt).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' })}
+                </span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (window.confirm('Delete this entry?')) {
+                      onDelete(entry.id);
+                    }
+                  }}
+                  className="p-1 rounded transition-all duration-200 opacity-0 group-hover:opacity-100 text-muted/50 hover:text-red-500 hover:bg-red-500/15 hover:shadow-[0_0_6px_rgba(239,68,68,0.25)]"
+                  title="Delete entry"
+                  aria-label={`Delete entry: ${entry.title || 'Untitled'}`}
+                >
+                  <XIcon className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
           ))
         )}
