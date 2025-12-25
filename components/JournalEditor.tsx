@@ -69,6 +69,11 @@ export const JournalEditor: React.FC = () => {
   const [showTemplate, setShowTemplate] = useState(false);
   const [activeTemplate, setActiveTemplate] = useState<string | undefined>(undefined);
   const [showSidebar, setShowSidebar] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false);
+  const [showSaveError, setShowSaveError] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const saveConfirmTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   const [entryListWidth, setEntryListWidth] = useState(240);
   const [referencePaneWidth, setReferencePaneWidth] = useState(320);
@@ -94,6 +99,14 @@ export const JournalEditor: React.FC = () => {
     localStorage.setItem('journal_entry_width', entryListWidth.toString());
     localStorage.setItem('journal_ref_width', referencePaneWidth.toString());
   }, [entryListWidth, referencePaneWidth]);
+
+  useEffect(() => {
+    return () => {
+      if (saveConfirmTimeoutRef.current) {
+        clearTimeout(saveConfirmTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleResizeEntryList = useCallback((delta: number) => {
     setEntryListWidth(prev => {
@@ -255,6 +268,35 @@ export const JournalEditor: React.FC = () => {
     setEntries(updatedEntries);
   }, [selectedId, entries, title, content, activeTemplate]);
 
+  const handleManualSave = useCallback(async () => {
+    setIsSaving(true);
+    setShowSaveError(false);
+    try {
+      await handleSave();
+      setShowSaveConfirm(true);
+      if (saveConfirmTimeoutRef.current) {
+        clearTimeout(saveConfirmTimeoutRef.current);
+      }
+      saveConfirmTimeoutRef.current = setTimeout(() => setShowSaveConfirm(false), 2000);
+    } catch (error) {
+      console.error('Failed to save entry:', error);
+      setShowSaveConfirm(false);
+      setShowSaveError(true);
+      if (saveConfirmTimeoutRef.current) {
+        clearTimeout(saveConfirmTimeoutRef.current);
+      }
+      saveConfirmTimeoutRef.current = setTimeout(() => setShowSaveError(false), 3000);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [handleSave]);
+
+  const handleDeleteCurrent = useCallback(async () => {
+    if (!selectedId) return;
+    setShowDeleteConfirm(false);
+    await deleteEntry(selectedId);
+  }, [selectedId, deleteEntry]);
+
   const handleTextareaBlur = useCallback(() => {
     if (textareaRef.current) {
       savedSelectionRef.current = {
@@ -345,18 +387,41 @@ export const JournalEditor: React.FC = () => {
             <span className="text-xs text-muted font-mono">
               {content.length} chars
             </span>
+            {showSaveConfirm && (
+              <span className="text-xs text-green-500 font-medium animate-pulse">Saved</span>
+            )}
+            {showSaveError && (
+              <span className="text-xs text-red-500 font-medium">Save failed</span>
+            )}
           </div>
 
-          <button
-            onClick={() => setShowTemplate(!showTemplate)}
-            className={`px-2 py-1 rounded-md text-xs font-medium transition-colors border ${showTemplate
-              ? 'bg-accent text-accent-text border-accent hover:bg-accent-hover'
-              : 'bg-bg text-muted border-default/30 hover:text-default hover:border-default'
-            }`}
-            title="Toggle Reference Pane"
-          >
-            {showTemplate ? 'Hide Reference' : 'Reference'}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleManualSave}
+              disabled={isSaving}
+              className="px-2 py-1 rounded-md text-xs font-medium transition-colors border bg-bg text-muted border-default/30 hover:text-default hover:border-default hover:bg-accent/10 disabled:opacity-50"
+              title="Save Entry"
+            >
+              {isSaving ? 'Saving...' : 'Save'}
+            </button>
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="px-2 py-1 rounded-md text-xs font-medium transition-colors border bg-bg text-red-400 border-red-400/30 hover:bg-red-500/10 hover:border-red-400"
+              title="Delete Entry"
+            >
+              Delete
+            </button>
+            <button
+              onClick={() => setShowTemplate(!showTemplate)}
+              className={`px-2 py-1 rounded-md text-xs font-medium transition-colors border ${showTemplate
+                ? 'bg-accent text-accent-text border-accent hover:bg-accent-hover'
+                : 'bg-bg text-muted border-default/30 hover:text-default hover:border-default'
+              }`}
+              title="Toggle Reference Pane"
+            >
+              {showTemplate ? 'Hide Reference' : 'Reference'}
+            </button>
+          </div>
         </div>
 
         <div className="flex-1 flex flex-col relative overflow-hidden">
@@ -395,6 +460,31 @@ export const JournalEditor: React.FC = () => {
             width={referencePaneWidth}
           />
         </>
+      )}
+
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-bg border border-default rounded-lg p-6 max-w-sm mx-4 shadow-xl">
+            <h3 className="text-lg font-semibold text-default mb-2">Delete Entry?</h3>
+            <p className="text-sm text-muted mb-4">
+              Are you sure you want to delete "{title || 'Untitled'}"? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-3 py-1.5 rounded-md text-sm font-medium bg-bg-alt text-default border border-default hover:bg-bg-alt/80 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteCurrent}
+                className="px-3 py-1.5 rounded-md text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
