@@ -1,4 +1,4 @@
-import { users, pinnedItems } from "../shared/schema.js";
+import { users, pinnedItems, journalEntries } from "../shared/schema.js";
 import { db } from "./db.js";
 import { eq, and, desc } from "drizzle-orm";
 
@@ -270,6 +270,11 @@ export class DatabaseStorage {
         .delete(pinnedItems)
         .where(eq(pinnedItems.userId, userId));
 
+      // Delete all journal entries for this user
+      await db
+        .delete(journalEntries)
+        .where(eq(journalEntries.userId, userId));
+
       // Then delete the user record
       const [deletedUser] = await db
         .delete(users)
@@ -283,6 +288,161 @@ export class DatabaseStorage {
       return deletedUser;
     } catch (error) {
       handleDatabaseError(error, 'deleteUser');
+    }
+  }
+
+  // Journal entries operations
+  async getJournalEntries(userId) {
+    try {
+      const entries = await db
+        .select()
+        .from(journalEntries)
+        .where(eq(journalEntries.userId, userId))
+        .orderBy(desc(journalEntries.updatedAt));
+      return entries.map(entry => ({
+        id: entry.id,
+        title: entry.title || '',
+        content: entry.content || '',
+        templateRef: entry.templateRef,
+        createdAt: entry.createdAt ? new Date(entry.createdAt).getTime() : Date.now(),
+        updatedAt: entry.updatedAt ? new Date(entry.updatedAt).getTime() : Date.now(),
+      }));
+    } catch (error) {
+      handleDatabaseError(error, 'getJournalEntries');
+    }
+  }
+
+  async getJournalEntry(userId, entryId) {
+    try {
+      const [entry] = await db
+        .select()
+        .from(journalEntries)
+        .where(and(
+          eq(journalEntries.userId, userId),
+          eq(journalEntries.id, entryId)
+        ))
+        .limit(1);
+      
+      if (!entry) return null;
+      
+      return {
+        id: entry.id,
+        title: entry.title || '',
+        content: entry.content || '',
+        templateRef: entry.templateRef,
+        createdAt: entry.createdAt ? new Date(entry.createdAt).getTime() : Date.now(),
+        updatedAt: entry.updatedAt ? new Date(entry.updatedAt).getTime() : Date.now(),
+      };
+    } catch (error) {
+      handleDatabaseError(error, 'getJournalEntry');
+    }
+  }
+
+  async createJournalEntry(userId, entryData) {
+    try {
+      const [entry] = await db
+        .insert(journalEntries)
+        .values({
+          id: entryData.id,
+          userId,
+          title: entryData.title || '',
+          content: entryData.content || '',
+          templateRef: entryData.templateRef,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .returning();
+      
+      return {
+        id: entry.id,
+        title: entry.title || '',
+        content: entry.content || '',
+        templateRef: entry.templateRef,
+        createdAt: entry.createdAt ? new Date(entry.createdAt).getTime() : Date.now(),
+        updatedAt: entry.updatedAt ? new Date(entry.updatedAt).getTime() : Date.now(),
+      };
+    } catch (error) {
+      handleDatabaseError(error, 'createJournalEntry');
+    }
+  }
+
+  async updateJournalEntry(userId, entryId, updates) {
+    try {
+      const [entry] = await db
+        .update(journalEntries)
+        .set({
+          ...(updates.title !== undefined && { title: updates.title }),
+          ...(updates.content !== undefined && { content: updates.content }),
+          ...(updates.templateRef !== undefined && { templateRef: updates.templateRef }),
+          updatedAt: new Date(),
+        })
+        .where(and(
+          eq(journalEntries.userId, userId),
+          eq(journalEntries.id, entryId)
+        ))
+        .returning();
+      
+      if (!entry) return null;
+      
+      return {
+        id: entry.id,
+        title: entry.title || '',
+        content: entry.content || '',
+        templateRef: entry.templateRef,
+        createdAt: entry.createdAt ? new Date(entry.createdAt).getTime() : Date.now(),
+        updatedAt: entry.updatedAt ? new Date(entry.updatedAt).getTime() : Date.now(),
+      };
+    } catch (error) {
+      handleDatabaseError(error, 'updateJournalEntry');
+    }
+  }
+
+  async deleteJournalEntry(userId, entryId) {
+    try {
+      const [deleted] = await db
+        .delete(journalEntries)
+        .where(and(
+          eq(journalEntries.userId, userId),
+          eq(journalEntries.id, entryId)
+        ))
+        .returning();
+      
+      return deleted;
+    } catch (error) {
+      handleDatabaseError(error, 'deleteJournalEntry');
+    }
+  }
+
+  async bulkCreateJournalEntries(userId, entries) {
+    try {
+      if (!entries || entries.length === 0) return [];
+      
+      const values = entries.map(e => ({
+        id: e.id,
+        userId,
+        title: e.title || '',
+        content: e.content || '',
+        templateRef: e.templateRef,
+        createdAt: e.createdAt ? new Date(e.createdAt) : new Date(),
+        updatedAt: e.updatedAt ? new Date(e.updatedAt) : new Date(),
+      }));
+      
+      const created = await db
+        .insert(journalEntries)
+        .values(values)
+        .onConflictDoNothing()
+        .returning();
+      
+      return created.map(entry => ({
+        id: entry.id,
+        title: entry.title || '',
+        content: entry.content || '',
+        templateRef: entry.templateRef,
+        createdAt: entry.createdAt ? new Date(entry.createdAt).getTime() : Date.now(),
+        updatedAt: entry.updatedAt ? new Date(entry.updatedAt).getTime() : Date.now(),
+      }));
+    } catch (error) {
+      handleDatabaseError(error, 'bulkCreateJournalEntries');
     }
   }
 }

@@ -45,3 +45,21 @@ export const pinnedItems = pgTable(
     unique("unique_user_item").on(table.userId, table.itemName),
   ]
 );
+
+// Journal entries table - stores user's writing entries (synced across devices)
+export const journalEntries = pgTable(
+  "journal_entries",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: varchar("user_id").notNull(),
+    title: varchar("title").notNull().default(''),
+    content: varchar("content").notNull().default(''),
+    templateRef: varchar("template_ref"),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => [
+    index("IDX_journal_entries_user_id").on(table.userId),
+    index("IDX_journal_entries_updated").on(table.userId, table.updatedAt),
+  ]
+);

@@ -533,6 +533,101 @@ app.delete('/api/pinned-items/:itemName', isAuthenticated, async (req, res) => {
   }
 });
 
+// Journal entries routes - require authentication
+app.get('/api/journal', isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.user.claims.sub;
+    const entries = await storage.getJournalEntries(userId);
+    res.json({ entries });
+  } catch (error) {
+    logger.error("Error fetching journal entries", error);
+    res.status(500).json({ error: "Failed to fetch journal entries" });
+  }
+});
+
+app.post('/api/journal', isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.user.claims.sub;
+    const { id, title, content, templateRef } = req.body;
+
+    if (!id) {
+      return res.status(400).json({ error: "Entry ID is required" });
+    }
+
+    const entry = await storage.createJournalEntry(userId, {
+      id,
+      title: title || '',
+      content: content || '',
+      templateRef,
+    });
+    res.json({ entry });
+  } catch (error) {
+    logger.error("Error creating journal entry", error);
+    const statusCode = error?.code === '23505' ? 409 : 500;
+    res.status(statusCode).json({ 
+      error: statusCode === 409 ? "Entry already exists" : "Failed to create journal entry"
+    });
+  }
+});
+
+app.patch('/api/journal/:id', isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.user.claims.sub;
+    const { id } = req.params;
+    const { title, content, templateRef } = req.body;
+
+    const entry = await storage.updateJournalEntry(userId, id, {
+      title,
+      content,
+      templateRef,
+    });
+
+    if (!entry) {
+      return res.status(404).json({ error: "Entry not found" });
+    }
+
+    res.json({ entry });
+  } catch (error) {
+    logger.error("Error updating journal entry", error);
+    res.status(500).json({ error: "Failed to update journal entry" });
+  }
+});
+
+app.delete('/api/journal/:id', isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.user.claims.sub;
+    const { id } = req.params;
+
+    const deleted = await storage.deleteJournalEntry(userId, id);
+    
+    if (!deleted) {
+      return res.status(404).json({ error: "Entry not found" });
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    logger.error("Error deleting journal entry", error);
+    res.status(500).json({ error: "Failed to delete journal entry" });
+  }
+});
+
+app.post('/api/journal/migrate', isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.user.claims.sub;
+    const { entries } = req.body;
+
+    if (!Array.isArray(entries)) {
+      return res.status(400).json({ error: "Entries must be an array" });
+    }
+
+    const created = await storage.bulkCreateJournalEntries(userId, entries);
+    res.json({ migrated: created.length, entries: created });
+  } catch (error) {
+    logger.error("Error migrating journal entries", error);
+    res.status(500).json({ error: "Failed to migrate journal entries" });
+  }
+});
+
 // Delete user account and all associated data
 app.delete('/api/auth/delete-account', isAuthenticated, async (req, res) => {
   try {
