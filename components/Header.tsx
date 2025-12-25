@@ -1,10 +1,12 @@
-import React, { useState, Suspense, lazy } from 'react';
+import React, { useState, Suspense, lazy, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { useAuth } from '../hooks/useAuth.js';
 import { BookPenIcon } from './icons/BookPenIcon';
 import { useTheme } from '../hooks/useTheme';
-const Notebook = lazy(() => import('./Notebook').then(module => ({ default: module.Notebook })));
+
+const notebookImport = () => import('./Notebook').then(module => ({ default: module.Notebook }));
+const Notebook = lazy(notebookImport);
 
 const NotebookFallback = () => (
   <div className="fixed inset-0 z-40 flex items-end justify-end pointer-events-none">
@@ -18,6 +20,12 @@ export const Header: React.FC = () => {
   const { mode } = useTheme();
   const [isNotebookOpen, setIsNotebookOpen] = useState(false);
   const [isNotebookHovered, setIsNotebookHovered] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      notebookImport();
+    }
+  }, [isAuthenticated]);
 
   return (
     <>
@@ -84,7 +92,7 @@ export const Header: React.FC = () => {
           </div>
         </div>
       </header>
-      {isAuthenticated && isNotebookOpen && (
+      {isAuthenticated && (
         <Suspense fallback={<NotebookFallback />}>
           <Notebook isOpen={isNotebookOpen} onClose={() => setIsNotebookOpen(false)} />
         </Suspense>
