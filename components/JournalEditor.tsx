@@ -417,18 +417,24 @@ export const JournalEditor: React.FC = () => {
             <button
               onClick={handleManualSave}
               disabled={isSaving}
-              className="px-2 py-1 rounded-md text-xs font-medium transition-colors border bg-bg text-muted border-default/30 hover:text-default hover:border-default hover:bg-accent/10 disabled:opacity-50"
+              className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-green-500 hover:bg-green-500/15 hover:shadow-[0_0_8px_rgba(34,197,94,0.3)] disabled:opacity-50 disabled:hover:text-muted disabled:hover:bg-transparent disabled:hover:shadow-none"
               title="Save Entry"
             >
-              {isSaving ? 'Saving...' : 'Save'}
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
             </button>
             <button
               onClick={() => setShowDeleteConfirm(true)}
-              className="px-2 py-1 rounded-md text-xs font-medium transition-colors border bg-bg text-red-400 border-red-400/30 hover:bg-red-500/10 hover:border-red-400"
+              className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-red-500 hover:bg-red-500/15 hover:shadow-[0_0_8px_rgba(239,68,68,0.3)]"
               title="Delete Entry"
             >
-              Delete
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
             </button>
+            <span className="h-4 w-px bg-default/20"></span>
             <button
               onClick={() => setShowTemplate(!showTemplate)}
               className={`px-2 py-1 rounded-md text-xs font-medium transition-colors border ${showTemplate
