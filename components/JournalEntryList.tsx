@@ -117,8 +117,8 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
                 </div>
                 
                 {/* Content Preview (Desktop) */}
-                <div className="hidden sm:block text-xs text-muted/70 line-clamp-2 leading-4 mb-2">
-                  {entry.content?.slice(0, 150) || <span className="italic opacity-50">Empty note...</span>}
+                <div className="hidden sm:block text-xs text-muted/70 truncate mb-2">
+                  {entry.content?.slice(0, 60) || <span className="italic opacity-50">Empty note...</span>}
                 </div>
 
                 {/* Mobile Date (fallback) */}
