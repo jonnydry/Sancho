@@ -139,7 +139,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
 
     return (
         <div 
-            className={`border-l border-default bg-bg-alt/20 flex flex-col h-full animate-slide-in-right absolute sm:relative z-10 sm:z-0 right-0 top-0 bottom-0 shadow-xl sm:shadow-none ${width ? '' : 'w-full sm:w-80'}`}
+            className={`border-l border-default bg-bg-alt/20 flex flex-col h-full overflow-y-auto animate-slide-in-right absolute sm:relative z-10 sm:z-0 right-0 top-0 bottom-0 shadow-xl sm:shadow-none ${width ? '' : 'w-full sm:w-80'}`}
             style={width ? { width } : undefined}
         >
             {/* Header */}
@@ -182,11 +182,11 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                 </button>
             </div>
 
-            <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex flex-col">
                 {activeTab === 'saved' ? (
                     /* Saved Items View - compact, resizable */
                     <div 
-                        className="shrink-0 overflow-y-auto p-4"
+                        className="shrink-0 p-4"
                         style={{ maxHeight: savedListHeight }}
                     >
                         {pinnedItems.length > 0 ? (
