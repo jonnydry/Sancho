@@ -52,10 +52,10 @@ const ResizeHandle: React.FC<ResizeHandleProps> = ({ onResize, className }) => {
 
   return (
     <div
-      className={`w-1 hover:w-1.5 cursor-col-resize hover:bg-accent/50 transition-all z-10 flex flex-col justify-center items-center group relative ${isDragging ? 'bg-accent w-1.5' : 'bg-transparent'} ${className || ''}`}
+      className={`w-[3px] cursor-col-resize z-10 flex flex-col justify-center items-center group relative ${isDragging ? 'bg-accent/40' : 'bg-transparent hover:bg-accent/30'} ${className || ''}`}
       onMouseDown={() => setIsDragging(true)}
     >
-        <div className={`w-0.5 h-8 rounded-full bg-border group-hover:bg-accent ${isDragging ? 'bg-accent' : ''}`} />
+        <div className={`w-px h-5 rounded-full ${isDragging ? 'bg-accent' : 'bg-border/40 group-hover:bg-accent/60'}`} />
     </div>
   );
 };
@@ -299,7 +299,7 @@ export const JournalEditor: React.FC = () => {
             onDelete={deleteEntry}
             width={entryListWidth}
           />
-          <ResizeHandle onResize={handleResizeEntryList} className="border-r border-default/50" />
+          <ResizeHandle onResize={handleResizeEntryList} />
         </>
       )}
 
@@ -357,7 +357,7 @@ export const JournalEditor: React.FC = () => {
 
       {showTemplate && (
         <>
-          <ResizeHandle onResize={handleResizeReferencePane} className="border-l border-default/50" />
+          <ResizeHandle onResize={handleResizeReferencePane} />
           <ReferencePane
             isOpen={showTemplate}
             onClose={() => setShowTemplate(false)}
