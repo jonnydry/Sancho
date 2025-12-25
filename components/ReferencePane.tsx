@@ -182,12 +182,12 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                 </button>
             </div>
 
-            <div className="flex flex-col">
+            <div className="flex-1 flex flex-col min-h-0">
                 {activeTab === 'saved' ? (
-                    /* Saved Items View - compact, resizable */
+                    /* Saved Items View - fixed height, scrollable */
                     <div 
-                        className="shrink-0 p-4"
-                        style={{ maxHeight: savedListHeight }}
+                        className="shrink-0 p-4 overflow-y-auto"
+                        style={{ height: savedListHeight }}
                     >
                         {pinnedItems.length > 0 ? (
                             <div className="space-y-2">
@@ -281,13 +281,12 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                     </div>
                 )}
 
-                {/* Selected Item Details (Bottom Panel) - fits content */}
+                {/* Selected Item Details (Bottom Panel) - fits content, scrolls if needed */}
                 {activeItem && (
                     <>
                     <VerticalResizeHandle onResize={handleResizeSavedList} />
-                    <div 
-                        className="border-t border-default bg-bg p-4 overflow-y-auto"
-                    >
+                    <div className="flex-1 min-h-0 border-t border-default bg-bg overflow-y-auto">
+                        <div className="p-4">
                         <div className="flex justify-between items-start mb-3">
                             <h4 className="font-bold text-sm text-default">{activeItem.name}</h4>
                             <button
@@ -351,6 +350,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                                     </div>
                                 </div>
                             )}
+                        </div>
                         </div>
                     </div>
                     </>
