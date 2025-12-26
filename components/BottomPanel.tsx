@@ -76,6 +76,7 @@ const VerticalResizeHandle: React.FC<{ onResize: (delta: number) => void }> = ({
       aria-orientation="horizontal"
       aria-label="Resize panel"
       tabIndex={0}
+      style={{ marginTop: '-1px' }}
     >
       <div className={`w-8 h-0.5 rounded-full ${isDragging ? 'bg-accent' : 'bg-transparent group-hover:bg-accent/60'}`} />
     </div>
@@ -161,7 +162,7 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
 
   return (
     <div 
-      className="flex flex-col border-t border-default/5 bg-bg"
+      className="flex flex-col border-t border-default/10 dark:border-default/5 bg-bg"
       style={{ height: isOpen ? height : headerHeight }}
     >
       {isOpen && <VerticalResizeHandle onResize={onResize} />}
