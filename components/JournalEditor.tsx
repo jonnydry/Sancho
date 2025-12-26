@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { JournalEntry, JournalStorage } from '../services/journalStorage';
 import { usePinnedItems } from '../contexts/PinnedItemsContext';
+import { useAuth } from '../hooks/useAuth';
 import { JournalEntryList } from './JournalEntryList';
 import { ReferencePane } from './ReferencePane';
 import { GridIcon } from './icons/GridIcon';
@@ -124,6 +125,7 @@ const ResizeHandle: React.FC<ResizeHandleProps> = ({ onResize, className }) => {
 
 export const JournalEditor: React.FC = () => {
   const { pinnedItems } = usePinnedItems();
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [content, setContent] = useState('');
@@ -554,7 +556,21 @@ export const JournalEditor: React.FC = () => {
   }, [content, title, activeTemplate, selectedId, handleSave, syncStatus]);
 
   return (
-    <div className="flex h-full overflow-hidden bg-bg relative">
+    <div className="flex flex-col h-full overflow-hidden bg-bg relative">
+      {!isAuthLoading && !isAuthenticated && (
+        <div className="bg-yellow-500/10 border-b border-yellow-500/30 px-4 py-2 flex items-center gap-2 shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-500 shrink-0">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <span className="text-sm text-yellow-600 dark:text-yellow-400">
+            <strong>Not logged in</strong> — Your notes are saved locally and may be lost if you clear browser data.{' '}
+            <a href="/api/login" className="underline hover:text-yellow-700 dark:hover:text-yellow-300">Log in</a> to sync across devices.
+          </span>
+        </div>
+      )}
+      <div className="flex flex-1 overflow-hidden">
       {showSidebar && (
         <>
           <JournalEntryList
@@ -604,14 +620,17 @@ export const JournalEditor: React.FC = () => {
                 </button>
               </div>
             )}
-            {!autosaveError && !showSaveError && syncStatus === 'synced' && (
+            {!isAuthLoading && !isAuthenticated && (
+              <span className="text-xs text-yellow-500 font-medium" title="Not logged in - saved locally only">Local Only</span>
+            )}
+            {isAuthenticated && !autosaveError && !showSaveError && syncStatus === 'synced' && (
               <span className="text-xs text-green-500/70 font-medium" title="Synced to server">●</span>
             )}
-            {syncStatus === 'syncing' && (
+            {isAuthenticated && syncStatus === 'syncing' && (
               <span className="text-xs text-muted font-medium animate-pulse" title="Syncing...">Syncing...</span>
             )}
-            {syncStatus === 'local' && (
-              <span className="text-xs text-yellow-500/70 font-medium" title="Local changes">○</span>
+            {isAuthenticated && syncStatus === 'local' && (
+              <span className="text-xs text-yellow-500/70 font-medium" title="Local changes pending sync">○</span>
             )}
           </div>
 
@@ -687,6 +706,7 @@ export const JournalEditor: React.FC = () => {
           />
         </>
       )}
+      </div>
 
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
