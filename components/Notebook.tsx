@@ -140,8 +140,8 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
         <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-default">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <BookPenIcon className="w-6 h-6 text-default" heartFilled={true} />
-              <h2 id="notebook-title" className="text-lg sm:text-xl font-bold text-default">
+              <BookPenIcon className="w-5 h-5 text-default" heartFilled={true} />
+              <h2 id="notebook-title" className="text-lg font-bold text-default leading-none">
                 Notebook
               </h2>
             </div>
