@@ -1,12 +1,30 @@
-import React, { useState, useMemo, useEffect, Suspense, lazy } from 'react';
+import React, { useState, useMemo, useEffect, Suspense, lazy, useRef } from 'react';
 import { PoetryCard } from '../components/PoetryCard';
 import { SearchFilter } from '../components/SearchFilter';
 import { PoetryItem } from '../types';
 import { SanchoQuote } from '../components/SanchoQuote';
 import { DataLoadingSkeleton } from '../components/DataLoadingSkeleton';
+import { usePinnedItems } from '../contexts/PinnedItemsContext';
 
 import { ArrowDownIcon } from '../components/icons/ArrowDownIcon';
 import { XIcon } from '../components/icons/XIcon';
+
+// Seeded random shuffle for consistent but random-looking order
+const seededShuffle = <T,>(array: T[], seed: number): T[] => {
+  const result = [...array];
+  let currentSeed = seed;
+  
+  const random = () => {
+    currentSeed = (currentSeed * 1103515245 + 12345) & 0x7fffffff;
+    return currentSeed / 0x7fffffff;
+  };
+  
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+};
 
 // Lazy load modal component (only loads when needed)
 const PoetryDetailModal = lazy(() => import('../components/PoetryDetailModal').then(module => ({ default: module.PoetryDetailModal })));
@@ -19,6 +37,11 @@ export const HomePage: React.FC = () => {
   const [allData, setAllData] = useState<PoetryItem[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [itemsToShow, setItemsToShow] = useState(10);
+  
+  const { isPinned } = usePinnedItems();
+  
+  // Generate a random seed once per session for consistent shuffle
+  const randomSeedRef = useRef<number>(Math.floor(Math.random() * 1000000));
 
   useEffect(() => {
     const loadData = async () => {
@@ -76,7 +99,8 @@ export const HomePage: React.FC = () => {
     const hasQuery = query.length > 0;
     const filterType = activeFilter;
 
-    return allData.filter(item => {
+    // First, filter the data
+    const filtered = allData.filter(item => {
       // Type filter
       if (filterType !== 'all' && item.type !== filterType) {
         return false;
@@ -100,7 +124,27 @@ export const HomePage: React.FC = () => {
 
       return true;
     });
-  }, [searchQuery, activeFilter, activeTagFilter, allData]);
+
+    // Split into pinned and unpinned first
+    const pinned = filtered.filter(item => isPinned(item.name));
+    const unpinned = filtered.filter(item => !isPinned(item.name));
+    
+    // Apply sorting/shuffling only to unpinned items
+    let sortedUnpinned: PoetryItem[];
+    
+    if (filterType === 'all') {
+      // Random shuffle for "All" view (only unpinned)
+      sortedUnpinned = seededShuffle(unpinned, randomSeedRef.current);
+    } else {
+      // Alphabetical sort for specific category views
+      sortedUnpinned = [...unpinned].sort((a, b) => a.name.localeCompare(b.name));
+    }
+    
+    // Pinned items stay at top (sorted alphabetically for consistency)
+    const sortedPinned = [...pinned].sort((a, b) => a.name.localeCompare(b.name));
+    
+    return [...sortedPinned, ...sortedUnpinned];
+  }, [searchQuery, activeFilter, activeTagFilter, allData, isPinned]);
 
   const displayedData = useMemo(() => {
     return filteredData.slice(0, itemsToShow);

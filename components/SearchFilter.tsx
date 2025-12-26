@@ -17,7 +17,7 @@ interface SearchFilterProps {
 }
 
 const filters: { label: string; value: FilterType; icon: React.FC<React.SVGProps<SVGSVGElement>> }[] = [
-  { label: 'All', value: 'all', icon: GridIcon },
+  { label: 'All (Random)', value: 'all', icon: GridIcon },
   { label: 'Forms', value: 'Form', icon: PoeticFormsIcon },
   { label: 'Meters', value: 'Meter', icon: PoeticMetersIcon },
   { label: 'Devices', value: 'Device', icon: LiteraryDevicesIcon },
