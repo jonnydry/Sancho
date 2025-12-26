@@ -1,10 +1,13 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { JournalEntry, JournalStorage } from '../services/journalStorage';
 import { usePinnedItems } from '../contexts/PinnedItemsContext';
 import { useAuth } from '../hooks/useAuth';
 import { JournalEntryList } from './JournalEntryList';
 import { ReferencePane } from './ReferencePane';
+import { BottomPanel } from './BottomPanel';
 import { GridIcon } from './icons/GridIcon';
+import { poetryData } from '../data/poetryData';
+import { poeticDevicesData } from '../data/poeticDevicesData';
 
 const generateUUID = (): string => {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
@@ -146,6 +149,9 @@ export const JournalEditor: React.FC = () => {
   
   const [entryListWidth, setEntryListWidth] = useState(240);
   const [referencePaneWidth, setReferencePaneWidth] = useState(320);
+  const [bottomPanelOpen, setBottomPanelOpen] = useState(false);
+  const [bottomPanelHeight, setBottomPanelHeight] = useState(250);
+  const [referenceSearchQuery, setReferenceSearchQuery] = useState<string | null>(null);
 
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const previousSelectedIdRef = useRef<string | null>(null);
@@ -196,6 +202,31 @@ export const JournalEditor: React.FC = () => {
       if (newWidth > 600) return 600;
       return newWidth;
     });
+  }, []);
+
+  const handleResizeBottomPanel = useCallback((delta: number) => {
+    setBottomPanelHeight(prev => {
+      const newHeight = prev + delta;
+      if (newHeight < 150) return 150;
+      if (newHeight > 500) return 500;
+      return newHeight;
+    });
+  }, []);
+
+  const allItems = useMemo(() => [...poetryData, ...poeticDevicesData], []);
+
+  const activeItem = useMemo(() => {
+    if (!activeTemplate) return null;
+    return allItems.find(item => item.name === activeTemplate) || null;
+  }, [activeTemplate, allItems]);
+
+  const handleBottomPanelTagClick = useCallback((tag: string) => {
+    setShowTemplate(true);
+    setReferenceSearchQuery(tag);
+  }, []);
+
+  const handleBottomPanelSeeAlsoClick = useCallback((name: string) => {
+    setActiveTemplate(name);
   }, []);
 
   useEffect(() => {
@@ -690,6 +721,18 @@ export const JournalEditor: React.FC = () => {
               className="w-full h-full min-h-[300px] bg-transparent border-none outline-none resize-none text-sm leading-relaxed text-default placeholder:text-muted/30"
             />
           </div>
+
+          {activeItem && (
+            <BottomPanel
+              item={activeItem}
+              isOpen={bottomPanelOpen}
+              onToggle={() => setBottomPanelOpen(!bottomPanelOpen)}
+              height={bottomPanelHeight}
+              onResize={handleResizeBottomPanel}
+              onTagClick={handleBottomPanelTagClick}
+              onSeeAlsoClick={handleBottomPanelSeeAlsoClick}
+            />
+          )}
         </div>
       </div>
 
@@ -703,6 +746,8 @@ export const JournalEditor: React.FC = () => {
             onSelectTemplate={setActiveTemplate}
             onInsert={handleInsert}
             width={referencePaneWidth}
+            initialSearchQuery={referenceSearchQuery}
+            onSearchQueryConsumed={() => setReferenceSearchQuery(null)}
           />
         </>
       )}

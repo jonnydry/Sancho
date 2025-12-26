@@ -122,6 +122,8 @@ interface ReferencePaneProps {
     onSelectTemplate: (name: string) => void;
     onInsert?: (text: string) => void;
     width?: number | string;
+    initialSearchQuery?: string | null;
+    onSearchQueryConsumed?: () => void;
 }
 
 type Tab = 'saved' | 'search';
@@ -133,6 +135,8 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
     onSelectTemplate,
     onInsert,
     width,
+    initialSearchQuery,
+    onSearchQueryConsumed,
 }) => {
     const { pinnedItems, pinItem, unpinItem, isPinned } = usePinnedItems();
     const [activeTab, setActiveTab] = useState<Tab>(pinnedItems.length > 0 ? 'saved' : 'search');
@@ -151,6 +155,14 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
     useEffect(() => {
         localStorage.setItem('journal_saved_list_height', savedListHeight.toString());
     }, [savedListHeight]);
+
+    useEffect(() => {
+        if (initialSearchQuery) {
+            setSearchQuery(initialSearchQuery);
+            setActiveTab('search');
+            onSearchQueryConsumed?.();
+        }
+    }, [initialSearchQuery, onSearchQueryConsumed]);
 
     const handleResizeSavedList = useCallback((delta: number) => {
         setSavedListHeight(prev => {
