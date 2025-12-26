@@ -137,7 +137,7 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
         aria-labelledby="notebook-title"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-default">
+        <div className="flex items-center justify-between px-4 sm:px-6 h-16 border-b border-default">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <BookPenIcon className="w-5 h-5 text-default" heartFilled={true} />
@@ -147,10 +147,10 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
             </div>
             
             {/* Tabs */}
-            <div className="flex bg-bg-alt/50 rounded-lg p-1 ml-4">
+            <div className="flex bg-bg-alt/50 rounded p-0.5 ml-4">
               <button
                 onClick={() => setActiveTab('saved')}
-                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
+                className={`px-2.5 py-0.5 text-xs font-medium rounded leading-none transition-all ${
                   activeTab === 'saved' 
                     ? 'bg-accent text-accent-text shadow-sm' 
                     : 'text-muted hover:text-default hover:bg-accent/10'
@@ -158,14 +158,14 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
               >
                 Saved Items
                 {pinnedItems.length > 0 && activeTab !== 'saved' && (
-                  <span className="ml-1.5 text-[10px] bg-accent/20 text-accent px-1.5 py-0.5 rounded-full">
+                  <span className="ml-1.5 text-[10px] bg-accent/20 text-accent px-1 py-0 rounded-full leading-none">
                     {pinnedItems.length}
                   </span>
                 )}
               </button>
               <button
                 onClick={() => setActiveTab('journal')}
-                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
+                className={`px-2.5 py-0.5 text-xs font-medium rounded leading-none transition-all ${
                   activeTab === 'journal' 
                     ? 'bg-accent text-accent-text shadow-sm' 
                     : 'text-muted hover:text-default hover:bg-accent/10'
@@ -181,7 +181,7 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
             className="text-muted hover:text-default transition-colors"
             aria-label="Close Notebook"
           >
-            <XIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+            <XIcon className="w-5 h-5" />
           </button>
         </div>
 
