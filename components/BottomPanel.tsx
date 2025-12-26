@@ -162,7 +162,7 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
 
   return (
     <div 
-      className="flex flex-col border-t border-default/10 dark:border-default/5 bg-bg"
+      className="flex flex-col border-t border-default bg-bg"
       style={{ height: isOpen ? height : headerHeight }}
     >
       {isOpen && <VerticalResizeHandle onResize={onResize} />}
