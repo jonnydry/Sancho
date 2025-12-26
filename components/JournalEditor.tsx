@@ -14,6 +14,7 @@ import { BottomPanel } from "./BottomPanel";
 import { GridIcon } from "./icons/GridIcon";
 import { poetryData } from "../data/poetryData";
 import { poeticDevicesData } from "../data/poeticDevicesData";
+import { getTextareaCaretCoordinates } from "../utils/textareaCaret";
 
 const generateUUID = (): string => {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
@@ -181,6 +182,7 @@ export const JournalEditor: React.FC = () => {
   const retryCountRef = useRef<number>(0);
   const previousSelectedIdRef = useRef<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const editorContentContainerRef = useRef<HTMLDivElement>(null);
   const savedSelectionRef = useRef<{ start: number; end: number } | null>(null);
   const currentStateRef = useRef<{
     title: string;
@@ -192,6 +194,216 @@ export const JournalEditor: React.FC = () => {
     content: "",
     entries: [],
   });
+
+  // Slash commands (Phase 1): line-based Markdown transforms
+  type SlashCommand = {
+    id: string;
+    label: string;
+    prefix: string;
+  };
+
+  type SlashContext = {
+    query: string;
+    slashPos: number;
+    cursorPos: number;
+    lineStart: number;
+    lineEnd: number;
+  };
+
+  const SLASH_COMMANDS = useMemo<SlashCommand[]>(
+    () => [
+      { id: "h1", label: "Heading 1", prefix: "# " },
+      { id: "h2", label: "Heading 2", prefix: "## " },
+      { id: "h3", label: "Heading 3", prefix: "### " },
+      { id: "ul", label: "Bullet List", prefix: "- " },
+      { id: "ol", label: "Numbered List", prefix: "1. " },
+      { id: "check", label: "Check List", prefix: "- [ ] " },
+      { id: "quote", label: "Quote", prefix: "> " },
+    ],
+    [],
+  );
+
+  const [showSlashMenu, setShowSlashMenu] = useState(false);
+  const [slashQuery, setSlashQuery] = useState("");
+  const [slashIndex, setSlashIndex] = useState(0);
+  const [slashMenuPosition, setSlashMenuPosition] = useState<{
+    top: number;
+    left: number;
+  } | null>(null);
+  const [slashContext, setSlashContext] = useState<SlashContext | null>(null);
+
+  const filteredSlashCommands = useMemo(() => {
+    const q = slashQuery.trim().toLowerCase();
+    if (!q) return SLASH_COMMANDS;
+    return SLASH_COMMANDS.filter(
+      (c) =>
+        c.id.toLowerCase().includes(q) ||
+        c.label.toLowerCase().includes(q) ||
+        `/${c.id}`.includes(q),
+    );
+  }, [SLASH_COMMANDS, slashQuery]);
+
+  const getSlashContextForValue = useCallback(
+    (value: string, cursorPos: number): SlashContext | null => {
+      const pos = Math.max(0, Math.min(cursorPos, value.length));
+      const lineStart = value.lastIndexOf("\n", pos - 1) + 1;
+      const lineEndIdx = value.indexOf("\n", pos);
+      const lineEnd = lineEndIdx === -1 ? value.length : lineEndIdx;
+      const beforeCursorInLine = value.slice(lineStart, pos);
+
+      // Match a trailing slash command, requiring start-of-line or whitespace before '/'
+      const match = beforeCursorInLine.match(/(?:^|\s)\/([a-z0-9]*)$/i);
+      if (!match) return null;
+
+      const matchText = match[0];
+      const query = match[1] || "";
+      const slashInMatchIndex = matchText.lastIndexOf("/");
+      const slashPos = pos - (matchText.length - slashInMatchIndex);
+
+      return { query, slashPos, cursorPos: pos, lineStart, lineEnd };
+    },
+    [],
+  );
+
+  const updateSlashMenuPosition = useCallback(
+    (textarea: HTMLTextAreaElement, cursorPos: number) => {
+      const coords = getTextareaCaretCoordinates(textarea, cursorPos);
+      const containerRect =
+        editorContentContainerRef.current?.getBoundingClientRect();
+      if (!containerRect) return;
+
+      // Position relative to the container
+      let top = coords.top - containerRect.top + coords.height;
+      let left = coords.left - containerRect.left;
+
+      // Clamp within container bounds (basic)
+      const padding = 8;
+      top = Math.max(padding, top);
+      left = Math.max(padding, left);
+
+      setSlashMenuPosition({ top, left });
+    },
+    [],
+  );
+
+  const closeSlashMenu = useCallback(() => {
+    setShowSlashMenu(false);
+    setSlashQuery("");
+    setSlashIndex(0);
+    setSlashMenuPosition(null);
+    setSlashContext(null);
+  }, []);
+
+  const maybeOpenSlashMenu = useCallback(
+    (value: string, cursorPos: number) => {
+      const textarea = textareaRef.current;
+      const ctx = getSlashContextForValue(value, cursorPos);
+
+      if (!ctx || !textarea) {
+        if (showSlashMenu) closeSlashMenu();
+        return;
+      }
+
+      setShowSlashMenu(true);
+      setSlashQuery(ctx.query);
+      setSlashContext(ctx);
+      setSlashIndex(0);
+      updateSlashMenuPosition(textarea, cursorPos);
+    },
+    [
+      closeSlashMenu,
+      getSlashContextForValue,
+      showSlashMenu,
+      updateSlashMenuPosition,
+    ],
+  );
+
+  const applySlashCommand = useCallback(
+    (command: SlashCommand) => {
+      const textarea = textareaRef.current;
+      if (!textarea) return;
+
+      const value = textarea.value ?? content;
+      const cursorPos = textarea.selectionStart ?? value.length;
+      const ctx = getSlashContextForValue(value, cursorPos) ?? slashContext;
+      if (!ctx) return;
+
+      const before = value.slice(ctx.lineStart, ctx.slashPos);
+      const after = value.slice(ctx.cursorPos, ctx.lineEnd);
+      const lineWithoutCommand = (before + after).trim();
+      const newLine = `${command.prefix}${lineWithoutCommand}`;
+      const newValue =
+        value.slice(0, ctx.lineStart) + newLine + value.slice(ctx.lineEnd);
+
+      const newCursor = ctx.lineStart + newLine.length;
+
+      setContent(newValue);
+      requestAnimationFrame(() => {
+        const ta = textareaRef.current;
+        if (!ta) return;
+        ta.focus();
+        ta.setSelectionRange(newCursor, newCursor);
+      });
+
+      savedSelectionRef.current = { start: newCursor, end: newCursor };
+      closeSlashMenu();
+    },
+    [closeSlashMenu, content, getSlashContextForValue, slashContext],
+  );
+
+  const handleEditorContentChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const next = e.target.value;
+      const cursorPos = e.target.selectionStart ?? next.length;
+      setContent(next);
+      maybeOpenSlashMenu(next, cursorPos);
+    },
+    [maybeOpenSlashMenu],
+  );
+
+  const handleEditorKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (!showSlashMenu) return;
+
+      const total = filteredSlashCommands.length;
+      if (total === 0) return;
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setSlashIndex((prev) => (prev + 1) % total);
+        return;
+      }
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setSlashIndex((prev) => (prev - 1 + total) % total);
+        return;
+      }
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const cmd = filteredSlashCommands[slashIndex];
+        if (cmd) applySlashCommand(cmd);
+        return;
+      }
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeSlashMenu();
+      }
+    },
+    [
+      applySlashCommand,
+      closeSlashMenu,
+      filteredSlashCommands,
+      showSlashMenu,
+      slashIndex,
+    ],
+  );
+
+  const handleEditorScroll = useCallback(() => {
+    if (!showSlashMenu) return;
+    const textarea = textareaRef.current;
+    if (!textarea || !slashContext) return;
+    updateSlashMenuPosition(textarea, textarea.selectionStart ?? slashContext.cursorPos);
+  }, [showSlashMenu, slashContext, updateSlashMenuPosition]);
 
   useEffect(() => {
     const savedEntryWidth = localStorage.getItem("journal_entry_width");
@@ -591,7 +803,8 @@ export const JournalEditor: React.FC = () => {
         end: textareaRef.current.selectionEnd,
       };
     }
-  }, []);
+    closeSlashMenu();
+  }, [closeSlashMenu]);
 
   const handleInsert = useCallback(
     (textToInsert: string) => {
@@ -879,15 +1092,65 @@ export const JournalEditor: React.FC = () => {
               />
             </div>
 
-            <div className="flex-1 relative overflow-auto px-4 sm:px-6 py-2">
+            <div
+              ref={editorContentContainerRef}
+              className="flex-1 relative overflow-auto px-4 sm:px-6 py-2"
+            >
               <textarea
                 ref={textareaRef}
                 value={content}
-                onChange={(e) => setContent(e.target.value)}
+                onChange={handleEditorContentChange}
+                onKeyDown={handleEditorKeyDown}
+                onScroll={handleEditorScroll}
                 onBlur={handleTextareaBlur}
-                placeholder="Start writing..."
+                placeholder="Start writing... Type '/' for commands"
                 className="w-full h-full min-h-[300px] bg-transparent border-none outline-none resize-none text-sm leading-relaxed text-default placeholder:text-muted/30"
               />
+
+              {showSlashMenu &&
+                slashMenuPosition &&
+                filteredSlashCommands.length > 0 && (
+                  <div
+                    className="absolute z-20 min-w-[220px] max-w-[320px] bg-bg border border-default/60 rounded-lg shadow-xl overflow-hidden"
+                    style={{
+                      top: slashMenuPosition.top,
+                      left: slashMenuPosition.left,
+                    }}
+                    role="listbox"
+                    aria-label="Slash commands"
+                  >
+                    <div className="px-2 py-1 text-[10px] uppercase tracking-wider text-muted border-b border-default/40 bg-bg/70">
+                      Formatting
+                    </div>
+                    <div className="max-h-56 overflow-auto">
+                      {filteredSlashCommands.map((cmd, idx) => {
+                        const isActive = idx === slashIndex;
+                        return (
+                          <button
+                            key={cmd.id}
+                            type="button"
+                            className={`w-full flex items-center justify-between gap-3 px-3 py-2 text-left text-xs transition-colors ${
+                              isActive
+                                ? "bg-accent/15 text-default"
+                                : "text-default hover:bg-bg-alt/60"
+                            }`}
+                            onMouseEnter={() => setSlashIndex(idx)}
+                            onMouseDown={(ev) => {
+                              // Prevent textarea blur before we apply the command
+                              ev.preventDefault();
+                            }}
+                            onClick={() => applySlashCommand(cmd)}
+                          >
+                            <span className="truncate">{cmd.label}</span>
+                            <span className="font-mono text-[11px] text-muted">
+                              /{cmd.id}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
             </div>
 
             {activeItem && (
