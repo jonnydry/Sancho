@@ -69,7 +69,10 @@ export const JournalStorage = {
       });
       console.log(`[Journal] Entry saved to server successfully`);
     } catch (error: unknown) {
-      if (error instanceof Error && error.message.includes('404')) {
+      const errorMsg = error instanceof Error ? error.message.toLowerCase() : '';
+      const isNotFound = errorMsg.includes('404') || errorMsg.includes('not found');
+      
+      if (isNotFound) {
         console.log(`[Journal] Entry not found, creating new entry on server`);
         try {
           await fetchWithAuth('/api/journal', {
