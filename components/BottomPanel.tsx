@@ -161,12 +161,12 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
 
   return (
     <div 
-      className="flex flex-col border-t border-default/30 bg-bg"
+      className="flex flex-col border-t border-default/20 bg-bg"
       style={{ height: isOpen ? height : headerHeight }}
     >
       {isOpen && <VerticalResizeHandle onResize={onResize} />}
       
-      <div className="flex items-center justify-between px-3 py-1.5 bg-bg-alt/50 border-b border-default/20" style={{ minHeight: headerHeight - 3 }}>
+      <div className="flex items-center justify-between px-3 py-1.5 bg-bg border-b border-default/10" style={{ minHeight: headerHeight - 3 }}>
         <div className="flex items-center gap-1">
           {tabs.map((tab) => (
             <button
