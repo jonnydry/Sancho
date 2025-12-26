@@ -29,7 +29,7 @@ The project utilizes a dual-server architecture with a React frontend (Vite) and
 - **Database**: PostgreSQL managed with Drizzle ORM for user and session data, including journal entries.
 - **Performance**: Optimized build, rate limiting on API endpoints, client-side quote caching, and aggressive model selection.
 - **Error Handling**: React Error Boundary for graceful fallback UI and improved error messages for authentication.
-- **Notebook Feature**: Allows users to save journal entries, synchronized to the server with offline fallback.
+- **Notebook Feature**: Allows users to save journal entries, synchronized to the server with offline fallback. Shows a warning banner when not logged in, with "Local Only" status indicator and detailed console logging for debugging.
 
 **System Design Choices:**
 - **Modular Structure**: Organized into logical directories (components, contexts, data, hooks, pages, services, server).
