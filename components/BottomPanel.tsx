@@ -66,7 +66,7 @@ const VerticalResizeHandle: React.FC<{ onResize: (delta: number) => void }> = ({
 
   return (
     <div
-      className={`h-[3px] cursor-row-resize flex items-center justify-center group ${isDragging ? 'bg-accent/40' : 'bg-transparent hover:bg-accent/30'}`}
+      className={`h-[1px] cursor-row-resize flex items-center justify-center group ${isDragging ? 'bg-accent/40' : 'bg-transparent hover:bg-accent/30'}`}
       onMouseDown={() => setIsDragging(true)}
       onTouchStart={(e) => {
         setIsDragging(true);
@@ -77,7 +77,7 @@ const VerticalResizeHandle: React.FC<{ onResize: (delta: number) => void }> = ({
       aria-label="Resize panel"
       tabIndex={0}
     >
-      <div className={`w-8 h-0.5 rounded-full ${isDragging ? 'bg-accent' : 'bg-border/40 group-hover:bg-accent/60'}`} />
+      <div className={`w-8 h-0.5 rounded-full ${isDragging ? 'bg-accent' : 'bg-transparent group-hover:bg-accent/60'}`} />
     </div>
   );
 };
