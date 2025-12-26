@@ -6,6 +6,9 @@ import { CheckIcon } from './icons/CheckIcon';
 import { usePinnedItems } from '../contexts/PinnedItemsContext';
 import { poetryData } from '../data/poetryData';
 import { poeticDevicesData } from '../data/poeticDevicesData';
+import { PoeticFormsIcon } from './icons/PoeticFormsIcon';
+import { PoeticMetersIcon } from './icons/PoeticMetersIcon';
+import { LiteraryDevicesIcon } from './icons/LiteraryDevicesIcon';
 
 interface VerticalResizeHandleProps {
   onResize: (delta: number) => void;
@@ -135,6 +138,11 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
     const [activeTab, setActiveTab] = useState<Tab>(pinnedItems.length > 0 ? 'saved' : 'search');
     const [searchQuery, setSearchQuery] = useState('');
     const [inserting, setInserting] = useState<string | null>(null);
+    const [expandedCategories, setExpandedCategories] = useState<{ forms: boolean; meters: boolean; devices: boolean }>({
+        forms: false,
+        meters: false,
+        devices: false,
+    });
     const [savedListHeight, setSavedListHeight] = useState(() => {
         const saved = localStorage.getItem('journal_saved_list_height');
         return saved ? parseInt(saved) : 100;
@@ -157,6 +165,29 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
     const allItems = useMemo(() => {
         return [...poetryData, ...poeticDevicesData];
     }, []);
+
+    // Categorize items for browse sections
+    const categorizedItems = useMemo(() => {
+        const forms: PoetryItem[] = [];
+        const meters: PoetryItem[] = [];
+        const devices: PoetryItem[] = [];
+
+        allItems.forEach((item) => {
+            if (item.type === 'Form') forms.push(item);
+            else if (item.type === 'Meter') meters.push(item);
+            else if (item.type === 'Device') devices.push(item);
+        });
+
+        forms.sort((a, b) => a.name.localeCompare(b.name));
+        meters.sort((a, b) => a.name.localeCompare(b.name));
+        devices.sort((a, b) => a.name.localeCompare(b.name));
+
+        return { forms, meters, devices };
+    }, [allItems]);
+
+    const toggleCategory = (category: 'forms' | 'meters' | 'devices') => {
+        setExpandedCategories(prev => ({ ...prev, [category]: !prev[category] }));
+    };
 
     // Filter items based on search query
     const searchResults = useMemo(() => {
@@ -335,8 +366,116 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                                     <p>No results found for "{searchQuery}"</p>
                                 </div>
                             ) : (
-                                <div className="text-center py-8 text-muted text-xs opacity-60">
-                                    <p>Type to search...</p>
+                                <div className="p-2 space-y-2">
+                                    <p className="text-[10px] text-muted uppercase tracking-wider font-bold mb-3">Browse by Category</p>
+                                    
+                                    {/* Forms Section */}
+                                    <div className="border border-default/30 rounded-md overflow-hidden">
+                                        <button
+                                            onClick={() => toggleCategory('forms')}
+                                            className="w-full flex items-center justify-between px-3 py-2 bg-bg/50 hover:bg-bg transition-colors"
+                                            aria-expanded={expandedCategories.forms}
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <PoeticFormsIcon className="w-3.5 h-3.5 text-accent" />
+                                                <span className="text-xs font-medium text-default">Forms</span>
+                                                <span className="text-[10px] text-muted">({categorizedItems.forms.length})</span>
+                                            </div>
+                                            <svg
+                                                className={`w-3 h-3 text-muted transition-transform duration-200 ${expandedCategories.forms ? 'rotate-180' : ''}`}
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </button>
+                                        {expandedCategories.forms && (
+                                            <div className="max-h-32 overflow-y-auto border-t border-default/20">
+                                                {categorizedItems.forms.map((item) => (
+                                                    <button
+                                                        key={item.name}
+                                                        onClick={() => onSelectTemplate(item.name)}
+                                                        className="w-full text-left px-3 py-1.5 text-xs text-muted hover:text-default hover:bg-accent/10 transition-colors truncate"
+                                                    >
+                                                        {item.name}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Meters Section */}
+                                    <div className="border border-default/30 rounded-md overflow-hidden">
+                                        <button
+                                            onClick={() => toggleCategory('meters')}
+                                            className="w-full flex items-center justify-between px-3 py-2 bg-bg/50 hover:bg-bg transition-colors"
+                                            aria-expanded={expandedCategories.meters}
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <PoeticMetersIcon className="w-3.5 h-3.5 text-accent" />
+                                                <span className="text-xs font-medium text-default">Meters</span>
+                                                <span className="text-[10px] text-muted">({categorizedItems.meters.length})</span>
+                                            </div>
+                                            <svg
+                                                className={`w-3 h-3 text-muted transition-transform duration-200 ${expandedCategories.meters ? 'rotate-180' : ''}`}
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </button>
+                                        {expandedCategories.meters && (
+                                            <div className="max-h-32 overflow-y-auto border-t border-default/20">
+                                                {categorizedItems.meters.map((item) => (
+                                                    <button
+                                                        key={item.name}
+                                                        onClick={() => onSelectTemplate(item.name)}
+                                                        className="w-full text-left px-3 py-1.5 text-xs text-muted hover:text-default hover:bg-accent/10 transition-colors truncate"
+                                                    >
+                                                        {item.name}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Devices Section */}
+                                    <div className="border border-default/30 rounded-md overflow-hidden">
+                                        <button
+                                            onClick={() => toggleCategory('devices')}
+                                            className="w-full flex items-center justify-between px-3 py-2 bg-bg/50 hover:bg-bg transition-colors"
+                                            aria-expanded={expandedCategories.devices}
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <LiteraryDevicesIcon className="w-3.5 h-3.5 text-accent" />
+                                                <span className="text-xs font-medium text-default">Devices</span>
+                                                <span className="text-[10px] text-muted">({categorizedItems.devices.length})</span>
+                                            </div>
+                                            <svg
+                                                className={`w-3 h-3 text-muted transition-transform duration-200 ${expandedCategories.devices ? 'rotate-180' : ''}`}
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </button>
+                                        {expandedCategories.devices && (
+                                            <div className="max-h-32 overflow-y-auto border-t border-default/20">
+                                                {categorizedItems.devices.map((item) => (
+                                                    <button
+                                                        key={item.name}
+                                                        onClick={() => onSelectTemplate(item.name)}
+                                                        className="w-full text-left px-3 py-1.5 text-xs text-muted hover:text-default hover:bg-accent/10 transition-colors truncate"
+                                                    >
+                                                        {item.name}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             )}
                         </div>
