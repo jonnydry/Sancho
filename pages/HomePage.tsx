@@ -36,12 +36,15 @@ export const HomePage: React.FC = () => {
   const [activeTagFilter, setActiveTagFilter] = useState<string | null>(null);
   const [allData, setAllData] = useState<PoetryItem[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
-  const [itemsToShow, setItemsToShow] = useState(10);
-  
+  const [itemsToShow, setItemsToShow] = useState(20); // Increased from 10 for better initial load
+
   const { isPinned } = usePinnedItems();
-  
+
   // Generate a random seed once per session for consistent shuffle
   const randomSeedRef = useRef<number>(Math.floor(Math.random() * 1000000));
+
+  // Intersection observer ref for auto-load
+  const observerTarget = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -63,8 +66,29 @@ export const HomePage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    setItemsToShow(10);
+    setItemsToShow(20); // Reset to initial chunk size
   }, [searchQuery, activeFilter, activeTagFilter]);
+
+  // Auto-load more items when scrolling to bottom
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && itemsToShow < filteredData.length) {
+          setItemsToShow(prev => Math.min(prev + 20, filteredData.length));
+        }
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '100px' // Start loading 100px before reaching bottom
+      }
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => observer.disconnect();
+  }, [itemsToShow, filteredData.length]);
 
   const handleCardClick = (item: PoetryItem) => {
     setModalItem(item);
@@ -210,6 +234,17 @@ export const HomePage: React.FC = () => {
                 />
               ))}
             </div>
+
+            {/* Loading skeleton for auto-loaded items */}
+            {itemsToShow < filteredData.length && (
+              <div className="mt-8 opacity-50">
+                <DataLoadingSkeleton count={2} />
+              </div>
+            )}
+
+            {/* Intersection observer target for auto-load */}
+            <div ref={observerTarget} className="h-4" />
+
             {itemsToShow < filteredData.length && (
               <div className="text-center mt-16">
                 <button

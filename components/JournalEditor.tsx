@@ -4,8 +4,9 @@ import React, {
   useRef,
   useCallback,
   useMemo,
+  lazy,
+  Suspense,
 } from "react";
-import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { JournalEntry, JournalStorage } from "../services/journalStorage";
 import { usePinnedItems } from "../contexts/PinnedItemsContext";
@@ -20,6 +21,21 @@ import { poetryData } from "../data/poetryData";
 import { poeticDevicesData } from "../data/poeticDevicesData";
 import { getCaretCoordinates } from "../utils/cursor";
 import { extractTagsFromContent, mergeTags, getAllTagsFromEntries } from "../utils/tagUtils";
+import { useLocalStorageSync } from '../hooks/useLocalStorageSync';
+
+// Lazy load ReactMarkdown - only loads when preview mode is activated
+const ReactMarkdown = lazy(() => import('react-markdown'));
+
+// Loading fallback for preview mode
+const PreviewLoadingFallback: React.FC = () => (
+  <div className="markdown-preview prose prose-sm max-w-none text-default">
+    <div className="space-y-2 animate-pulse">
+      <div className="h-4 bg-default/10 rounded w-3/4"></div>
+      <div className="h-4 bg-default/10 rounded w-5/6"></div>
+      <div className="h-4 bg-default/10 rounded w-2/3"></div>
+    </div>
+  </div>
+);
 
 const generateUUID = (): string => {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
@@ -246,10 +262,9 @@ export const JournalEditor: React.FC = () => {
     if (savedRefWidth) setReferencePaneWidth(parseInt(savedRefWidth));
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem("journal_entry_width", entryListWidth.toString());
-    localStorage.setItem("journal_ref_width", referencePaneWidth.toString());
-  }, [entryListWidth, referencePaneWidth]);
+  // Debounced localStorage sync for panel widths (prevents excessive writes during resize)
+  useLocalStorageSync("journal_entry_width", entryListWidth.toString(), 500);
+  useLocalStorageSync("journal_ref_width", referencePaneWidth.toString(), 500);
 
   // Persist daily goal
   useEffect(() => {
@@ -1392,11 +1407,13 @@ export const JournalEditor: React.FC = () => {
 
             <div className="flex-1 relative overflow-auto px-4 sm:px-6 py-2">
               {isPreviewMode ? (
-                <div className="markdown-preview prose prose-sm max-w-none text-default">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {content || '*Start writing to see preview...*'}
-                  </ReactMarkdown>
-                </div>
+                <Suspense fallback={<PreviewLoadingFallback />}>
+                  <div className="markdown-preview prose prose-sm max-w-none text-default">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {content || '*Start writing to see preview...*'}
+                    </ReactMarkdown>
+                  </div>
+                </Suspense>
               ) : (
                 <div className="relative h-full">
                   <textarea

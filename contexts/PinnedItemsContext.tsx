@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { PoetryItem } from '../types';
 import { useAuth } from '../hooks/useAuth.js';
 
@@ -13,19 +13,32 @@ interface PinnedItemsContextType {
 
 const PinnedItemsContext = createContext<PinnedItemsContextType | undefined>(undefined);
 
+// Client-side cache TTL - 30 seconds
+const CACHE_TTL = 30000;
+
 export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [pinnedItems, setPinnedItems] = useState<PoetryItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const cacheTimestampRef = useRef<number>(0);
 
-  const fetchPinnedItems = useCallback(async () => {
+  const fetchPinnedItems = useCallback(async (forceRefresh = false) => {
     // Wait for auth to finish loading before fetching pinned items
     if (isAuthLoading) {
       return;
     }
-    
+
     if (!isAuthenticated) {
       setPinnedItems([]);
+      return;
+    }
+
+    // Check cache freshness - skip fetch if cache is still valid
+    const now = Date.now();
+    const cacheAge = now - cacheTimestampRef.current;
+
+    if (!forceRefresh && cacheAge < CACHE_TTL && pinnedItems.length > 0) {
+      // Cache is still fresh, skip fetch
       return;
     }
 
@@ -38,6 +51,7 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
       if (response.ok) {
         const data = await response.json();
         setPinnedItems(data.items || []);
+        cacheTimestampRef.current = now; // Update cache timestamp
       } else {
         console.error('Failed to fetch pinned items');
         setPinnedItems([]);
@@ -48,11 +62,16 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
     } finally {
       setIsLoading(false);
     }
-  }, [isAuthenticated, isAuthLoading]);
+  }, [isAuthenticated, isAuthLoading, pinnedItems.length]);
 
   useEffect(() => {
     fetchPinnedItems();
   }, [fetchPinnedItems]);
+
+  // Invalidate cache when auth status changes
+  useEffect(() => {
+    cacheTimestampRef.current = 0; // Force refresh on next fetch
+  }, [isAuthenticated]);
 
   const pinItem = useCallback(async (item: PoetryItem) => {
     // Wait for auth to finish loading and ensure user is authenticated
@@ -103,8 +122,8 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
         if (import.meta.env.DEV) {
           console.log('Successfully pinned item:', item.name);
         }
-        // Refresh to ensure server state matches (handles race conditions)
-        await fetchPinnedItems();
+        // Update cache timestamp to mark data as fresh - no need to refetch
+        cacheTimestampRef.current = Date.now();
       } else {
         // Revert optimistic update on failure
         if (!wasAlreadyPinned) {
@@ -163,20 +182,18 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
         if (import.meta.env.DEV) {
           console.log('Successfully unpinned item:', itemName);
         }
-        // Refresh to ensure server state matches
-        await fetchPinnedItems();
+        // Update cache timestamp to mark data as fresh - optimistic update already done
+        cacheTimestampRef.current = Date.now();
       } else {
-        // Revert optimistic update on failure
+        // Revert optimistic update on failure by refreshing from server
         if (wasPinned) {
-          // Note: To revert, we'd need the full item data, which we don't have here
-          // So instead, just refresh to restore from server
-          await fetchPinnedItems();
+          await fetchPinnedItems(true); // force refresh
         }
         throw new Error('Server error unpinning item');
       }
     } catch (error) {
       // Revert by refreshing from server on error
-      await fetchPinnedItems();
+      await fetchPinnedItems(true); // force refresh
       console.error('Error unpinning item:', error);
       if (error instanceof Error) {
         throw error;
