@@ -1,13 +1,13 @@
 import { PoetryExampleResponse, SanchoQuoteResponse, LearnMoreResponse } from '../types';
 
-export const findPoetryExample = async (topic: string, previousExamples?: string[]): Promise<PoetryExampleResponse> => {
+export const findPoetryExample = async (topic: string, previousExample?: string): Promise<PoetryExampleResponse> => {
   try {
     const response = await fetch('/api/poetry-example', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ topic, previousExamples }),
+      body: JSON.stringify({ topic, previousExample }),
     });
 
     if (!response.ok) {

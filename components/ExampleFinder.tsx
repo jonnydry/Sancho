@@ -15,32 +15,26 @@ export const ExampleFinder: React.FC<ExampleFinderProps> = memo(({ topic, embedd
   const [example, setExample] = useState<PoetryExampleResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [exampleHistory, setExampleHistory] = useState<string[]>([]);
 
   // Reset state when topic changes
   useEffect(() => {
     setExample(null);
     setError(null);
-    setExampleHistory([]);
   }, [topic]);
 
   const handleFindExample = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      // Pass the full history of examples to ensure we get a different result
-      const result = await findPoetryExample(topic, exampleHistory);
+      // Pass the current example so the AI knows to pick something different
+      const result = await findPoetryExample(topic, example?.example);
       setExample(result);
-      // Add the new example to history (keep last 5 to avoid huge payloads)
-      if (result.example) {
-        setExampleHistory(prev => [...prev.slice(-4), result.example]);
-      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred.');
     } finally {
       setIsLoading(false);
     }
-  }, [topic, exampleHistory]);
+  }, [topic, example]);
 
   const containerClass = embedded
     ? "p-5 border-t border-accent/20"
