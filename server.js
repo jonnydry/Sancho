@@ -1,7 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import compression from 'compression';
+import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
+import crypto from 'crypto';
 import OpenAI from 'openai';
+import sanitizeHtml from 'sanitize-html';
 import { setupAuth, isAuthenticated, getFrontendOrigin } from './server/replitAuth.js';
 import { storage } from './server/storage.js';
 import { pool } from './server/db.js';
@@ -20,12 +24,34 @@ function rateLimit(maxRequests, windowMs) {
     const now = Date.now();
     const windowStart = now - windowMs;
 
+    // Aggressive cleanup: if store is getting too large, clean expired entries immediately
+    if (rateLimitStore.size >= MAX_STORE_SIZE * 0.9) { // 90% threshold
+      const cutoff = now - windowMs;
+      for (const [k, requests] of rateLimitStore.entries()) {
+        const validRequests = requests.filter(time => time > cutoff);
+        if (validRequests.length === 0) {
+          rateLimitStore.delete(k);
+        } else {
+          rateLimitStore.set(k, validRequests);
+        }
+      }
+    }
+
     if (!rateLimitStore.has(key)) {
-      // Prevent memory exhaustion by limiting store size
+      // If still at capacity after cleanup, use LRU eviction
       if (rateLimitStore.size >= MAX_STORE_SIZE) {
-        // Remove oldest entry (simple FIFO eviction)
-        const firstKey = rateLimitStore.keys().next().value;
-        rateLimitStore.delete(firstKey);
+        // Find and remove the least recently used entry (oldest timestamp)
+        let oldestKey = null;
+        let oldestTime = Infinity;
+        for (const [k, requests] of rateLimitStore.entries()) {
+          if (requests.length > 0 && requests[requests.length - 1] < oldestTime) {
+            oldestTime = requests[requests.length - 1];
+            oldestKey = k;
+          }
+        }
+        if (oldestKey) {
+          rateLimitStore.delete(oldestKey);
+        }
       }
       rateLimitStore.set(key, []);
     }
@@ -147,6 +173,67 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+// Cookie parser for CSRF tokens
+app.use(cookieParser());
+
+// Security headers with helmet
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"], // unsafe-inline needed for Vite in dev
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "https://replit.com"], // For auth
+      fontSrc: ["'self'", "data:"],
+    },
+  },
+  hsts: {
+    maxAge: 31536000, // 1 year
+    includeSubDomains: true,
+    preload: true,
+  },
+}));
+
+// CSRF Protection Middleware (Double-Submit Cookie Pattern)
+function generateCsrfToken() {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+// Middleware to set CSRF token cookie
+app.use((req, res, next) => {
+  if (!req.cookies['csrf-token']) {
+    const token = generateCsrfToken();
+    res.cookie('csrf-token', token, {
+      httpOnly: false, // Client needs to read this
+      secure: isProductionEnvironment(),
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    });
+  }
+  next();
+});
+
+// CSRF validation for state-changing requests
+function csrfProtection(req, res, next) {
+  // Skip CSRF for GET, HEAD, OPTIONS requests (safe methods)
+  if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
+    return next();
+  }
+
+  const cookieToken = req.cookies['csrf-token'];
+  const headerToken = req.headers['x-csrf-token'];
+
+  if (!cookieToken || !headerToken || cookieToken !== headerToken) {
+    return res.status(403).json({
+      error: 'CSRF token validation failed',
+      code: 'CSRF_INVALID',
+    });
+  }
+
+  next();
+}
+
 // Response compression (gzip/brotli) - compress JSON responses and static assets
 // Filter function to skip compression for very small responses (not worth CPU cost)
 app.use(compression({
@@ -179,10 +266,16 @@ app.use((req, res, next) => {
 
 // Input validation middleware
 function validateInput(req, res, next) {
-  // Sanitize string inputs
+  // Sanitize string inputs using sanitize-html library
   const sanitizeString = (str, maxLength = 1000) => {
     if (typeof str !== 'string') return '';
-    return str.trim().substring(0, maxLength).replace(/[<>]/g, '');
+    // Use sanitize-html with strict settings - strip all HTML tags
+    const cleaned = sanitizeHtml(str, {
+      allowedTags: [], // No HTML tags allowed
+      allowedAttributes: {}, // No attributes allowed
+      disallowedTagsMode: 'discard', // Remove disallowed tags entirely
+    });
+    return cleaned.trim().substring(0, maxLength);
   };
 
   // Validate topic parameter for poetry examples
@@ -475,7 +568,7 @@ app.get('/api/pinned-items', isAuthenticated, async (req, res) => {
   }
 });
 
-app.post('/api/pinned-items', isAuthenticated, async (req, res) => {
+app.post('/api/pinned-items', csrfProtection, isAuthenticated, async (req, res) => {
   try {
     const userId = req.user.claims.sub;
     const { itemData } = req.body;
@@ -512,7 +605,7 @@ app.post('/api/pinned-items', isAuthenticated, async (req, res) => {
   }
 });
 
-app.delete('/api/pinned-items/:itemName', isAuthenticated, async (req, res) => {
+app.delete('/api/pinned-items/:itemName', csrfProtection, isAuthenticated, async (req, res) => {
   try {
     const userId = req.user.claims.sub;
     const { itemName } = req.params;
@@ -545,7 +638,7 @@ app.get('/api/journal', isAuthenticated, async (req, res) => {
   }
 });
 
-app.post('/api/journal', isAuthenticated, async (req, res) => {
+app.post('/api/journal', csrfProtection, isAuthenticated, async (req, res) => {
   try {
     const userId = req.user.claims.sub;
     const { id, title, content, templateRef } = req.body;
@@ -570,7 +663,7 @@ app.post('/api/journal', isAuthenticated, async (req, res) => {
   }
 });
 
-app.patch('/api/journal/:id', isAuthenticated, async (req, res) => {
+app.patch('/api/journal/:id', csrfProtection, isAuthenticated, async (req, res) => {
   try {
     const userId = req.user.claims.sub;
     const { id } = req.params;
@@ -593,7 +686,7 @@ app.patch('/api/journal/:id', isAuthenticated, async (req, res) => {
   }
 });
 
-app.delete('/api/journal/:id', isAuthenticated, async (req, res) => {
+app.delete('/api/journal/:id', csrfProtection, isAuthenticated, async (req, res) => {
   try {
     const userId = req.user.claims.sub;
     const { id } = req.params;
@@ -611,7 +704,7 @@ app.delete('/api/journal/:id', isAuthenticated, async (req, res) => {
   }
 });
 
-app.post('/api/journal/migrate', isAuthenticated, async (req, res) => {
+app.post('/api/journal/migrate', csrfProtection, isAuthenticated, async (req, res) => {
   try {
     const userId = req.user.claims.sub;
     const { entries } = req.body;
@@ -629,7 +722,7 @@ app.post('/api/journal/migrate', isAuthenticated, async (req, res) => {
 });
 
 // Delete user account and all associated data
-app.delete('/api/auth/delete-account', isAuthenticated, async (req, res) => {
+app.delete('/api/auth/delete-account', csrfProtection, isAuthenticated, async (req, res) => {
   try {
     const userId = req.user.claims.sub;
     

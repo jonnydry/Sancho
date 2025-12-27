@@ -65,24 +65,26 @@ const PINNED_ITEMS_CACHE_TTL = 5 * 1000; // 5 seconds
 // Helper function to handle database errors
 function handleDatabaseError(error, operation) {
   console.error(`Database error in ${operation}:`, error);
-  
+
   // Connection errors
   if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
     const dbError = new Error('Database connection failed');
     dbError.code = 'DB_CONNECTION_ERROR';
-    dbError.originalError = error;
+    dbError.cause = error; // ES2022 Error.cause for stack trace preservation
+    dbError.stack = error.stack; // Preserve original stack
     throw dbError;
   }
-  
+
   // Query timeout
   if (error.code === 'ETIMEDOUT' || error.message?.includes('timeout')) {
     const dbError = new Error('Database query timeout');
     dbError.code = 'DB_TIMEOUT';
-    dbError.originalError = error;
+    dbError.cause = error; // ES2022 Error.cause for stack trace preservation
+    dbError.stack = error.stack; // Preserve original stack
     throw dbError;
   }
-  
-  // Re-throw with original error for other cases
+
+  // Re-throw with original error for other cases (stack preserved automatically)
   throw error;
 }
 
@@ -132,27 +134,43 @@ export class DatabaseStorage {
   }
 
   // Pinned items operations
-  async getPinnedItems(userId) {
-    // Check cache first
+  async getPinnedItems(userId, options = {}) {
+    const { limit = 100, offset = 0 } = options;
+
+    // Check cache first (only for non-paginated requests)
     const cacheKey = `pinned:${userId}`;
-    const cached = pinnedItemsCache.get(cacheKey);
-    if (cached !== null) {
-      return cached;
+    if (!options.limit && !options.offset) {
+      const cached = pinnedItemsCache.get(cacheKey);
+      if (cached !== null) {
+        return cached;
+      }
     }
 
     try {
-      const items = await db
+      let query = db
         .select()
         .from(pinnedItems)
         .where(eq(pinnedItems.userId, userId))
         .orderBy(desc(pinnedItems.createdAt));
+
+      // Add pagination
+      if (limit) {
+        query = query.limit(limit);
+      }
+      if (offset) {
+        query = query.offset(offset);
+      }
+
+      const items = await query;
       const processedItems = items.map(item => ({
         ...item,
         itemData: typeof item.itemData === 'string' ? JSON.parse(item.itemData) : item.itemData,
       }));
-      
-      // Cache the result
-      pinnedItemsCache.set(cacheKey, processedItems, PINNED_ITEMS_CACHE_TTL);
+
+      // Cache the result (only for non-paginated requests)
+      if (!options.limit && !options.offset) {
+        pinnedItemsCache.set(cacheKey, processedItems, PINNED_ITEMS_CACHE_TTL);
+      }
       return processedItems;
     } catch (error) {
       handleDatabaseError(error, 'getPinnedItems');
@@ -292,18 +310,39 @@ export class DatabaseStorage {
   }
 
   // Journal entries operations
-  async getJournalEntries(userId) {
+  async getJournalEntries(userId, options = {}) {
+    const { limit = 100, offset = 0, orderBy = 'createdAt', order = 'desc' } = options;
+
     try {
-      const entries = await db
+      let query = db
         .select()
         .from(journalEntries)
-        .where(eq(journalEntries.userId, userId))
-        .orderBy(desc(journalEntries.createdAt));
+        .where(eq(journalEntries.userId, userId));
+
+      // Add ordering
+      const orderColumn = orderBy === 'updatedAt' ? journalEntries.updatedAt : journalEntries.createdAt;
+      if (order === 'asc') {
+        query = query.orderBy(orderColumn);
+      } else {
+        query = query.orderBy(desc(orderColumn));
+      }
+
+      // Add pagination
+      if (limit) {
+        query = query.limit(limit);
+      }
+      if (offset) {
+        query = query.offset(offset);
+      }
+
+      const entries = await query;
       return entries.map(entry => ({
         id: entry.id,
         title: entry.title || '',
         content: entry.content || '',
         templateRef: entry.templateRef,
+        tags: entry.tags || [],
+        isStarred: entry.isStarred === 'true',
         createdAt: entry.createdAt ? new Date(entry.createdAt).getTime() : Date.now(),
         updatedAt: entry.updatedAt ? new Date(entry.updatedAt).getTime() : Date.now(),
       }));

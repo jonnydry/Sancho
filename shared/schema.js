@@ -63,5 +63,7 @@ export const journalEntries = pgTable(
   (table) => [
     index("IDX_journal_entries_user_id").on(table.userId),
     index("IDX_journal_entries_updated").on(table.userId, table.updatedAt),
+    index("IDX_journal_entries_starred").on(table.userId, table.isStarred),
+    index("IDX_journal_entries_created").on(table.userId, table.createdAt),
   ]
 );

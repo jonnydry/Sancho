@@ -42,6 +42,28 @@ export function getSession() {
     );
   }
 
+  // Validate session secret strength
+  const sessionSecret = process.env.SESSION_SECRET;
+  const minLength = 32;
+  if (sessionSecret.length < minLength) {
+    throw new Error(
+      `SESSION_SECRET must be at least ${minLength} characters long for security. Current length: ${sessionSecret.length}`
+    );
+  }
+
+  // Warn if session secret appears to be weak (only alphanumeric or only lowercase)
+  const hasUpperCase = /[A-Z]/.test(sessionSecret);
+  const hasLowerCase = /[a-z]/.test(sessionSecret);
+  const hasNumbers = /[0-9]/.test(sessionSecret);
+  const hasSpecialChars = /[^a-zA-Z0-9]/.test(sessionSecret);
+  const characterTypeCount = [hasUpperCase, hasLowerCase, hasNumbers, hasSpecialChars].filter(Boolean).length;
+
+  if (characterTypeCount < 3) {
+    console.warn(
+      'WARNING: SESSION_SECRET should contain at least 3 of: uppercase, lowercase, numbers, special characters for better security.'
+    );
+  }
+
   if (!process.env.DATABASE_URL) {
     throw new Error(
       'DATABASE_URL must be set. Sessions require a database connection.'

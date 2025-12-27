@@ -75,10 +75,16 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
 
     // Optimistic update: add item to local state if not already pinned
-    const isAlreadyPinned = pinnedItems.some(pinned => pinned.name === item.name);
-    if (!isAlreadyPinned) {
-      setPinnedItems(prev => [...prev, item]);
-    }
+    // Use functional update to ensure atomicity and avoid race conditions
+    let wasAlreadyPinned = false;
+    setPinnedItems(prev => {
+      const isAlreadyPinned = prev.some(pinned => pinned.name === item.name);
+      wasAlreadyPinned = isAlreadyPinned;
+      if (isAlreadyPinned) {
+        return prev; // No change needed
+      }
+      return [...prev, item];
+    });
 
     try {
       if (import.meta.env.DEV) {
@@ -101,14 +107,14 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
         await fetchPinnedItems();
       } else {
         // Revert optimistic update on failure
-        if (!isAlreadyPinned) {
+        if (!wasAlreadyPinned) {
           setPinnedItems(prev => prev.filter(pinned => pinned.name !== item.name));
         }
         throw new Error('Server error pinning item');
       }
     } catch (error) {
       // Revert optimistic update on any error
-      if (!isAlreadyPinned) {
+      if (!wasAlreadyPinned) {
         setPinnedItems(prev => prev.filter(pinned => pinned.name !== item.name));
       }
       console.error('Error pinning item:', error);
@@ -118,7 +124,7 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
         throw new Error(`Failed to pin item: ${String(error)}`);
       }
     }
-  }, [isAuthenticated, isAuthLoading, fetchPinnedItems, pinnedItems]);
+  }, [isAuthenticated, isAuthLoading, fetchPinnedItems]); // pinnedItems removed - using functional update
 
   const unpinItem = useCallback(async (itemName: string) => {
     // Wait for auth to finish loading and ensure user is authenticated
@@ -134,10 +140,15 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
 
     // Optimistic update: remove item from local state
-    const wasPinned = pinnedItems.some(item => item.name === itemName);
-    if (wasPinned) {
-      setPinnedItems(prev => prev.filter(item => item.name !== itemName));
-    }
+    // Use functional update to ensure atomicity and avoid race conditions
+    let wasPinned = false;
+    setPinnedItems(prev => {
+      wasPinned = prev.some(item => item.name === itemName);
+      if (!wasPinned) {
+        return prev; // No change needed
+      }
+      return prev.filter(item => item.name !== itemName);
+    });
 
     try {
       if (import.meta.env.DEV) {
@@ -173,7 +184,7 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
         throw new Error(`Failed to unpin item: ${String(error)}`);
       }
     }
-  }, [isAuthenticated, isAuthLoading, fetchPinnedItems, pinnedItems]);
+  }, [isAuthenticated, isAuthLoading, fetchPinnedItems]); // pinnedItems removed - using functional update
 
   const isPinned = useCallback((itemName: string) => {
     return pinnedItems.some(item => item.name === itemName);

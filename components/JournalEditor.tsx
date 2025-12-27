@@ -237,6 +237,7 @@ export const JournalEditor: React.FC = () => {
     isStarred: false,
     entries: [],
   });
+  const autosaveErrorRef = useRef<string | null>(null);
 
   useEffect(() => {
     const savedEntryWidth = localStorage.getItem("journal_entry_width");
@@ -354,6 +355,10 @@ export const JournalEditor: React.FC = () => {
     currentStateRef.current = { title, content, activeTemplate, tags, isStarred, entries };
   }, [title, content, activeTemplate, tags, isStarred, entries]);
 
+  useEffect(() => {
+    autosaveErrorRef.current = autosaveError;
+  }, [autosaveError]);
+
   const selectEntryDirect = useCallback((entry: JournalEntry) => {
     setSelectedId(entry.id);
     setTitle(entry.title);
@@ -391,8 +396,21 @@ export const JournalEditor: React.FC = () => {
     // Save to server in background
     try {
       await JournalStorage.save(newEntry);
+      setSyncStatus("synced");
     } catch (error) {
       console.error("Failed to save new entry:", error);
+      setSyncStatus("error");
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to create new entry";
+      setAutosaveError(errorMessage);
+
+      // Clear error message after 5 seconds
+      if (autosaveErrorTimeoutRef.current) {
+        clearTimeout(autosaveErrorTimeoutRef.current);
+      }
+      autosaveErrorTimeoutRef.current = setTimeout(() => {
+        setAutosaveError(null);
+      }, 5000);
     }
   }, []);
 
@@ -471,6 +489,19 @@ export const JournalEditor: React.FC = () => {
         setEntries(updatedEntries);
       } catch (error) {
         console.error("Failed to save entry before switching:", error);
+        // Notify user about the save failure
+        const errorMessage =
+          error instanceof Error ? error.message : "Failed to save before switching";
+        setAutosaveError(errorMessage);
+        setSyncStatus("error");
+
+        // Clear error message after 5 seconds
+        if (autosaveErrorTimeoutRef.current) {
+          clearTimeout(autosaveErrorTimeoutRef.current);
+        }
+        autosaveErrorTimeoutRef.current = setTimeout(() => {
+          setAutosaveError(null);
+        }, 5000);
       }
     }
 
@@ -555,33 +586,40 @@ export const JournalEditor: React.FC = () => {
 
   const handleSave = useCallback(
     async (isManual = false, retryAttempt = 0) => {
-      if (!selectedId) return;
+      const state = currentStateRef.current;
+      const currentSelectedId = state.entries.find((e) =>
+        e.id === previousSelectedIdRef.current ||
+        e.title === state.title ||
+        e.content === state.content
+      )?.id;
 
-      const currentEntry = entries.find((e) => e.id === selectedId);
+      if (!currentSelectedId) return;
+
+      const currentEntry = state.entries.find((e) => e.id === currentSelectedId);
       if (!currentEntry) return;
 
-      let entryTitle = title;
+      let entryTitle = state.title;
       if (!entryTitle.trim()) {
-        const firstLine = content.split("\n")[0].trim();
+        const firstLine = state.content.split("\n")[0].trim();
         entryTitle = firstLine.substring(0, 30) || "Untitled";
         if (firstLine.length > 30) entryTitle += "...";
         setTitle(entryTitle);
       }
 
       const updatedEntry: JournalEntry = {
-        id: selectedId,
+        id: currentSelectedId,
         title: entryTitle,
-        content,
+        content: state.content,
         createdAt: currentEntry.createdAt || Date.now(),
         updatedAt: Date.now(),
-        templateRef: activeTemplate,
-        tags,
-        isStarred,
+        templateRef: state.activeTemplate,
+        tags: state.tags,
+        isStarred: state.isStarred,
       };
 
       // Update local state optimistically (preserve order)
       setEntries((prev) =>
-        prev.map((e) => (e.id === selectedId ? updatedEntry : e)),
+        prev.map((e) => (e.id === currentSelectedId ? updatedEntry : e)),
       );
 
       // Only show "syncing" status for manual saves (less distracting)
@@ -594,7 +632,7 @@ export const JournalEditor: React.FC = () => {
         await JournalStorage.save(updatedEntry);
         setSyncStatus("synced");
         retryCountRef.current = 0; // Reset retry count on success
-        if (autosaveError) {
+        if (autosaveErrorRef.current) {
           setAutosaveError(null);
           if (autosaveErrorTimeoutRef.current) {
             clearTimeout(autosaveErrorTimeoutRef.current);
@@ -642,7 +680,7 @@ export const JournalEditor: React.FC = () => {
         }
       }
     },
-    [selectedId, entries, title, content, activeTemplate, tags, isStarred, autosaveError],
+    [], // No dependencies - all values accessed via refs
   );
 
   const handleManualSave = useCallback(async () => {
@@ -992,7 +1030,7 @@ export const JournalEditor: React.FC = () => {
     return () => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     };
-  }, [content, title, activeTemplate, tags, isStarred, selectedId, handleSave]);
+  }, [content, title, activeTemplate, tags, isStarred, selectedId]); // handleSave is now stable, removed from deps
 
   // Keyboard shortcuts
   useEffect(() => {
