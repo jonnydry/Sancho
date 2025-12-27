@@ -345,23 +345,28 @@ app.post('/api/poetry-example', rateLimit(10, 60000), async (req, res) => { // 1
       exclusionNote = `\n\nDO NOT use this poem again - choose something completely different:\n"${previousExample.substring(0, 200)}..."`;
     }
     
-    const prompt = `Provide a famous example of ${topic} in poetry.
+    const prompt = `Find an existing, published poem that demonstrates ${topic}.
 
-VARIETY REQUIREMENT (seed: ${randomSeed}):
-- Consider exploring ${suggestedEra} ${suggestedRegion} poetry, but feel free to choose any era/region
-- Pick a DIFFERENT poem than you might typically choose - surprise me with a lesser-known gem
-- Draw from your vast knowledge across all poetic traditions${exclusionNote}
+CRITICAL: You are a REFERENCE TOOL. Do NOT create new poetry. Only quote from real, published works.
 
-Include the author, title, the poem excerpt, and explain how it demonstrates ${topic}.
+VARIETY (seed: ${randomSeed}):
+- Consider ${suggestedEra} ${suggestedRegion} poetry
+- Choose something different from the obvious/common examples${exclusionNote}
 
-Respond with JSON: { "example": "poem excerpt", "author": "poet name", "title": "poem title", "explanation": "how it demonstrates the concept" }`;
+Provide:
+1. An exact quote from the real poem (the excerpt)
+2. The actual poet's name
+3. The actual poem title
+4. How this excerpt demonstrates ${topic}
+
+Respond with JSON: { "example": "exact poem excerpt", "author": "poet name", "title": "poem title", "explanation": "how it demonstrates the concept" }`;
 
     const response = await openai.chat.completions.create({
       model: "grok-4-1-fast-non-reasoning",
       messages: [
         {
           role: "system",
-          content: "You are a poetry scholar with encyclopedic knowledge spanning all eras, cultures, and styles. Each time you're asked for an example, choose something DIFFERENT - vary widely across poets, time periods, and traditions. When told not to use a specific poem, you MUST choose a different one."
+          content: "You are a poetry reference librarian. Your job is to find and quote REAL, EXISTING poems from published literary works. NEVER create new poetry - only reference authentic source material. When asked for an example, cite a real poem with accurate author attribution. Vary your selections across eras, cultures, and traditions."
         },
         {
           role: "user",
