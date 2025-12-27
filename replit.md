@@ -25,7 +25,7 @@ The project utilizes a dual-server architecture with a React frontend (Vite) and
 - **Backend**: Express.js for API handling and secure communication with XAI.
 - **Styling**: Tailwind CSS v4.
 - **Authentication**: Replit Auth (OpenID Connect) integrated with PostgreSQL session storage.
-- **AI Integration**: XAI Grok API with a multi-model strategy: `grok-3-mini` for Sancho quotes, `grok-4` for poetry examples, and `grok-4-fast` for "learn more" context.
+- **AI Integration**: XAI Grok API with Live Search enabled for poetry examples. Uses `grok-4` with web search to find REAL poems from online poetry archives and literary databases. The AI acts as a reference tool - it searches the web for actual published poems rather than generating content. Source URLs are displayed when available.
 - **Database**: PostgreSQL managed with Drizzle ORM for user and session data, including journal entries.
 - **Performance**: Optimized build, rate limiting on API endpoints, client-side quote caching, and aggressive model selection.
 - **Error Handling**: React Error Boundary for graceful fallback UI and improved error messages for authentication.
