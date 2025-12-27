@@ -268,11 +268,10 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
     return filteredEntries.filter(e => e.isStarred);
   }, [filteredEntries]);
 
-  // Get recent entries (last 5 accessed, excluding starred)
+  // Get recent entries (first 5 non-starred, in original order)
   const recentEntries = useMemo(() => {
     return filteredEntries
       .filter(e => !e.isStarred)
-      .sort((a, b) => b.updatedAt - a.updatedAt)
       .slice(0, 5);
   }, [filteredEntries]);
 
