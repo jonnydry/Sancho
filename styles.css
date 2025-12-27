@@ -400,15 +400,6 @@ body::-webkit-scrollbar-corner,
   accent-color: rgb(var(--app-accent));
 }
 
-/* Typewriter Mode */
-.typewriter-mode {
-  scroll-behavior: auto;
-}
-
-.typewriter-mode textarea {
-  scroll-margin-top: 50vh;
-}
-
 /* Slash Menu Animation */
 @keyframes slideUpFade {
   from {

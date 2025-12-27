@@ -184,7 +184,6 @@ export const JournalEditor: React.FC = () => {
 
   // New feature states
   const [isZenMode, setIsZenMode] = useState(false);
-  const [isTypewriterMode, setIsTypewriterMode] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   
   // Slash command state
@@ -695,26 +694,6 @@ export const JournalEditor: React.FC = () => {
     }
   }, []);
 
-  // Typewriter mode - center active line (internal implementation)
-  const doCenterActiveLine = useCallback(() => {
-    if (!textareaRef.current) return;
-    const textarea = textareaRef.current;
-    const { selectionStart } = textarea;
-    const coords = getCaretCoordinates(textarea, selectionStart);
-    const viewportHeight = textarea.clientHeight;
-    const targetScrollTop = coords.top - (viewportHeight / 2);
-    textarea.scrollTo({
-      top: Math.max(0, targetScrollTop),
-      behavior: 'auto',
-    });
-  }, []);
-
-  // Typewriter mode - center active line (only when mode is enabled)
-  const centerActiveLine = useCallback(() => {
-    if (!isTypewriterMode) return;
-    doCenterActiveLine();
-  }, [isTypewriterMode, doCenterActiveLine]);
-
   // Slash command detection on input
   const handleTextareaInput = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
@@ -743,12 +722,7 @@ export const JournalEditor: React.FC = () => {
     } else {
       setShowSlashMenu(false);
     }
-    
-    // Typewriter mode centering
-    if (isTypewriterMode) {
-      requestAnimationFrame(centerActiveLine);
-    }
-  }, [isTypewriterMode, centerActiveLine]);
+  }, []);
 
   // Handle slash command keyboard navigation and list auto-continuation
   const handleTextareaKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -822,7 +796,6 @@ export const JournalEditor: React.FC = () => {
             if (textareaRef.current) {
               textareaRef.current.focus();
               textareaRef.current.setSelectionRange(lineStartPos, lineStartPos);
-              if (isTypewriterMode) centerActiveLine();
             }
           });
         } else {
@@ -838,13 +811,12 @@ export const JournalEditor: React.FC = () => {
             if (textareaRef.current) {
               textareaRef.current.focus();
               textareaRef.current.setSelectionRange(newCursorPos, newCursorPos);
-              if (isTypewriterMode) centerActiveLine();
             }
           });
         }
       }
     }
-  }, [showSlashMenu, slashQuery, slashSelectedIndex, content, isTypewriterMode, centerActiveLine]);
+  }, [showSlashMenu, slashQuery, slashSelectedIndex, content]);
 
   // Execute a slash command
   const executeSlashCommand = useCallback((command: SlashCommand) => {
@@ -862,10 +834,9 @@ export const JournalEditor: React.FC = () => {
       if (textareaRef.current) {
         textareaRef.current.focus();
         textareaRef.current.setSelectionRange(newCursor, newCursor);
-        if (isTypewriterMode) centerActiveLine();
       }
     });
-  }, [content, isTypewriterMode, centerActiveLine]);
+  }, [content]);
 
   // Download entry as markdown
   const handleDownload = useCallback(() => {
@@ -955,17 +926,6 @@ export const JournalEditor: React.FC = () => {
   const toggleZenMode = useCallback(() => {
     setIsZenMode(prev => !prev);
   }, []);
-
-  // Toggle typewriter mode
-  const toggleTypewriterMode = useCallback(() => {
-    setIsTypewriterMode(prev => {
-      if (!prev) {
-        // When enabling, center the current line immediately
-        requestAnimationFrame(doCenterActiveLine);
-      }
-      return !prev;
-    });
-  }, [doCenterActiveLine]);
 
   // Toggle preview mode
   const togglePreviewMode = useCallback(() => {
@@ -1070,11 +1030,6 @@ export const JournalEditor: React.FC = () => {
         e.preventDefault();
         toggleZenMode();
       }
-      // Cmd/Ctrl + Shift + T: Toggle typewriter mode
-      else if (isMod && e.shiftKey && e.key.toLowerCase() === "t") {
-        e.preventDefault();
-        toggleTypewriterMode();
-      }
       // Cmd/Ctrl + Shift + P: Toggle preview mode
       else if (isMod && e.shiftKey && e.key.toLowerCase() === "p") {
         e.preventDefault();
@@ -1084,7 +1039,7 @@ export const JournalEditor: React.FC = () => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleManualSave, createNewEntry, isZenMode, toggleZenMode, toggleTypewriterMode, togglePreviewMode]);
+  }, [handleManualSave, createNewEntry, isZenMode, toggleZenMode, togglePreviewMode]);
 
   // Zen mode wrapper
   const editorContent = (
@@ -1252,22 +1207,6 @@ export const JournalEditor: React.FC = () => {
             <div className="flex items-center gap-1">
               {/* Focus mode toggles */}
               <button
-                onClick={toggleTypewriterMode}
-                className={`p-1.5 rounded-md transition-all duration-200 ${
-                  isTypewriterMode 
-                    ? "text-accent bg-accent/10" 
-                    : "text-muted hover:text-default hover:bg-bg-alt"
-                }`}
-                title="Typewriter Mode (⌘⇧T)"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="21" x2="3" y1="6" y2="6"/>
-                  <line x1="17" x2="7" y1="12" y2="12"/>
-                  <line x1="19" x2="5" y1="18" y2="18"/>
-                </svg>
-              </button>
-              
-              <button
                 onClick={toggleZenMode}
                 className={`p-1.5 rounded-md transition-all duration-200 ${
                   isZenMode 
@@ -1413,7 +1352,7 @@ export const JournalEditor: React.FC = () => {
               />
             </div>
 
-            <div className={`flex-1 relative overflow-auto px-4 sm:px-6 py-2 ${isTypewriterMode ? 'typewriter-mode' : ''}`}>
+            <div className="flex-1 relative overflow-auto px-4 sm:px-6 py-2">
               {isPreviewMode ? (
                 <div className="markdown-preview prose prose-sm max-w-none text-default">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -1429,7 +1368,7 @@ export const JournalEditor: React.FC = () => {
                     onKeyDown={handleTextareaKeyDown}
                     onBlur={handleTextareaBlur}
                     placeholder="Start writing... Type '/' for commands"
-                    className={`w-full h-full min-h-[300px] bg-transparent border-none outline-none resize-none text-sm leading-relaxed text-default placeholder:text-muted/30 ${isTypewriterMode ? 'pb-[50vh]' : ''}`}
+                    className="w-full h-full min-h-[300px] bg-transparent border-none outline-none resize-none text-sm leading-relaxed text-default placeholder:text-muted/30"
                   />
                   
                   {/* Slash command menu */}
