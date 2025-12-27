@@ -1,4 +1,4 @@
-import React, { useState, useCallback, memo } from 'react';
+import React, { useState, useCallback, useEffect, memo } from 'react';
 import { findPoetryExample } from '../services/apiService';
 import { PoetryExampleResponse } from '../types';
 import { SearchSparkleIcon } from './icons/SearchSparkleIcon';
@@ -15,20 +15,32 @@ export const ExampleFinder: React.FC<ExampleFinderProps> = memo(({ topic, embedd
   const [example, setExample] = useState<PoetryExampleResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [exampleHistory, setExampleHistory] = useState<string[]>([]);
+
+  // Reset state when topic changes
+  useEffect(() => {
+    setExample(null);
+    setError(null);
+    setExampleHistory([]);
+  }, [topic]);
 
   const handleFindExample = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    setExample(null);
     try {
-      const result = await findPoetryExample(topic);
+      // Pass the full history of examples to ensure we get a different result
+      const result = await findPoetryExample(topic, exampleHistory);
       setExample(result);
+      // Add the new example to history (keep last 5 to avoid huge payloads)
+      if (result.example) {
+        setExampleHistory(prev => [...prev.slice(-4), result.example]);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred.');
     } finally {
       setIsLoading(false);
     }
-  }, [topic]);
+  }, [topic, exampleHistory]);
 
   const containerClass = embedded
     ? "p-5 border-t border-accent/20"
@@ -49,7 +61,7 @@ export const ExampleFinder: React.FC<ExampleFinderProps> = memo(({ topic, embedd
           icon={<SearchSparkleIcon className="w-3.5 h-3.5" />}
           loadingIcon={<SpinnerIcon className="w-3.5 h-3.5 animate-spin" />}
         >
-          Find Example
+          {example !== null ? "Regenerate" : "Find Example"}
         </ActionButton>
       </div>
 

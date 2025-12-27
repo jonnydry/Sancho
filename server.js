@@ -318,9 +318,17 @@ const openai = new OpenAI({
   apiKey: process.env.XAI_API_KEY
 });
 
+// Helper function to check if an example is similar to any in a list
+function isSimilarToAny(newExample, excludedExamples) {
+  if (!newExample || !excludedExamples || excludedExamples.length === 0) return false;
+  const normalize = (str) => str.toLowerCase().replace(/\s+/g, ' ').trim().substring(0, 100);
+  const normalizedNew = normalize(newExample);
+  return excludedExamples.some(excluded => normalize(excluded) === normalizedNew);
+}
+
 app.post('/api/poetry-example', rateLimit(10, 60000), async (req, res) => { // 10 requests per minute
   try {
-    const { topic } = req.body;
+    const { topic, previousExamples } = req.body;
 
     if (!topic) {
       return res.status(400).json({ error: 'Topic is required' });
@@ -332,27 +340,74 @@ app.post('/api/poetry-example', rateLimit(10, 60000), async (req, res) => { // 1
       });
     }
 
-    const randomSeed = Math.floor(Math.random() * 10000);
-    const prompt = `Please provide a famous, concise example of a ${topic} in poetry (seed: ${randomSeed}). Choose a DIFFERENT example each time - vary your selections widely across different poets, eras, and styles. Include the author, the title, and a brief explanation of how it fits the conventions. Respond with JSON in this format: { "example": "string", "author": "string", "title": "string", "explanation": "string" }`;
-
-    const response = await openai.chat.completions.create({
-      model: "grok-4-1-fast-non-reasoning",
-      messages: [
-        {
-          role: "system",
-          content: "You are a poetry expert. Provide famous poetic examples with detailed explanations. Always choose different examples when asked multiple times - draw from a wide variety of poets, time periods, and literary traditions."
-        },
-        {
-          role: "user",
-          content: prompt
+    const MAX_RETRIES = 3;
+    let parsedJson = null;
+    let attempts = 0;
+    let foundUnique = false;
+    
+    // Track all examples to exclude (starts with client's history if provided)
+    const excludedExamples = [];
+    if (previousExamples && Array.isArray(previousExamples)) {
+      previousExamples.forEach(ex => {
+        if (ex && ex.trim()) {
+          excludedExamples.push(ex);
         }
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0.9,
-    });
+      });
+    }
+    
+    while (attempts < MAX_RETRIES && !foundUnique) {
+      attempts++;
+      const randomSeed = Math.floor(Math.random() * 10000);
+      
+      // Build exclusion instruction listing all previously seen examples
+      let exclusionNote = '';
+      if (excludedExamples.length > 0) {
+        const exclusionList = excludedExamples.map((ex, i) => 
+          `${i + 1}. "${ex.substring(0, 150)}..."`
+        ).join('\n');
+        exclusionNote = `\n\nCRITICAL: You MUST provide a DIFFERENT poem. Do NOT use any of these ${excludedExamples.length} example(s):\n${exclusionList}\n\nChoose a completely different poet and poem from a different era or tradition.`;
+      }
+      
+      const prompt = `Please provide a famous, concise example of a ${topic} in poetry (seed: ${randomSeed}, attempt: ${attempts}). Choose a DIFFERENT example each time - vary your selections widely across different poets, eras, and styles. Include the author, the title, and a brief explanation of how it fits the conventions.${exclusionNote}\n\nRespond with JSON in this format: { "example": "string", "author": "string", "title": "string", "explanation": "string" }`;
 
-    const jsonText = response.choices[0].message.content || "{}";
-    const parsedJson = JSON.parse(jsonText);
+      const response = await openai.chat.completions.create({
+        model: "grok-4-1-fast-non-reasoning",
+        messages: [
+          {
+            role: "system",
+            content: "You are a poetry expert with encyclopedic knowledge of poetry across all cultures and eras. Provide famous poetic examples with detailed explanations. CRITICAL: When examples are listed as excluded, you MUST choose a completely different poem from a different poet. Draw from your vast knowledge of world poetry - classical, modern, international."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        response_format: { type: "json_object" },
+        temperature: Math.min(0.95 + (attempts * 0.03), 1.0), // Increase temperature on retries, cap at 1.0
+      });
+
+      const jsonText = response.choices[0].message.content || "{}";
+      parsedJson = JSON.parse(jsonText);
+      
+      // Check if we got a unique example
+      if (!isSimilarToAny(parsedJson.example, excludedExamples)) {
+        foundUnique = true;
+        break;
+      }
+      
+      // Add this duplicate to exclusion list for next attempt
+      excludedExamples.push(parsedJson.example);
+      logger.info(`Poetry example retry ${attempts}/${MAX_RETRIES}: Got duplicate, adding to exclusion list for topic: ${topic}`);
+    }
+    
+    if (!foundUnique && attempts >= MAX_RETRIES && excludedExamples.length > 0) {
+      logger.warn(`Could not find unique poetry example after ${MAX_RETRIES} attempts for topic: ${topic}`);
+      // Return a 409 conflict to signal the client couldn't get a unique example
+      return res.status(409).json({ 
+        error: "Could not generate a unique example after multiple attempts. Please try again.",
+        retryable: true
+      });
+    }
     
     res.json(parsedJson);
   } catch (error) {

@@ -124,6 +124,7 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
   const [example, setExample] = useState<PoetryExampleResponse | null>(null);
   const [isLoadingExample, setIsLoadingExample] = useState(false);
   const [exampleError, setExampleError] = useState<string | null>(null);
+  const [exampleHistory, setExampleHistory] = useState<string[]>([]);
   const previousItemRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -132,6 +133,7 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
       setLearnMoreError(null);
       setExample(null);
       setExampleError(null);
+      setExampleHistory([]);
       previousItemRef.current = item.name;
     }
   }, [item]);
@@ -157,8 +159,13 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
     setIsLoadingExample(true);
     setExampleError(null);
     try {
-      const result = await findPoetryExample(item.name);
+      // Pass the full history of examples to ensure we get a different result
+      const result = await findPoetryExample(item.name, exampleHistory);
       setExample(result);
+      // Add the new example to history (keep last 5 to avoid huge payloads)
+      if (result.example) {
+        setExampleHistory(prev => [...prev.slice(-4), result.example]);
+      }
     } catch (err) {
       setExampleError(
         err instanceof Error ? err.message : "An unknown error occurred.",
@@ -166,7 +173,7 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
     } finally {
       setIsLoadingExample(false);
     }
-  }, [item]);
+  }, [item, exampleHistory]);
 
   if (!item) return null;
 
