@@ -48,7 +48,7 @@ const EntryItem: React.FC<{
     <div 
       className={`group cursor-pointer border-l-2 transition-all duration-200 hover:bg-bg-alt/50 ${
         isSelected ? 'border-accent bg-bg-alt' : 'border-transparent'
-      } ${compact ? 'px-2 py-1.5' : 'p-3'}`}
+      } ${compact ? 'px-2 py-1' : 'px-2 py-1.5'}`}
     >
       <div 
         onClick={onSelect}
@@ -57,50 +57,30 @@ const EntryItem: React.FC<{
         <div className="flex items-center gap-1.5">
           {/* Star indicator */}
           {entry.isStarred && (
-            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="text-yellow-500 shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="currentColor" className="text-yellow-500 shrink-0">
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
             </svg>
           )}
           {/* Title */}
-          <div className={`font-medium text-default truncate ${compact ? 'text-xs' : 'text-sm'}`}>
+          <div className="font-medium text-default truncate text-xs flex-1">
             {entry.title || 'Untitled'}
           </div>
+          {/* Inline date */}
+          <span className="hidden sm:block text-[9px] text-muted/60 shrink-0">
+            {new Date(entry.updatedAt).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' })}
+          </span>
         </div>
-        
-        {/* Content Preview (Desktop, non-compact) */}
-        {!compact && (
-          <div className="hidden sm:block text-xs text-muted/70 truncate mb-2 mt-1">
-            {entry.content?.slice(0, 60) || <span className="italic opacity-50">Empty note...</span>}
-          </div>
-        )}
-
-        {/* Tags preview */}
-        {!compact && entry.tags && entry.tags.length > 0 && (
-          <div className="hidden sm:flex flex-wrap gap-1 mb-1">
-            {entry.tags.slice(0, 3).map(tag => (
-              <span key={tag} className="text-[9px] px-1.5 py-0.5 bg-accent/10 text-accent/80 rounded">
-                #{tag}
-              </span>
-            ))}
-            {entry.tags.length > 3 && (
-              <span className="text-[9px] text-muted">+{entry.tags.length - 3}</span>
-            )}
-          </div>
-        )}
 
         {/* Mobile Date (fallback) */}
         {!compact && (
-          <div className="sm:hidden text-[10px] text-muted text-center mt-1">
+          <div className="sm:hidden text-[9px] text-muted text-center mt-0.5">
             {new Date(entry.updatedAt).getDate()}
           </div>
         )}
       </div>
 
-      {/* Footer: Date, Star & Delete */}
-      <div className={`hidden sm:flex items-center justify-between ${compact ? 'mt-0.5' : 'mt-1'}`}>
-        <span className="text-[10px] text-muted">
-          {new Date(entry.updatedAt).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' })}
-        </span>
+      {/* Footer: Star & Delete buttons */}
+      <div className={`hidden sm:flex items-center justify-end gap-0.5 ${compact ? 'mt-0' : 'mt-0.5'}`}>
         <div className="flex items-center gap-0.5">
           {/* Star button */}
           {onToggleStar && (
