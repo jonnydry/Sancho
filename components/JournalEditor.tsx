@@ -695,9 +695,9 @@ export const JournalEditor: React.FC = () => {
     }
   }, []);
 
-  // Typewriter mode - center active line
-  const centerActiveLine = useCallback(() => {
-    if (!isTypewriterMode || !textareaRef.current) return;
+  // Typewriter mode - center active line (internal implementation)
+  const doCenterActiveLine = useCallback(() => {
+    if (!textareaRef.current) return;
     const textarea = textareaRef.current;
     const { selectionStart } = textarea;
     const coords = getCaretCoordinates(textarea, selectionStart);
@@ -707,7 +707,13 @@ export const JournalEditor: React.FC = () => {
       top: Math.max(0, targetScrollTop),
       behavior: 'auto',
     });
-  }, [isTypewriterMode]);
+  }, []);
+
+  // Typewriter mode - center active line (only when mode is enabled)
+  const centerActiveLine = useCallback(() => {
+    if (!isTypewriterMode) return;
+    doCenterActiveLine();
+  }, [isTypewriterMode, doCenterActiveLine]);
 
   // Slash command detection on input
   const handleTextareaInput = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -954,12 +960,12 @@ export const JournalEditor: React.FC = () => {
   const toggleTypewriterMode = useCallback(() => {
     setIsTypewriterMode(prev => {
       if (!prev) {
-        // When enabling, center the current line
-        requestAnimationFrame(centerActiveLine);
+        // When enabling, center the current line immediately
+        requestAnimationFrame(doCenterActiveLine);
       }
       return !prev;
     });
-  }, [centerActiveLine]);
+  }, [doCenterActiveLine]);
 
   // Toggle preview mode
   const togglePreviewMode = useCallback(() => {
