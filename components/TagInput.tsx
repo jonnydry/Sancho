@@ -119,7 +119,7 @@ export const TagInput: React.FC<TagInputProps> = ({
   return (
     <div ref={containerRef} className="relative">
       <div 
-        className={`flex flex-wrap items-center gap-1.5 px-2 py-1.5 bg-bg border border-default/30 rounded-md transition-colors focus-within:border-accent/50 ${disabled ? 'opacity-50' : ''}`}
+        className={`flex flex-wrap items-center gap-1.5 px-3 py-1.5 bg-bg border border-default rounded-sm transition-colors focus-within:border-accent ${disabled ? 'opacity-50' : ''}`}
         onClick={() => inputRef.current?.focus()}
       >
         {/* Tag Pills */}
@@ -164,7 +164,7 @@ export const TagInput: React.FC<TagInputProps> = ({
 
       {/* Autocomplete Suggestions */}
       {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-bg border border-default/30 rounded-md shadow-lg z-20 overflow-hidden">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-bg border border-default rounded-sm shadow-lg z-20 overflow-hidden">
           {suggestions.map((suggestion, index) => (
             <button
               key={suggestion}
