@@ -5,15 +5,19 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { JournalEntry, JournalStorage } from "../services/journalStorage";
 import { usePinnedItems } from "../contexts/PinnedItemsContext";
 import { useAuth } from "../hooks/useAuth";
 import { JournalEntryList } from "./JournalEntryList";
 import { ReferencePane } from "./ReferencePane";
 import { BottomPanel } from "./BottomPanel";
+import { SlashMenu, SLASH_COMMANDS, SlashCommand, replaceSlashCommand } from "./SlashMenu";
 import { GridIcon } from "./icons/GridIcon";
 import { poetryData } from "../data/poetryData";
 import { poeticDevicesData } from "../data/poeticDevicesData";
+import { getCaretCoordinates } from "../utils/cursor";
 
 const generateUUID = (): string => {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
@@ -176,6 +180,37 @@ export const JournalEditor: React.FC = () => {
     string | null
   >(null);
 
+  // New feature states
+  const [isZenMode, setIsZenMode] = useState(false);
+  const [isTypewriterMode, setIsTypewriterMode] = useState(false);
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
+  
+  // Slash command state
+  const [showSlashMenu, setShowSlashMenu] = useState(false);
+  const [slashMenuPosition, setSlashMenuPosition] = useState({ top: 0, left: 0 });
+  const [slashQuery, setSlashQuery] = useState("");
+  const [slashSelectedIndex, setSlashSelectedIndex] = useState(0);
+  
+  // Daily goal state
+  const [dailyGoal, setDailyGoal] = useState(() => {
+    const saved = localStorage.getItem("sancho_daily_goal");
+    return saved ? parseInt(saved, 10) : 0;
+  });
+  const [dailyProgress, setDailyProgress] = useState(() => {
+    const saved = localStorage.getItem("sancho_daily_progress");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      const today = new Date().toDateString();
+      if (parsed.date === today) {
+        return parsed.count;
+      }
+    }
+    return 0;
+  });
+  const [isEditingGoal, setIsEditingGoal] = useState(false);
+  const [tempGoal, setTempGoal] = useState(dailyGoal.toString());
+  const previousWordCountRef = useRef<number>(0);
+
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const retryCountRef = useRef<number>(0);
@@ -204,6 +239,43 @@ export const JournalEditor: React.FC = () => {
     localStorage.setItem("journal_entry_width", entryListWidth.toString());
     localStorage.setItem("journal_ref_width", referencePaneWidth.toString());
   }, [entryListWidth, referencePaneWidth]);
+
+  // Persist daily goal
+  useEffect(() => {
+    localStorage.setItem("sancho_daily_goal", dailyGoal.toString());
+  }, [dailyGoal]);
+
+  // Persist daily progress
+  useEffect(() => {
+    localStorage.setItem("sancho_daily_progress", JSON.stringify({
+      date: new Date().toDateString(),
+      count: dailyProgress,
+    }));
+  }, [dailyProgress]);
+
+  // Track word count changes for daily goal
+  useEffect(() => {
+    const wordCount = content.trim().split(/\s+/).filter(w => w.length > 0).length;
+    const diff = wordCount - previousWordCountRef.current;
+    if (diff > 0 && previousWordCountRef.current > 0) {
+      setDailyProgress(prev => prev + diff);
+    }
+    previousWordCountRef.current = wordCount;
+  }, [content]);
+
+  // Computed stats
+  const wordCount = useMemo(() => {
+    return content.trim().split(/\s+/).filter(w => w.length > 0).length;
+  }, [content]);
+
+  const readingTime = useMemo(() => {
+    return Math.max(1, Math.ceil(wordCount / 200));
+  }, [wordCount]);
+
+  const goalProgress = useMemo(() => {
+    if (dailyGoal <= 0) return 0;
+    return Math.min(100, Math.round((dailyProgress / dailyGoal) * 100));
+  }, [dailyGoal, dailyProgress]);
 
   useEffect(() => {
     return () => {
@@ -593,6 +665,146 @@ export const JournalEditor: React.FC = () => {
     }
   }, []);
 
+  // Typewriter mode - center active line
+  const centerActiveLine = useCallback(() => {
+    if (!isTypewriterMode || !textareaRef.current) return;
+    const textarea = textareaRef.current;
+    const { selectionStart } = textarea;
+    const coords = getCaretCoordinates(textarea, selectionStart);
+    const viewportHeight = textarea.clientHeight;
+    const targetScrollTop = coords.top - (viewportHeight / 2);
+    textarea.scrollTo({
+      top: Math.max(0, targetScrollTop),
+      behavior: 'auto',
+    });
+  }, [isTypewriterMode]);
+
+  // Slash command detection on input
+  const handleTextareaInput = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    const cursorPos = e.target.selectionStart;
+    
+    setContent(value);
+    
+    // Slash command detection
+    const textBefore = value.substring(0, cursorPos);
+    const match = textBefore.match(/\/([a-zA-Z0-9]*)$/);
+    
+    if (match) {
+      setShowSlashMenu(true);
+      setSlashQuery(match[1]);
+      setSlashSelectedIndex(0);
+      
+      // Calculate position for menu
+      const coords = getCaretCoordinates(e.target, cursorPos);
+      const rect = e.target.getBoundingClientRect();
+      const scrollTop = e.target.scrollTop;
+      
+      setSlashMenuPosition({
+        top: coords.top - scrollTop + 24,
+        left: Math.min(coords.left + 10, rect.width - 240),
+      });
+    } else {
+      setShowSlashMenu(false);
+    }
+    
+    // Typewriter mode centering
+    if (isTypewriterMode) {
+      requestAnimationFrame(centerActiveLine);
+    }
+  }, [isTypewriterMode, centerActiveLine]);
+
+  // Handle slash command keyboard navigation
+  const handleTextareaKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (showSlashMenu) {
+      const filteredCommands = SLASH_COMMANDS.filter(cmd =>
+        cmd.label.toLowerCase().includes(slashQuery.toLowerCase()) ||
+        cmd.id.includes(slashQuery.toLowerCase())
+      );
+      
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSlashSelectedIndex(prev => (prev + 1) % filteredCommands.length);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSlashSelectedIndex(prev => (prev - 1 + filteredCommands.length) % filteredCommands.length);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const command = filteredCommands[slashSelectedIndex];
+        if (command) {
+          executeSlashCommand(command);
+        }
+      } else if (e.key === 'Escape') {
+        setShowSlashMenu(false);
+      }
+    }
+  }, [showSlashMenu, slashQuery, slashSelectedIndex]);
+
+  // Execute a slash command
+  const executeSlashCommand = useCallback((command: SlashCommand) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    
+    const cursorPos = textarea.selectionStart;
+    const { text, newCursor } = replaceSlashCommand(content, cursorPos, command.action);
+    
+    setContent(text);
+    setShowSlashMenu(false);
+    
+    // Set cursor position after state update
+    requestAnimationFrame(() => {
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+        textareaRef.current.setSelectionRange(newCursor, newCursor);
+        if (isTypewriterMode) centerActiveLine();
+      }
+    });
+  }, [content, isTypewriterMode, centerActiveLine]);
+
+  // Download entry as markdown
+  const handleDownload = useCallback(() => {
+    const blob = new Blob([content], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${title || 'untitled'}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [content, title]);
+
+  // Handle goal submit
+  const handleGoalSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    const val = parseInt(tempGoal, 10);
+    if (!isNaN(val) && val > 0) {
+      setDailyGoal(val);
+    } else {
+      setDailyGoal(0);
+    }
+    setIsEditingGoal(false);
+  }, [tempGoal]);
+
+  // Toggle zen mode
+  const toggleZenMode = useCallback(() => {
+    setIsZenMode(prev => !prev);
+  }, []);
+
+  // Toggle typewriter mode
+  const toggleTypewriterMode = useCallback(() => {
+    setIsTypewriterMode(prev => {
+      if (!prev) {
+        // When enabling, center the current line
+        requestAnimationFrame(centerActiveLine);
+      }
+      return !prev;
+    });
+  }, [centerActiveLine]);
+
+  // Toggle preview mode
+  const togglePreviewMode = useCallback(() => {
+    setIsPreviewMode(prev => !prev);
+  }, []);
+
   const handleInsert = useCallback(
     (textToInsert: string) => {
       const textarea = textareaRef.current;
@@ -681,15 +893,36 @@ export const JournalEditor: React.FC = () => {
         e.preventDefault();
         setShowTemplate((prev) => !prev);
       }
+      // Escape: Exit zen mode
+      else if (e.key === "Escape" && isZenMode) {
+        e.preventDefault();
+        setIsZenMode(false);
+      }
+      // Cmd/Ctrl + Shift + Z: Toggle zen mode
+      else if (isMod && e.shiftKey && e.key.toLowerCase() === "z") {
+        e.preventDefault();
+        toggleZenMode();
+      }
+      // Cmd/Ctrl + Shift + T: Toggle typewriter mode
+      else if (isMod && e.shiftKey && e.key.toLowerCase() === "t") {
+        e.preventDefault();
+        toggleTypewriterMode();
+      }
+      // Cmd/Ctrl + Shift + P: Toggle preview mode
+      else if (isMod && e.shiftKey && e.key.toLowerCase() === "p") {
+        e.preventDefault();
+        togglePreviewMode();
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleManualSave, createNewEntry]);
+  }, [handleManualSave, createNewEntry, isZenMode, toggleZenMode, toggleTypewriterMode, togglePreviewMode]);
 
-  return (
-    <div className="flex flex-col h-full overflow-hidden bg-bg relative">
-      {!isAuthLoading && !isAuthenticated && (
+  // Zen mode wrapper
+  const editorContent = (
+    <div className={`flex flex-col h-full overflow-hidden bg-bg relative ${isZenMode ? 'fixed inset-0 z-[100]' : ''}`}>
+      {!isAuthLoading && !isAuthenticated && !isZenMode && (
         <div className="bg-yellow-500/10 border-b border-yellow-500/30 px-4 py-2 flex items-center gap-2 shrink-0">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -721,7 +954,7 @@ export const JournalEditor: React.FC = () => {
         </div>
       )}
       <div className="flex flex-1 overflow-hidden">
-        {showSidebar && (
+        {showSidebar && !isZenMode && (
           <>
             <JournalEntryList
               entries={entries}
@@ -735,22 +968,58 @@ export const JournalEditor: React.FC = () => {
           </>
         )}
 
-        <div className="flex-1 flex flex-col min-w-[300px] transition-all duration-300">
+        <div className={`flex-1 flex flex-col min-w-[300px] transition-all duration-300 ${isZenMode ? 'max-w-3xl mx-auto w-full' : ''}`}>
           <div className="flex items-center justify-between px-3 py-2 border-b border-default bg-bg/50 backdrop-blur-sm sticky top-0 z-10">
             <div className="flex items-center gap-3">
-              <button
-                onClick={() => setShowSidebar(!showSidebar)}
-                className={`p-1.5 rounded-md transition-colors ${!showSidebar ? "bg-accent/10 text-accent" : "text-muted hover:text-default hover:bg-bg-alt"}`}
-                title={
-                  showSidebar ? "Hide Sidebar (Focus Mode)" : "Show Sidebar"
-                }
-              >
-                <GridIcon className="w-4 h-4" />
-              </button>
-              <span className="h-4 w-px bg-default/20 mx-1"></span>
-              <span className="text-xs text-muted font-mono">
-                {content.length} chars
-              </span>
+              {!isZenMode && (
+                <>
+                  <button
+                    onClick={() => setShowSidebar(!showSidebar)}
+                    className={`p-1.5 rounded-md transition-colors ${!showSidebar ? "bg-accent/10 text-accent" : "text-muted hover:text-default hover:bg-bg-alt"}`}
+                    title={
+                      showSidebar ? "Hide Sidebar (Focus Mode)" : "Show Sidebar"
+                    }
+                  >
+                    <GridIcon className="w-4 h-4" />
+                  </button>
+                  <span className="h-4 w-px bg-default/20 mx-1"></span>
+                </>
+              )}
+              
+              {/* Stats display */}
+              <div className="flex items-center gap-2 text-[10px] text-muted font-medium uppercase tracking-wide">
+                <span>{wordCount} words</span>
+                <span className="opacity-50">•</span>
+                <span>{readingTime} min</span>
+                <span className="opacity-50">•</span>
+                <span className="font-mono text-[11px] normal-case">{content.length} chars</span>
+              </div>
+              
+              {/* Daily goal widget */}
+              {dailyGoal > 0 && (
+                <>
+                  <span className="h-4 w-px bg-default/20 mx-1"></span>
+                  <div 
+                    className="flex items-center gap-2 cursor-pointer group"
+                    onClick={() => setIsEditingGoal(true)}
+                    title="Click to edit daily goal"
+                  >
+                    <div className="w-16 h-1.5 bg-default/10 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full transition-all duration-500 ${goalProgress >= 100 ? 'bg-green-500' : 'bg-accent'}`}
+                        style={{ width: `${goalProgress}%` }}
+                      />
+                    </div>
+                    <span className={`text-[10px] font-medium ${goalProgress >= 100 ? 'text-green-500' : 'text-muted'}`}>
+                      {dailyProgress}/{dailyGoal}
+                    </span>
+                    {goalProgress >= 100 && (
+                      <span className="text-[10px]" title="Goal reached!">🎉</span>
+                    )}
+                  </div>
+                </>
+              )}
+              
               {showSaveConfirm && (
                 <span className="text-xs text-green-500 font-medium animate-pulse">
                   Saved
@@ -775,7 +1044,7 @@ export const JournalEditor: React.FC = () => {
                   </button>
                 </div>
               )}
-              {!isAuthLoading && !isAuthenticated && (
+              {!isAuthLoading && !isAuthenticated && !isZenMode && (
                 <span
                   className="text-xs text-yellow-500 font-medium"
                   title="Not logged in - saved locally only"
@@ -812,12 +1081,95 @@ export const JournalEditor: React.FC = () => {
               )}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              {/* Focus mode toggles */}
+              <button
+                onClick={toggleTypewriterMode}
+                className={`p-1.5 rounded-md transition-all duration-200 ${
+                  isTypewriterMode 
+                    ? "text-accent bg-accent/10" 
+                    : "text-muted hover:text-default hover:bg-bg-alt"
+                }`}
+                title="Typewriter Mode (⌘⇧T)"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="21" x2="3" y1="6" y2="6"/>
+                  <line x1="17" x2="7" y1="12" y2="12"/>
+                  <line x1="19" x2="5" y1="18" y2="18"/>
+                </svg>
+              </button>
+              
+              <button
+                onClick={toggleZenMode}
+                className={`p-1.5 rounded-md transition-all duration-200 ${
+                  isZenMode 
+                    ? "text-accent bg-accent/10" 
+                    : "text-muted hover:text-default hover:bg-bg-alt"
+                }`}
+                title={isZenMode ? "Exit Zen Mode (Esc)" : "Zen Mode (⌘⇧Z)"}
+              >
+                {isZenMode ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="4 14 10 14 10 20"/>
+                    <polyline points="20 10 14 10 14 4"/>
+                    <line x1="14" x2="21" y1="10" y2="3"/>
+                    <line x1="3" x2="10" y1="21" y2="14"/>
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="15 3 21 3 21 9"/>
+                    <polyline points="9 21 3 21 3 15"/>
+                    <line x1="21" x2="14" y1="3" y2="10"/>
+                    <line x1="3" x2="10" y1="21" y2="14"/>
+                  </svg>
+                )}
+              </button>
+              
+              <span className="h-4 w-px bg-default/20 mx-1"></span>
+              
+              {/* Preview toggle */}
+              <button
+                onClick={togglePreviewMode}
+                className={`p-1.5 rounded-md transition-all duration-200 ${
+                  isPreviewMode 
+                    ? "text-accent bg-accent/10" 
+                    : "text-muted hover:text-default hover:bg-bg-alt"
+                }`}
+                title={isPreviewMode ? "Edit Mode (⌘⇧P)" : "Preview Mode (⌘⇧P)"}
+              >
+                {isPreviewMode ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                    <line x1="1" x2="23" y1="1" y2="23"/>
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                )}
+              </button>
+              
+              {/* Download */}
+              <button
+                onClick={handleDownload}
+                className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-default hover:bg-bg-alt"
+                title="Download as Markdown"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" x2="12" y1="15" y2="3"/>
+                </svg>
+              </button>
+              
+              <span className="h-4 w-px bg-default/20 mx-1"></span>
+              
               <button
                 onClick={handleManualSave}
                 disabled={isSaving}
                 className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-green-500 hover:bg-green-500/15 hover:shadow-[0_0_8px_rgba(34,197,94,0.3)] disabled:opacity-50 disabled:hover:text-muted disabled:hover:bg-transparent disabled:hover:shadow-none"
-                title="Save Entry"
+                title="Save Entry (⌘S)"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -853,18 +1205,23 @@ export const JournalEditor: React.FC = () => {
                   <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
               </button>
-              <span className="h-4 w-px bg-default/20"></span>
-              <button
-                onClick={() => setShowTemplate(!showTemplate)}
-                className={`px-2 py-1 rounded-md text-xs font-medium transition-colors border ${
-                  showTemplate
-                    ? "bg-accent text-accent-text border-accent hover:bg-accent-hover"
-                    : "bg-bg text-muted border-default/30 hover:text-default hover:border-default"
-                }`}
-                title="Toggle Reference Pane"
-              >
-                {showTemplate ? "Hide Reference" : "Reference"}
-              </button>
+              
+              {!isZenMode && (
+                <>
+                  <span className="h-4 w-px bg-default/20"></span>
+                  <button
+                    onClick={() => setShowTemplate(!showTemplate)}
+                    className={`px-2 py-1 rounded-md text-xs font-medium transition-colors border ${
+                      showTemplate
+                        ? "bg-accent text-accent-text border-accent hover:bg-accent-hover"
+                        : "bg-bg text-muted border-default/30 hover:text-default hover:border-default"
+                    }`}
+                    title="Toggle Reference Pane (⌘/)"
+                  >
+                    {showTemplate ? "Hide Reference" : "Reference"}
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
@@ -876,21 +1233,49 @@ export const JournalEditor: React.FC = () => {
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Untitled Note"
                 className="bg-transparent border-none text-lg sm:text-xl font-bold text-default focus:ring-0 w-full outline-none placeholder:text-muted/30"
+                disabled={isPreviewMode}
               />
             </div>
 
-            <div className="flex-1 relative overflow-auto px-4 sm:px-6 py-2">
-              <textarea
-                ref={textareaRef}
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                onBlur={handleTextareaBlur}
-                placeholder="Start writing..."
-                className="w-full h-full min-h-[300px] bg-transparent border-none outline-none resize-none text-sm leading-relaxed text-default placeholder:text-muted/30"
-              />
+            <div className={`flex-1 relative overflow-auto px-4 sm:px-6 py-2 ${isTypewriterMode ? 'typewriter-mode' : ''}`}>
+              {isPreviewMode ? (
+                <div className="markdown-preview prose prose-sm max-w-none text-default">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {content || '*Start writing to see preview...*'}
+                  </ReactMarkdown>
+                </div>
+              ) : (
+                <div className="relative h-full">
+                  <textarea
+                    ref={textareaRef}
+                    value={content}
+                    onChange={handleTextareaInput}
+                    onKeyDown={handleTextareaKeyDown}
+                    onBlur={handleTextareaBlur}
+                    placeholder="Start writing... Type '/' for commands"
+                    className={`w-full h-full min-h-[300px] bg-transparent border-none outline-none resize-none text-sm leading-relaxed text-default placeholder:text-muted/30 ${isTypewriterMode ? 'pb-[50vh]' : ''}`}
+                  />
+                  
+                  {/* Slash command menu */}
+                  {showSlashMenu && (
+                    <SlashMenu
+                      position={slashMenuPosition}
+                      query={slashQuery}
+                      selectedIndex={slashSelectedIndex}
+                      onSelect={executeSlashCommand}
+                      onClose={() => setShowSlashMenu(false)}
+                      onNavigate={(dir) => {
+                        if (typeof dir === 'number') {
+                          setSlashSelectedIndex(dir);
+                        }
+                      }}
+                    />
+                  )}
+                </div>
+              )}
             </div>
 
-            {activeItem && (
+            {activeItem && !isZenMode && (
               <BottomPanel
                 item={activeItem}
                 isOpen={bottomPanelOpen}
@@ -904,7 +1289,7 @@ export const JournalEditor: React.FC = () => {
           </div>
         </div>
 
-        {showTemplate && (
+        {showTemplate && !isZenMode && (
           <>
             <ResizeHandle onResize={handleResizeReferencePane} />
             <ReferencePane
@@ -988,6 +1373,64 @@ export const JournalEditor: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Daily goal editing modal */}
+      {isEditingGoal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-bg border border-default rounded-lg p-6 max-w-sm mx-4 shadow-xl">
+            <h3 className="text-lg font-semibold text-default mb-2">
+              Daily Writing Goal
+            </h3>
+            <p className="text-sm text-muted mb-4">
+              Set a word count goal to track your daily writing progress.
+            </p>
+            <form onSubmit={handleGoalSubmit}>
+              <input
+                type="number"
+                value={tempGoal}
+                onChange={(e) => setTempGoal(e.target.value)}
+                placeholder="Word count (e.g., 500)"
+                className="w-full px-3 py-2 rounded-md border border-default bg-bg-alt text-default mb-4 focus:border-accent focus:outline-none"
+                min="0"
+                autoFocus
+              />
+              <div className="flex justify-between items-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDailyGoal(0);
+                    setDailyProgress(0);
+                    setIsEditingGoal(false);
+                  }}
+                  className="text-xs text-muted hover:text-red-500"
+                >
+                  Reset Progress
+                </button>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTempGoal(dailyGoal.toString());
+                      setIsEditingGoal(false);
+                    }}
+                    className="px-3 py-1.5 rounded-md text-sm font-medium bg-bg-alt text-default border border-default hover:bg-bg-alt/80 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-3 py-1.5 rounded-md text-sm font-medium bg-accent text-accent-text hover:bg-accent-hover transition-colors"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
+
+  return editorContent;
 };

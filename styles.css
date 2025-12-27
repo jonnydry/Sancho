@@ -270,3 +270,173 @@ body::-webkit-scrollbar-corner,
 *::-webkit-scrollbar-corner {
   background: transparent;
 }
+
+/* ============================================
+   ELEGANT NOTES FEATURES
+   ============================================ */
+
+/* Markdown Preview Styles */
+.markdown-preview {
+  font-family: 'Source Serif Pro', 'Georgia', serif;
+  line-height: 1.75;
+}
+
+.markdown-preview h1,
+.markdown-preview h2,
+.markdown-preview h3,
+.markdown-preview h4,
+.markdown-preview h5,
+.markdown-preview h6 {
+  font-family: 'Source Code Pro', monospace;
+  font-weight: 700;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  color: rgb(var(--app-text));
+}
+
+.markdown-preview h1 { font-size: 1.875rem; }
+.markdown-preview h2 { font-size: 1.5rem; }
+.markdown-preview h3 { font-size: 1.25rem; }
+.markdown-preview h4 { font-size: 1.125rem; }
+
+.markdown-preview p {
+  margin-bottom: 1em;
+}
+
+.markdown-preview a {
+  color: rgb(var(--app-accent));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.markdown-preview a:hover {
+  opacity: 0.8;
+}
+
+.markdown-preview code {
+  font-family: 'Source Code Pro', monospace;
+  background-color: rgb(var(--app-bg-alt));
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+}
+
+.markdown-preview pre {
+  background-color: rgb(var(--app-bg-alt));
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1em 0;
+}
+
+.markdown-preview pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+.markdown-preview blockquote {
+  border-left: 3px solid rgb(var(--app-accent));
+  margin: 1em 0;
+  padding-left: 1rem;
+  color: rgb(var(--app-text-muted));
+  font-style: italic;
+}
+
+.markdown-preview ul,
+.markdown-preview ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1em;
+}
+
+.markdown-preview li {
+  margin-bottom: 0.375em;
+}
+
+.markdown-preview ul {
+  list-style-type: disc;
+}
+
+.markdown-preview ol {
+  list-style-type: decimal;
+}
+
+.markdown-preview ul ul,
+.markdown-preview ol ul {
+  list-style-type: circle;
+}
+
+.markdown-preview hr {
+  border: none;
+  border-top: 1px solid rgb(var(--app-border));
+  margin: 2em 0;
+}
+
+.markdown-preview img {
+  max-width: 100%;
+  border-radius: 0.5rem;
+}
+
+.markdown-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+
+.markdown-preview th,
+.markdown-preview td {
+  border: 1px solid rgb(var(--app-border));
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.markdown-preview th {
+  background-color: rgb(var(--app-bg-alt));
+  font-weight: 600;
+}
+
+/* Checkbox styling in markdown */
+.markdown-preview input[type="checkbox"] {
+  margin-right: 0.5rem;
+  accent-color: rgb(var(--app-accent));
+}
+
+/* Typewriter Mode */
+.typewriter-mode {
+  scroll-behavior: auto;
+}
+
+.typewriter-mode textarea {
+  scroll-margin-top: 50vh;
+}
+
+/* Slash Menu Animation */
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slash-menu {
+  animation: slideUpFade 0.15s ease-out;
+}
+
+/* Focus ring styles */
+.focus-visible:focus {
+  outline: 2px solid rgb(var(--app-accent));
+  outline-offset: 2px;
+}
+
+/* Goal progress bar animation */
+@keyframes goalPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.goal-reached {
+  animation: goalPulse 2s ease-in-out infinite;
+}
