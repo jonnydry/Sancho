@@ -440,3 +440,25 @@ body::-webkit-scrollbar-corner,
 .goal-reached {
   animation: goalPulse 2s ease-in-out infinite;
 }
+
+/* Tag Highlight in Content */
+.tag-highlight {
+  color: rgb(var(--app-accent));
+  font-weight: 500;
+}
+
+/* Tag folder animation */
+@keyframes folderExpand {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+  }
+}
+
+.tag-folder-content {
+  animation: folderExpand 0.2s ease-out;
+}

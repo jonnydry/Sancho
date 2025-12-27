@@ -14,10 +14,12 @@ import { JournalEntryList } from "./JournalEntryList";
 import { ReferencePane } from "./ReferencePane";
 import { BottomPanel } from "./BottomPanel";
 import { SlashMenu, SLASH_COMMANDS, SlashCommand, replaceSlashCommand } from "./SlashMenu";
+import { TagInput } from "./TagInput";
 import { GridIcon } from "./icons/GridIcon";
 import { poetryData } from "../data/poetryData";
 import { poeticDevicesData } from "../data/poeticDevicesData";
 import { getCaretCoordinates } from "../utils/cursor";
+import { extractTagsFromContent, mergeTags, getAllTagsFromEntries } from "../utils/tagUtils";
 
 const generateUUID = (): string => {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
@@ -211,6 +213,11 @@ export const JournalEditor: React.FC = () => {
   const [tempGoal, setTempGoal] = useState(dailyGoal.toString());
   const previousWordCountRef = useRef<number>(0);
 
+  // Tag state
+  const [tags, setTags] = useState<string[]>([]);
+  const [isStarred, setIsStarred] = useState(false);
+  const tagExtractionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const retryCountRef = useRef<number>(0);
@@ -221,10 +228,14 @@ export const JournalEditor: React.FC = () => {
     title: string;
     content: string;
     activeTemplate?: string;
+    tags: string[];
+    isStarred: boolean;
     entries: JournalEntry[];
   }>({
     title: "",
     content: "",
+    tags: [],
+    isStarred: false,
     entries: [],
   });
 
@@ -291,6 +302,9 @@ export const JournalEditor: React.FC = () => {
       if (retryTimeoutRef.current) {
         clearTimeout(retryTimeoutRef.current);
       }
+      if (tagExtractionTimeoutRef.current) {
+        clearTimeout(tagExtractionTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -338,14 +352,16 @@ export const JournalEditor: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    currentStateRef.current = { title, content, activeTemplate, entries };
-  }, [title, content, activeTemplate, entries]);
+    currentStateRef.current = { title, content, activeTemplate, tags, isStarred, entries };
+  }, [title, content, activeTemplate, tags, isStarred, entries]);
 
   const selectEntryDirect = useCallback((entry: JournalEntry) => {
     setSelectedId(entry.id);
     setTitle(entry.title);
     setContent(entry.content);
     setActiveTemplate(entry.templateRef);
+    setTags(entry.tags || []);
+    setIsStarred(entry.isStarred || false);
     if (entry.templateRef) {
       setShowTemplate(true);
     }
@@ -359,6 +375,8 @@ export const JournalEditor: React.FC = () => {
       content: "",
       createdAt: Date.now(),
       updatedAt: Date.now(),
+      tags: [],
+      isStarred: false,
     };
 
     // Optimistic UI update - show new entry immediately
@@ -367,6 +385,8 @@ export const JournalEditor: React.FC = () => {
     setTitle(newEntry.title);
     setContent(newEntry.content);
     setActiveTemplate(newEntry.templateRef);
+    setTags([]);
+    setIsStarred(false);
     previousSelectedIdRef.current = newEntry.id;
 
     // Save to server in background
@@ -443,6 +463,8 @@ export const JournalEditor: React.FC = () => {
         content: state.content || currentEntry.content,
         updatedAt: Date.now(),
         templateRef: state.activeTemplate,
+        tags: state.tags,
+        isStarred: state.isStarred,
       };
       try {
         await JournalStorage.save(entryToSave);
@@ -484,6 +506,8 @@ export const JournalEditor: React.FC = () => {
               setTitle(nextEntry.title);
               setContent(nextEntry.content);
               setActiveTemplate(nextEntry.templateRef);
+              setTags(nextEntry.tags || []);
+              setIsStarred(nextEntry.isStarred || false);
               previousSelectedIdRef.current = nextEntry.id;
             });
           }
@@ -496,6 +520,8 @@ export const JournalEditor: React.FC = () => {
             content: "",
             createdAt: Date.now(),
             updatedAt: Date.now(),
+            tags: [],
+            isStarred: false,
           };
 
           // Schedule state updates and save
@@ -504,6 +530,8 @@ export const JournalEditor: React.FC = () => {
             setTitle("");
             setContent("");
             setActiveTemplate(undefined);
+            setTags([]);
+            setIsStarred(false);
             previousSelectedIdRef.current = newEntry.id;
 
             // Save new entry to server
@@ -548,6 +576,8 @@ export const JournalEditor: React.FC = () => {
         createdAt: currentEntry.createdAt || Date.now(),
         updatedAt: Date.now(),
         templateRef: activeTemplate,
+        tags,
+        isStarred,
       };
 
       // Update local state optimistically (preserve order)
@@ -613,7 +643,7 @@ export const JournalEditor: React.FC = () => {
         }
       }
     },
-    [selectedId, entries, title, content, activeTemplate, autosaveError],
+    [selectedId, entries, title, content, activeTemplate, tags, isStarred, autosaveError],
   );
 
   const handleManualSave = useCallback(async () => {
@@ -784,6 +814,67 @@ export const JournalEditor: React.FC = () => {
     setIsEditingGoal(false);
   }, [tempGoal]);
 
+  // Toggle star for an entry
+  const handleToggleStar = useCallback(async (id: string) => {
+    const entry = entries.find((e) => e.id === id);
+    if (!entry) return;
+
+    const newStarred = !entry.isStarred;
+    
+    // Optimistic update
+    setEntries((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, isStarred: newStarred } : e))
+    );
+    
+    // Update current entry state if it's the selected one
+    if (id === selectedId) {
+      setIsStarred(newStarred);
+    }
+
+    // Save to server
+    try {
+      await JournalStorage.save({ ...entry, isStarred: newStarred, updatedAt: Date.now() });
+    } catch (error) {
+      console.error("Failed to toggle star:", error);
+      // Revert on error
+      setEntries((prev) =>
+        prev.map((e) => (e.id === id ? { ...e, isStarred: !newStarred } : e))
+      );
+      if (id === selectedId) {
+        setIsStarred(!newStarred);
+      }
+    }
+  }, [entries, selectedId]);
+
+  // Get all tags from entries for autocomplete
+  const allAvailableTags = useMemo(() => getAllTagsFromEntries(entries), [entries]);
+
+  // Auto-extract tags from content (debounced)
+  useEffect(() => {
+    if (tagExtractionTimeoutRef.current) {
+      clearTimeout(tagExtractionTimeoutRef.current);
+    }
+    
+    tagExtractionTimeoutRef.current = setTimeout(() => {
+      const extractedTags = extractTagsFromContent(content);
+      // Merge with existing manual tags, keeping all unique tags
+      setTags((currentTags) => {
+        const merged = mergeTags(currentTags, extractedTags);
+        // Only update if there are new tags from content
+        if (merged.length !== currentTags.length || !merged.every((t) => currentTags.includes(t))) {
+          return merged;
+        }
+        return currentTags;
+      });
+    }, 1000); // 1 second debounce
+
+    return () => {
+      if (tagExtractionTimeoutRef.current) {
+        clearTimeout(tagExtractionTimeoutRef.current);
+      }
+    };
+  }, [content]);
+
   // Toggle zen mode
   const toggleZenMode = useCallback(() => {
     setIsZenMode(prev => !prev);
@@ -865,7 +956,7 @@ export const JournalEditor: React.FC = () => {
     return () => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     };
-  }, [content, title, activeTemplate, selectedId, handleSave]);
+  }, [content, title, activeTemplate, tags, isStarred, selectedId, handleSave]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -962,6 +1053,7 @@ export const JournalEditor: React.FC = () => {
               onSelect={handleEntrySelect}
               onCreate={createNewEntry}
               onDelete={deleteEntry}
+              onToggleStar={handleToggleStar}
               width={entryListWidth}
             />
             <ResizeHandle onResize={handleResizeEntryList} />
@@ -1226,13 +1318,21 @@ export const JournalEditor: React.FC = () => {
           </div>
 
           <div className="flex-1 flex flex-col relative overflow-hidden">
-            <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-2">
+            <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-2 space-y-2">
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Untitled Note"
                 className="bg-transparent border-none text-lg sm:text-xl font-bold text-default focus:ring-0 w-full outline-none placeholder:text-muted/30"
+                disabled={isPreviewMode}
+              />
+              {/* Tag Input */}
+              <TagInput
+                tags={tags}
+                onChange={setTags}
+                allTags={allAvailableTags}
+                placeholder="Add tags... (type #tag in content or add here)"
                 disabled={isPreviewMode}
               />
             </div>

@@ -5,6 +5,8 @@ export interface JournalEntry {
   createdAt: number;
   updatedAt: number;
   templateRef?: string;
+  tags?: string[];
+  isStarred?: boolean;
 }
 
 const LOCAL_STORAGE_KEY = 'sancho_journal_entries';
@@ -65,6 +67,8 @@ export const JournalStorage = {
           title: entry.title,
           content: entry.content,
           templateRef: entry.templateRef,
+          tags: entry.tags || [],
+          isStarred: entry.isStarred || false,
         }),
       });
       console.log(`[Journal] Entry saved to server successfully`);
@@ -82,6 +86,8 @@ export const JournalStorage = {
               title: entry.title,
               content: entry.content,
               templateRef: entry.templateRef,
+              tags: entry.tags || [],
+              isStarred: entry.isStarred || false,
             }),
           });
           console.log(`[Journal] Entry created on server successfully`);

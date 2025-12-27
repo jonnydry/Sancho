@@ -55,6 +55,8 @@ export const journalEntries = pgTable(
     title: varchar("title").notNull().default(''),
     content: varchar("content").notNull().default(''),
     templateRef: varchar("template_ref"),
+    tags: jsonb("tags").default([]),
+    isStarred: varchar("is_starred").default('false'),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
   },
