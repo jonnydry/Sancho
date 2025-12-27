@@ -157,8 +157,8 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
     setIsLoadingExample(true);
     setExampleError(null);
     try {
-      // Pass the current example so the AI knows to pick something different
-      const result = await findPoetryExample(item.name, example?.example);
+      // Pass the full item context so AI knows the rules, plus previous example to avoid
+      const result = await findPoetryExample(item, example?.example);
       setExample(result);
     } catch (err) {
       setExampleError(

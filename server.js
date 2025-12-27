@@ -320,10 +320,10 @@ const openai = new OpenAI({
 
 app.post('/api/poetry-example', rateLimit(10, 60000), async (req, res) => { // 10 requests per minute
   try {
-    const { topic, previousExample } = req.body;
+    const { context, previousExample } = req.body;
 
-    if (!topic) {
-      return res.status(400).json({ error: 'Topic is required' });
+    if (!context || !context.name) {
+      return res.status(400).json({ error: 'Poetry item context is required' });
     }
 
     if (!process.env.XAI_API_KEY) {
@@ -345,16 +345,27 @@ app.post('/api/poetry-example', rateLimit(10, 60000), async (req, res) => { // 1
       exclusionNote = `\n\nDO NOT use this poem again - choose something completely different:\n"${previousExample.substring(0, 200)}..."`;
     }
     
-    const prompt = `Provide a famous example of ${topic} in poetry.
+    // Build context from the poetry item
+    const structureRules = context.structure ? context.structure.join('\n- ') : '';
+    const notesInfo = context.notes ? context.notes.join('\n- ') : '';
+    
+    const prompt = `Find a famous example of "${context.name}" (a poetic ${context.type.toLowerCase()}) in poetry.
+
+DEFINITION: ${context.description}
+
+RULES/STRUCTURE that the example MUST follow:
+- ${structureRules}
+
+${notesInfo ? `ADDITIONAL NOTES:\n- ${notesInfo}\n` : ''}
+CRITICAL: The example you provide MUST correctly demonstrate ${context.name} by following the rules above. For example, if the form requires a specific syllable count or rhyme scheme, the example must have that exact structure.
 
 VARIETY REQUIREMENT (seed: ${randomSeed}):
 - Consider exploring ${suggestedEra} ${suggestedRegion} poetry, but feel free to choose any era/region
-- Pick a DIFFERENT poem than you might typically choose - surprise me with a lesser-known gem
-- Draw from your vast knowledge across all poetic traditions${exclusionNote}
+- Pick a DIFFERENT poem than you might typically choose - surprise me with a lesser-known gem${exclusionNote}
 
-Include the author, title, the poem excerpt, and explain how it demonstrates ${topic}.
+Include the author, title, the poem excerpt, and explain specifically how it follows the rules of ${context.name}.
 
-Respond with JSON: { "example": "poem excerpt", "author": "poet name", "title": "poem title", "explanation": "how it demonstrates the concept" }`;
+Respond with JSON: { "example": "poem excerpt", "author": "poet name", "title": "poem title", "explanation": "how it demonstrates the concept by following the specific rules" }`;
 
     const response = await openai.chat.completions.create({
       model: "grok-4-1-fast-non-reasoning",
