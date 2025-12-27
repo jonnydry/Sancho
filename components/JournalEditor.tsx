@@ -744,7 +744,7 @@ export const JournalEditor: React.FC = () => {
     }
   }, [isTypewriterMode, centerActiveLine]);
 
-  // Handle slash command keyboard navigation
+  // Handle slash command keyboard navigation and list auto-continuation
   const handleTextareaKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (showSlashMenu) {
       const filteredCommands = SLASH_COMMANDS.filter(cmd =>
@@ -767,8 +767,78 @@ export const JournalEditor: React.FC = () => {
       } else if (e.key === 'Escape') {
         setShowSlashMenu(false);
       }
+    } else if (e.key === 'Enter' && !e.shiftKey) {
+      // List auto-continuation
+      const textarea = e.currentTarget;
+      const cursorPos = textarea.selectionStart;
+      const textBefore = content.substring(0, cursorPos);
+      
+      // Find the current line
+      const lastNewline = textBefore.lastIndexOf('\n');
+      const currentLine = textBefore.substring(lastNewline + 1);
+      
+      // Check for list patterns (order matters: checklist before bullet since checklist starts with -)
+      const checklistMatch = currentLine.match(/^(\s*)-\s\[[x\s]\]\s(.*)$/i);
+      const bulletMatch = currentLine.match(/^(\s*)-\s(.*)$/);
+      const numberedMatch = currentLine.match(/^(\s*)(\d+)\.\s(.*)$/);
+      
+      let listPrefix: string | null = null;
+      let isEmptyItem = false;
+      let lineStartPos = lastNewline + 1;
+      
+      if (checklistMatch) {
+        const [, indent, itemContent] = checklistMatch;
+        isEmptyItem = itemContent.trim() === '';
+        listPrefix = `\n${indent}- [ ] `;
+      } else if (bulletMatch) {
+        const [, indent, itemContent] = bulletMatch;
+        isEmptyItem = itemContent.trim() === '';
+        listPrefix = `\n${indent}- `;
+      } else if (numberedMatch) {
+        const [, indent, num, itemContent] = numberedMatch;
+        isEmptyItem = itemContent.trim() === '';
+        listPrefix = `\n${indent}${parseInt(num, 10) + 1}. `;
+      }
+      
+      if (listPrefix !== null) {
+        e.preventDefault();
+        
+        if (isEmptyItem) {
+          // Remove the empty list item prefix (exit the list)
+          const beforeLine = content.substring(0, lineStartPos);
+          const afterCursor = content.substring(cursorPos);
+          const newContent = beforeLine + afterCursor;
+          
+          setContent(newContent);
+          
+          // Set cursor at the start of what was the list line
+          requestAnimationFrame(() => {
+            if (textareaRef.current) {
+              textareaRef.current.focus();
+              textareaRef.current.setSelectionRange(lineStartPos, lineStartPos);
+              if (isTypewriterMode) centerActiveLine();
+            }
+          });
+        } else {
+          // Insert the list continuation prefix
+          const beforeCursor = content.substring(0, cursorPos);
+          const afterCursor = content.substring(cursorPos);
+          const newContent = beforeCursor + listPrefix + afterCursor;
+          const newCursorPos = cursorPos + listPrefix.length;
+          
+          setContent(newContent);
+          
+          requestAnimationFrame(() => {
+            if (textareaRef.current) {
+              textareaRef.current.focus();
+              textareaRef.current.setSelectionRange(newCursorPos, newCursorPos);
+              if (isTypewriterMode) centerActiveLine();
+            }
+          });
+        }
+      }
     }
-  }, [showSlashMenu, slashQuery, slashSelectedIndex]);
+  }, [showSlashMenu, slashQuery, slashSelectedIndex, content, isTypewriterMode, centerActiveLine]);
 
   // Execute a slash command
   const executeSlashCommand = useCallback((command: SlashCommand) => {
