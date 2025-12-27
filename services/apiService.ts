@@ -1,29 +1,13 @@
-import { PoetryExampleResponse, SanchoQuoteResponse, LearnMoreResponse, PoetryItem } from '../types';
+import { PoetryExampleResponse, SanchoQuoteResponse, LearnMoreResponse } from '../types';
 
-interface PoetryExampleContext {
-  name: string;
-  type: string;
-  description: string;
-  structure: string[];
-  notes?: string[];
-}
-
-export const findPoetryExample = async (item: PoetryItem, previousExample?: string): Promise<PoetryExampleResponse> => {
-  const context: PoetryExampleContext = {
-    name: item.name,
-    type: item.type,
-    description: item.description,
-    structure: item.structure,
-    notes: item.notes,
-  };
-  
+export const findPoetryExample = async (topic: string, previousExample?: string): Promise<PoetryExampleResponse> => {
   try {
     const response = await fetch('/api/poetry-example', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ context, previousExample }),
+      body: JSON.stringify({ topic, previousExample }),
     });
 
     if (!response.ok) {
