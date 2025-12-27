@@ -117,7 +117,7 @@ export const JournalStorage = {
         console.log(`[Journal] Created new local entry`);
       }
       
-      entries.sort((a, b) => b.updatedAt - a.updatedAt);
+      entries.sort((a, b) => b.createdAt - a.createdAt);
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(entries));
       console.log(`[Journal] Local storage now has ${entries.length} entries`);
     } catch (error) {

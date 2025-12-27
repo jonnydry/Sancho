@@ -298,7 +298,7 @@ export class DatabaseStorage {
         .select()
         .from(journalEntries)
         .where(eq(journalEntries.userId, userId))
-        .orderBy(desc(journalEntries.updatedAt));
+        .orderBy(desc(journalEntries.createdAt));
       return entries.map(entry => ({
         id: entry.id,
         title: entry.title || '',
