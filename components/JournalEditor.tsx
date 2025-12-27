@@ -5,19 +5,15 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { JournalEntry, JournalStorage } from "../services/journalStorage";
 import { usePinnedItems } from "../contexts/PinnedItemsContext";
 import { useAuth } from "../hooks/useAuth";
 import { JournalEntryList } from "./JournalEntryList";
 import { ReferencePane } from "./ReferencePane";
 import { BottomPanel } from "./BottomPanel";
-import { SlashMenu, SLASH_COMMANDS, SlashCommand } from "./SlashMenu";
 import { GridIcon } from "./icons/GridIcon";
 import { poetryData } from "../data/poetryData";
 import { poeticDevicesData } from "../data/poeticDevicesData";
-import { getCaretCoordinates } from "../utils/cursor";
 
 const generateUUID = (): string => {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
@@ -180,46 +176,6 @@ export const JournalEditor: React.FC = () => {
     string | null
   >(null);
 
-  // Markdown preview mode
-  const [isPreviewMode, setIsPreviewMode] = useState(false);
-
-  // Slash command menu state
-  const [showSlashMenu, setShowSlashMenu] = useState(false);
-  const [slashMenuPosition, setSlashMenuPosition] = useState({ top: 0, left: 0 });
-  const [slashQuery, setSlashQuery] = useState("");
-  const [slashIndex, setSlashIndex] = useState(0);
-
-  // Zen Mode - fullscreen distraction-free writing
-  const [isZenMode, setIsZenMode] = useState(false);
-
-  // Typewriter Mode - keeps active line centered
-  const [isTypewriterMode, setIsTypewriterMode] = useState(false);
-
-  // Font selection
-  const [editorFont, setEditorFont] = useState<"sans" | "serif" | "mono">(() => {
-    const saved = localStorage.getItem("journal_editor_font");
-    return (saved as "sans" | "serif" | "mono") || "sans";
-  });
-
-  // Writing goal state
-  const [dailyGoal, setDailyGoal] = useState<number>(() => {
-    const saved = localStorage.getItem("journal_daily_goal");
-    return saved ? parseInt(saved) : 0;
-  });
-  const [dailyProgress, setDailyProgress] = useState<number>(() => {
-    const saved = localStorage.getItem("journal_daily_progress");
-    const savedDate = localStorage.getItem("journal_daily_progress_date");
-    const today = new Date().toDateString();
-    // Reset if it's a new day
-    if (savedDate !== today) {
-      return 0;
-    }
-    return saved ? parseInt(saved) : 0;
-  });
-  const [showGoalInput, setShowGoalInput] = useState(false);
-  const [goalInputValue, setGoalInputValue] = useState("");
-  const previousWordCountRef = useRef<number>(0);
-
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const retryCountRef = useRef<number>(0);
@@ -248,22 +204,6 @@ export const JournalEditor: React.FC = () => {
     localStorage.setItem("journal_entry_width", entryListWidth.toString());
     localStorage.setItem("journal_ref_width", referencePaneWidth.toString());
   }, [entryListWidth, referencePaneWidth]);
-
-  // Persist font selection
-  useEffect(() => {
-    localStorage.setItem("journal_editor_font", editorFont);
-  }, [editorFont]);
-
-  // Persist daily goal
-  useEffect(() => {
-    localStorage.setItem("journal_daily_goal", dailyGoal.toString());
-  }, [dailyGoal]);
-
-  // Persist daily progress with date
-  useEffect(() => {
-    localStorage.setItem("journal_daily_progress", dailyProgress.toString());
-    localStorage.setItem("journal_daily_progress_date", new Date().toDateString());
-  }, [dailyProgress]);
 
   useEffect(() => {
     return () => {
@@ -315,36 +255,6 @@ export const JournalEditor: React.FC = () => {
     if (!activeTemplate) return null;
     return allItems.find((item) => item.name === activeTemplate) || null;
   }, [activeTemplate, allItems]);
-
-  // Word count and reading time calculations
-  const wordCount = useMemo(() => {
-    if (!content) return 0;
-    return content.trim().split(/\s+/).filter((w) => w.length > 0).length;
-  }, [content]);
-
-  const readingTime = useMemo(() => {
-    return Math.max(1, Math.ceil(wordCount / 200));
-  }, [wordCount]);
-
-  // Track word count changes for daily progress
-  useEffect(() => {
-    if (previousWordCountRef.current > 0 && wordCount > previousWordCountRef.current) {
-      const wordsAdded = wordCount - previousWordCountRef.current;
-      setDailyProgress((prev) => prev + wordsAdded);
-    }
-    previousWordCountRef.current = wordCount;
-  }, [wordCount]);
-
-  // Filtered slash commands based on query
-  const filteredSlashCommands = useMemo(() => {
-    if (!slashQuery) return SLASH_COMMANDS;
-    const query = slashQuery.toLowerCase();
-    return SLASH_COMMANDS.filter(
-      (cmd) =>
-        cmd.label.toLowerCase().includes(query) ||
-        cmd.id.toLowerCase().includes(query)
-    );
-  }, [slashQuery]);
 
   const handleBottomPanelTagClick = useCallback((tag: string) => {
     setShowTemplate(true);
@@ -668,41 +578,6 @@ export const JournalEditor: React.FC = () => {
     await handleSave();
   }, [handleSave]);
 
-  // Download as Markdown
-  const handleDownload = useCallback(() => {
-    const blob = new Blob([content], { type: "text/markdown" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${title || "untitled"}.md`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }, [content, title]);
-
-  // Typewriter mode: center active line
-  const centerActiveLine = useCallback(() => {
-    if (!isTypewriterMode || !textareaRef.current) return;
-    const textarea = textareaRef.current;
-    const { selectionStart } = textarea;
-    const coords = getCaretCoordinates(textarea, selectionStart);
-    const viewportHeight = textarea.clientHeight;
-    const targetScrollTop = coords.top - viewportHeight / 2;
-    textarea.scrollTo({
-      top: Math.max(0, targetScrollTop),
-      behavior: "auto",
-    });
-  }, [isTypewriterMode]);
-
-  // Handle goal submission
-  const handleGoalSubmit = useCallback(() => {
-    const val = parseInt(goalInputValue, 10);
-    if (!isNaN(val) && val > 0) {
-      setDailyGoal(val);
-    }
-    setShowGoalInput(false);
-    setGoalInputValue("");
-  }, [goalInputValue]);
-
   const handleDeleteCurrent = useCallback(async () => {
     if (!selectedId) return;
     setShowDeleteConfirm(false);
@@ -717,107 +592,6 @@ export const JournalEditor: React.FC = () => {
       };
     }
   }, []);
-
-  // Slash command: replace "/" + query with the markdown prefix
-  const executeSlashCommand = useCallback(
-    (command: SlashCommand) => {
-      const textarea = textareaRef.current;
-      if (!textarea) return;
-
-      const cursorPos = textarea.selectionStart;
-      const textBefore = content.substring(0, cursorPos);
-      const slashIdx = textBefore.lastIndexOf("/");
-
-      if (slashIdx === -1) return;
-
-      const beforeSlash = content.substring(0, slashIdx);
-      const afterCursor = content.substring(cursorPos);
-      const newContent = beforeSlash + command.prefix + afterCursor;
-      const newCursor = beforeSlash.length + command.prefix.length;
-
-      setContent(newContent);
-      setShowSlashMenu(false);
-      setSlashQuery("");
-      setSlashIndex(0);
-
-      // Restore cursor position after state update
-      setTimeout(() => {
-        if (textareaRef.current) {
-          textareaRef.current.focus();
-          textareaRef.current.setSelectionRange(newCursor, newCursor);
-        }
-      }, 0);
-    },
-    [content]
-  );
-
-  // Handle textarea input for slash command detection
-  const handleTextareaInput = useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      const val = e.target.value;
-      const cursorPos = e.target.selectionStart;
-      setContent(val);
-
-      // Detect slash command
-      const textBefore = val.substring(0, cursorPos);
-      const match = textBefore.match(/\/([a-zA-Z0-9]*)$/);
-
-      if (match) {
-        setShowSlashMenu(true);
-        setSlashQuery(match[1]);
-        setSlashIndex(0);
-
-        // Calculate position for the slash menu
-        const coords = getCaretCoordinates(e.target, cursorPos);
-        const rect = e.target.getBoundingClientRect();
-        const parentRect = e.target.parentElement?.getBoundingClientRect();
-        const scrollTop = e.target.scrollTop;
-
-        setSlashMenuPosition({
-          top: coords.top - scrollTop + 24, // Add line height offset
-          left: coords.left + (parentRect ? rect.left - parentRect.left : 0) + 10,
-        });
-      } else {
-        setShowSlashMenu(false);
-      }
-
-      // Typewriter mode: center active line after input
-      if (isTypewriterMode) {
-        requestAnimationFrame(() => {
-          centerActiveLine();
-        });
-      }
-    },
-    [isTypewriterMode, centerActiveLine]
-  );
-
-  // Handle keyboard navigation for slash menu
-  const handleTextareaKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (!showSlashMenu) return;
-
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
-        setSlashIndex((prev) => (prev + 1) % filteredSlashCommands.length);
-      } else if (e.key === "ArrowUp") {
-        e.preventDefault();
-        setSlashIndex(
-          (prev) =>
-            (prev - 1 + filteredSlashCommands.length) %
-            filteredSlashCommands.length
-        );
-      } else if (e.key === "Enter") {
-        e.preventDefault();
-        const command = filteredSlashCommands[slashIndex];
-        if (command) executeSlashCommand(command);
-      } else if (e.key === "Escape") {
-        setShowSlashMenu(false);
-        setSlashQuery("");
-        setSlashIndex(0);
-      }
-    },
-    [showSlashMenu, filteredSlashCommands, slashIndex, executeSlashCommand]
-  );
 
   const handleInsert = useCallback(
     (textToInsert: string) => {
@@ -886,158 +660,35 @@ export const JournalEditor: React.FC = () => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Check for Cmd (Mac) or Ctrl (Windows/Linux)
       const isMod = e.metaKey || e.ctrlKey;
-      const isShift = e.shiftKey;
 
       // Cmd/Ctrl + S: Save
-      if (isMod && !isShift && e.key === "s") {
+      if (isMod && e.key === "s") {
         e.preventDefault();
         handleManualSave();
       }
       // Cmd/Ctrl + N: New entry
-      else if (isMod && !isShift && e.key === "n") {
+      else if (isMod && e.key === "n") {
         e.preventDefault();
         createNewEntry();
       }
       // Cmd/Ctrl + K: Toggle sidebar
-      else if (isMod && !isShift && e.key === "k") {
+      else if (isMod && e.key === "k") {
         e.preventDefault();
         setShowSidebar((prev) => !prev);
       }
       // Cmd/Ctrl + /: Toggle reference pane
-      else if (isMod && !isShift && e.key === "/") {
+      else if (isMod && e.key === "/") {
         e.preventDefault();
         setShowTemplate((prev) => !prev);
-      }
-      // Cmd/Ctrl + Shift + F: Toggle Zen Mode
-      else if (isMod && isShift && e.key.toLowerCase() === "f") {
-        e.preventDefault();
-        setIsZenMode((prev) => !prev);
-      }
-      // Cmd/Ctrl + Shift + T: Toggle Typewriter Mode
-      else if (isMod && isShift && e.key.toLowerCase() === "t") {
-        e.preventDefault();
-        setIsTypewriterMode((prev) => !prev);
-      }
-      // Cmd/Ctrl + Shift + D: Download as Markdown
-      else if (isMod && isShift && e.key.toLowerCase() === "d") {
-        e.preventDefault();
-        handleDownload();
-      }
-      // Escape: Exit Zen Mode
-      else if (e.key === "Escape" && isZenMode) {
-        setIsZenMode(false);
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleManualSave, createNewEntry, handleDownload, isZenMode]);
-
-  // Zen Mode Editor (fullscreen overlay)
-  const ZenModeEditor = (
-    <div className="fixed inset-0 z-[100] bg-bg flex flex-col">
-      {/* Minimal Zen Mode Header */}
-      <div className="flex items-center justify-between px-6 py-3 border-b border-default/30">
-        <div className="flex items-center gap-4">
-          <span className="text-xs text-muted font-mono">
-            {wordCount} {wordCount === 1 ? "word" : "words"} • {readingTime} min
-          </span>
-          {dailyGoal > 0 && (
-            <div className="flex items-center gap-2">
-              <div className="w-12 h-1 bg-default/20 rounded-full overflow-hidden">
-                <div
-                  className={`h-full rounded-full ${
-                    dailyProgress >= dailyGoal ? "bg-green-500" : "bg-accent"
-                  }`}
-                  style={{
-                    width: `${Math.min(100, (dailyProgress / dailyGoal) * 100)}%`,
-                  }}
-                />
-              </div>
-            </div>
-          )}
-        </div>
-        <button
-          onClick={() => setIsZenMode(false)}
-          className="p-1.5 rounded-md text-muted hover:text-default hover:bg-bg-alt transition-colors"
-          title="Exit Zen Mode (Esc)"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="4 14 10 14 10 20" />
-            <polyline points="20 10 14 10 14 4" />
-            <line x1="14" y1="10" x2="21" y2="3" />
-            <line x1="3" y1="21" x2="10" y2="14" />
-          </svg>
-        </button>
-      </div>
-      {/* Zen Mode Content */}
-      <div className="flex-1 overflow-auto flex justify-center">
-        <div className="w-full max-w-2xl px-6 py-8">
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Untitled"
-            className={`bg-transparent border-none text-2xl font-bold text-default focus:ring-0 w-full outline-none placeholder:text-muted/30 mb-6 ${
-              editorFont === "serif"
-                ? "font-serif"
-                : editorFont === "mono"
-                ? "font-mono"
-                : ""
-            }`}
-            style={{
-              fontFamily:
-                editorFont === "serif"
-                  ? "Georgia, Cambria, serif"
-                  : editorFont === "mono"
-                  ? "ui-monospace, SFMono-Regular, monospace"
-                  : undefined,
-            }}
-          />
-          <textarea
-            ref={textareaRef}
-            value={content}
-            onChange={handleTextareaInput}
-            onKeyDown={handleTextareaKeyDown}
-            placeholder="Start writing..."
-            className={`w-full min-h-[60vh] bg-transparent border-none outline-none resize-none text-base leading-relaxed text-default placeholder:text-muted/30 ${
-              isTypewriterMode ? "pb-[50vh]" : ""
-            } ${
-              editorFont === "serif"
-                ? "font-serif"
-                : editorFont === "mono"
-                ? "font-mono"
-                : ""
-            }`}
-            style={{
-              fontFamily:
-                editorFont === "serif"
-                  ? "Georgia, Cambria, serif"
-                  : editorFont === "mono"
-                  ? "ui-monospace, SFMono-Regular, monospace"
-                  : undefined,
-            }}
-          />
-        </div>
-      </div>
-    </div>
-  );
+  }, [handleManualSave, createNewEntry]);
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-bg relative">
-      {/* Zen Mode Overlay */}
-      {isZenMode && ZenModeEditor}
-
       {!isAuthLoading && !isAuthenticated && (
         <div className="bg-yellow-500/10 border-b border-yellow-500/30 px-4 py-2 flex items-center gap-2 shrink-0">
           <svg
@@ -1098,47 +749,8 @@ export const JournalEditor: React.FC = () => {
               </button>
               <span className="h-4 w-px bg-default/20 mx-1"></span>
               <span className="text-xs text-muted font-mono">
-                {wordCount} {wordCount === 1 ? "word" : "words"}
+                {content.length} chars
               </span>
-              <span className="text-xs text-muted/50">•</span>
-              <span className="text-xs text-muted font-mono">
-                {readingTime} min read
-              </span>
-              {/* Daily Goal Widget */}
-              {dailyGoal > 0 ? (
-                <div className="flex items-center gap-2 ml-2">
-                  <div
-                    className="relative w-16 h-1.5 bg-default/20 rounded-full overflow-hidden cursor-pointer"
-                    onClick={() => setShowGoalInput(true)}
-                    title={`${dailyProgress}/${dailyGoal} words today`}
-                  >
-                    <div
-                      className={`absolute left-0 top-0 h-full rounded-full transition-all duration-300 ${
-                        dailyProgress >= dailyGoal ? "bg-green-500" : "bg-accent"
-                      }`}
-                      style={{
-                        width: `${Math.min(100, (dailyProgress / dailyGoal) * 100)}%`,
-                      }}
-                    />
-                  </div>
-                  <span className="text-[10px] text-muted font-mono">
-                    {dailyProgress}/{dailyGoal}
-                  </span>
-                  {dailyProgress >= dailyGoal && (
-                    <span className="text-[10px] text-green-500" title="Goal reached!">
-                      ✓
-                    </span>
-                  )}
-                </div>
-              ) : (
-                <button
-                  onClick={() => setShowGoalInput(true)}
-                  className="text-[10px] text-muted hover:text-default transition-colors ml-2"
-                  title="Set daily writing goal"
-                >
-                  + Goal
-                </button>
-              )}
               {showSaveConfirm && (
                 <span className="text-xs text-green-500 font-medium animate-pulse">
                   Saved
@@ -1201,135 +813,9 @@ export const JournalEditor: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              {/* Font Selector */}
-              <select
-                value={editorFont}
-                onChange={(e) => setEditorFont(e.target.value as "sans" | "serif" | "mono")}
-                className="text-[10px] bg-transparent border border-default/30 rounded px-1 py-0.5 text-muted hover:text-default hover:border-default cursor-pointer outline-none"
-                title="Editor Font"
-              >
-                <option value="sans">Sans</option>
-                <option value="serif">Serif</option>
-                <option value="mono">Mono</option>
-              </select>
-              {/* Typewriter Mode */}
-              <button
-                onClick={() => setIsTypewriterMode(!isTypewriterMode)}
-                className={`p-1.5 rounded-md transition-all duration-200 ${
-                  isTypewriterMode
-                    ? "bg-accent/15 text-accent"
-                    : "text-muted hover:text-default hover:bg-bg-alt"
-                }`}
-                title={isTypewriterMode ? "Exit Typewriter Mode" : "Typewriter Mode (center cursor)"}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="18" y1="10" x2="6" y2="10" />
-                  <line x1="21" y1="6" x2="3" y2="6" />
-                  <line x1="21" y1="14" x2="3" y2="14" />
-                  <line x1="18" y1="18" x2="6" y2="18" />
-                </svg>
-              </button>
-              {/* Zen Mode */}
-              <button
-                onClick={() => setIsZenMode(!isZenMode)}
-                className={`p-1.5 rounded-md transition-all duration-200 ${
-                  isZenMode
-                    ? "bg-accent/15 text-accent"
-                    : "text-muted hover:text-default hover:bg-bg-alt"
-                }`}
-                title={isZenMode ? "Exit Zen Mode (Esc)" : "Zen Mode (fullscreen)"}
-              >
-                {isZenMode ? (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <polyline points="4 14 10 14 10 20" />
-                    <polyline points="20 10 14 10 14 4" />
-                    <line x1="14" y1="10" x2="21" y2="3" />
-                    <line x1="3" y1="21" x2="10" y2="14" />
-                  </svg>
-                ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <polyline points="15 3 21 3 21 9" />
-                    <polyline points="9 21 3 21 3 15" />
-                    <line x1="21" y1="3" x2="14" y2="10" />
-                    <line x1="3" y1="21" x2="10" y2="14" />
-                  </svg>
-                )}
-              </button>
-              {/* Preview Mode */}
-              <button
-                onClick={() => setIsPreviewMode(!isPreviewMode)}
-                className={`p-1.5 rounded-md transition-all duration-200 ${
-                  isPreviewMode
-                    ? "bg-accent/15 text-accent"
-                    : "text-muted hover:text-default hover:bg-bg-alt"
-                }`}
-                title={isPreviewMode ? "Edit Mode" : "Preview Mode"}
-              >
-                {isPreviewMode ? (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-                    <line x1="1" y1="1" x2="23" y2="23" />
-                  </svg>
-                ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
-                )}
-              </button>
               <button
                 onClick={handleManualSave}
-                disabled={isSaving || isPreviewMode}
+                disabled={isSaving}
                 className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-green-500 hover:bg-green-500/15 hover:shadow-[0_0_8px_rgba(34,197,94,0.3)] disabled:opacity-50 disabled:hover:text-muted disabled:hover:bg-transparent disabled:hover:shadow-none"
                 title="Save Entry"
               >
@@ -1345,28 +831,6 @@ export const JournalEditor: React.FC = () => {
                   strokeLinejoin="round"
                 >
                   <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-              </button>
-              {/* Download as Markdown */}
-              <button
-                onClick={handleDownload}
-                className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-blue-500 hover:bg-blue-500/15 hover:shadow-[0_0_8px_rgba(59,130,246,0.3)]"
-                title="Download as Markdown"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
                 </svg>
               </button>
               <button
@@ -1416,125 +880,14 @@ export const JournalEditor: React.FC = () => {
             </div>
 
             <div className="flex-1 relative overflow-auto px-4 sm:px-6 py-2">
-              {isPreviewMode ? (
-                <div className="prose prose-sm dark:prose-invert max-w-none min-h-[300px] text-default">
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    components={{
-                      h1: ({ children }) => (
-                        <h1 className="text-2xl font-bold text-default mt-6 mb-3 first:mt-0">
-                          {children}
-                        </h1>
-                      ),
-                      h2: ({ children }) => (
-                        <h2 className="text-xl font-semibold text-default mt-5 mb-2">
-                          {children}
-                        </h2>
-                      ),
-                      h3: ({ children }) => (
-                        <h3 className="text-lg font-medium text-default mt-4 mb-2">
-                          {children}
-                        </h3>
-                      ),
-                      p: ({ children }) => (
-                        <p className="text-sm leading-relaxed text-default mb-3">
-                          {children}
-                        </p>
-                      ),
-                      ul: ({ children }) => (
-                        <ul className="list-disc list-inside text-sm text-default mb-3 space-y-1">
-                          {children}
-                        </ul>
-                      ),
-                      ol: ({ children }) => (
-                        <ol className="list-decimal list-inside text-sm text-default mb-3 space-y-1">
-                          {children}
-                        </ol>
-                      ),
-                      li: ({ children }) => (
-                        <li className="text-sm text-default">{children}</li>
-                      ),
-                      blockquote: ({ children }) => (
-                        <blockquote className="border-l-4 border-accent/50 pl-4 italic text-muted my-3">
-                          {children}
-                        </blockquote>
-                      ),
-                      code: ({ children, className }) => {
-                        const isBlock = className?.includes("language-");
-                        return isBlock ? (
-                          <pre className="bg-bg-alt rounded-md p-3 overflow-x-auto my-3">
-                            <code className="text-xs font-mono text-default">
-                              {children}
-                            </code>
-                          </pre>
-                        ) : (
-                          <code className="bg-bg-alt px-1.5 py-0.5 rounded text-xs font-mono text-accent">
-                            {children}
-                          </code>
-                        );
-                      },
-                      a: ({ href, children }) => (
-                        <a
-                          href={href}
-                          className="text-accent hover:underline"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {children}
-                        </a>
-                      ),
-                      input: ({ checked, type }) =>
-                        type === "checkbox" ? (
-                          <input
-                            type="checkbox"
-                            checked={checked}
-                            readOnly
-                            className="mr-2 accent-accent"
-                          />
-                        ) : null,
-                    }}
-                  >
-                    {content || "*No content yet...*"}
-                  </ReactMarkdown>
-                </div>
-              ) : (
-                <div className="relative h-full">
-                  <textarea
-                    ref={textareaRef}
-                    value={content}
-                    onChange={handleTextareaInput}
-                    onKeyDown={handleTextareaKeyDown}
-                    onBlur={handleTextareaBlur}
-                    placeholder="Start writing... Type '/' for formatting commands"
-                    className={`w-full h-full min-h-[300px] bg-transparent border-none outline-none resize-none text-sm leading-relaxed text-default placeholder:text-muted/30 ${
-                      isTypewriterMode ? "pb-[50vh]" : ""
-                    } ${
-                      editorFont === "serif"
-                        ? "font-serif"
-                        : editorFont === "mono"
-                        ? "font-mono"
-                        : ""
-                    }`}
-                    style={{
-                      fontFamily:
-                        editorFont === "serif"
-                          ? "Georgia, Cambria, serif"
-                          : editorFont === "mono"
-                          ? "ui-monospace, SFMono-Regular, monospace"
-                          : undefined,
-                    }}
-                  />
-                  {showSlashMenu && filteredSlashCommands.length > 0 && (
-                    <SlashMenu
-                      position={slashMenuPosition}
-                      commands={filteredSlashCommands}
-                      selectedIndex={slashIndex}
-                      onSelect={executeSlashCommand}
-                      onMouseEnter={setSlashIndex}
-                    />
-                  )}
-                </div>
-              )}
+              <textarea
+                ref={textareaRef}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                onBlur={handleTextareaBlur}
+                placeholder="Start writing..."
+                className="w-full h-full min-h-[300px] bg-transparent border-none outline-none resize-none text-sm leading-relaxed text-default placeholder:text-muted/30"
+              />
             </div>
 
             {activeItem && (
@@ -1631,67 +984,6 @@ export const JournalEditor: React.FC = () => {
               >
                 Save & Switch
               </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Goal Input Modal */}
-      {showGoalInput && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-bg border border-default rounded-lg p-6 max-w-xs mx-4 shadow-xl">
-            <h3 className="text-lg font-semibold text-default mb-2">
-              Daily Writing Goal
-            </h3>
-            <p className="text-sm text-muted mb-4">
-              Set a daily word count target to track your writing progress.
-            </p>
-            <input
-              type="number"
-              value={goalInputValue}
-              onChange={(e) => setGoalInputValue(e.target.value)}
-              placeholder={dailyGoal > 0 ? dailyGoal.toString() : "e.g. 500"}
-              className="w-full px-3 py-2 mb-4 bg-bg-alt border border-default rounded-md text-sm text-default placeholder:text-muted/50 outline-none focus:border-accent"
-              autoFocus
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleGoalSubmit();
-                if (e.key === "Escape") {
-                  setShowGoalInput(false);
-                  setGoalInputValue("");
-                }
-              }}
-            />
-            <div className="flex justify-between">
-              {dailyGoal > 0 && (
-                <button
-                  onClick={() => {
-                    setDailyGoal(0);
-                    setDailyProgress(0);
-                    setShowGoalInput(false);
-                    setGoalInputValue("");
-                  }}
-                  className="px-3 py-1.5 rounded-md text-sm font-medium text-red-500 hover:bg-red-500/10 transition-colors"
-                >
-                  Remove Goal
-                </button>
-              )}
-              <div className="flex gap-2 ml-auto">
-                <button
-                  onClick={() => {
-                    setShowGoalInput(false);
-                    setGoalInputValue("");
-                  }}
-                  className="px-3 py-1.5 rounded-md text-sm font-medium bg-bg-alt text-default border border-default hover:bg-bg-alt/80 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleGoalSubmit}
-                  className="px-3 py-1.5 rounded-md text-sm font-medium bg-accent text-accent-text hover:bg-accent-hover transition-colors"
-                >
-                  Set Goal
-                </button>
-              </div>
             </div>
           </div>
         </div>
