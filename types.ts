@@ -30,6 +30,8 @@ export interface PoetryExampleResponse {
   author: string;
   title: string;
   explanation: string;
+  sourceUrl?: string | null;
+  citations?: string[];
 }
 
 export interface SanchoQuoteResponse {

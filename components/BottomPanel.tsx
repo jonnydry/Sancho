@@ -348,6 +348,14 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
                       {example.explanation}
                     </p>
                   </div>
+                  {example.sourceUrl && (
+                    <div className="text-xs text-muted">
+                      <span className="opacity-70">Source: </span>
+                      <a href={example.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
+                        {(() => { try { return new URL(example.sourceUrl).hostname; } catch { return example.sourceUrl; } })()}
+                      </a>
+                    </div>
+                  )}
                 </div>
               )}
 

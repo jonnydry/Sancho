@@ -79,6 +79,14 @@ export const ExampleFinder: React.FC<ExampleFinderProps> = memo(({ topic, embedd
             <h5 className="font-semibold text-xs text-default uppercase tracking-wide mb-2">Explanation</h5>
             <p className="text-sm text-muted leading-relaxed">{example.explanation}</p>
           </div>
+          {example.sourceUrl && (
+            <div className="text-xs text-muted">
+              <span className="opacity-70">Source: </span>
+              <a href={example.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
+                {new URL(example.sourceUrl).hostname}
+              </a>
+            </div>
+          )}
         </div>
       )}
     </div>

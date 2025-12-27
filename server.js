@@ -332,41 +332,31 @@ app.post('/api/poetry-example', rateLimit(10, 60000), async (req, res) => { // 1
       });
     }
 
-    // Generate strong randomization factors
-    const randomSeed = Math.floor(Math.random() * 100000);
-    const eraChoices = ['ancient Greek', 'medieval', 'Renaissance', 'Romantic era', '19th century', 'early 20th century', 'modern', 'contemporary', 'Victorian', 'Elizabethan', 'Beat generation', 'Harlem Renaissance'];
-    const regionChoices = ['American', 'British', 'Irish', 'French', 'German', 'Italian', 'Spanish', 'Russian', 'Japanese', 'Chinese', 'Indian', 'Persian', 'Latin American', 'African', 'Australian'];
-    const suggestedEra = eraChoices[Math.floor(Math.random() * eraChoices.length)];
-    const suggestedRegion = regionChoices[Math.floor(Math.random() * regionChoices.length)];
-    
     // Build exclusion note if there's a previous example
     let exclusionNote = '';
     if (previousExample && previousExample.trim()) {
-      exclusionNote = `\n\nDO NOT use this poem again - choose something completely different:\n"${previousExample.substring(0, 200)}..."`;
+      exclusionNote = `\n\nDo NOT cite this poem again - find a different one:\n"${previousExample.substring(0, 150)}..."`;
     }
     
-    const prompt = `Find an existing, published poem that demonstrates ${topic}.
+    const prompt = `Search for a real, published poem that demonstrates "${topic}" in poetry.
 
-CRITICAL: You are a REFERENCE TOOL. Do NOT create new poetry. Only quote from real, published works.
-
-VARIETY (seed: ${randomSeed}):
-- Consider ${suggestedEra} ${suggestedRegion} poetry
-- Choose something different from the obvious/common examples${exclusionNote}
+Use your web search to find an actual poem from a poetry archive, literary database, or reputable source.${exclusionNote}
 
 Provide:
-1. An exact quote from the real poem (the excerpt)
-2. The actual poet's name
-3. The actual poem title
-4. How this excerpt demonstrates ${topic}
+1. The exact quote/excerpt from the real poem
+2. The poet's name
+3. The poem's title  
+4. A brief explanation of how it demonstrates ${topic}
+5. The source URL where you found it (if available)
 
-Respond with JSON: { "example": "exact poem excerpt", "author": "poet name", "title": "poem title", "explanation": "how it demonstrates the concept" }`;
+Respond with JSON: { "example": "exact poem excerpt", "author": "poet name", "title": "poem title", "explanation": "how it demonstrates the concept", "sourceUrl": "url or null" }`;
 
     const response = await openai.chat.completions.create({
-      model: "grok-4-1-fast-non-reasoning",
+      model: "grok-4",
       messages: [
         {
           role: "system",
-          content: "You are a poetry reference librarian. Your job is to find and quote REAL, EXISTING poems from published literary works. NEVER create new poetry - only reference authentic source material. When asked for an example, cite a real poem with accurate author attribution. Vary your selections across eras, cultures, and traditions."
+          content: "You are a poetry reference tool. Search the web to find REAL poems from poetry archives and literary databases. Always cite actual published works with accurate attributions. Never make up poems."
         },
         {
           role: "user",
@@ -374,17 +364,32 @@ Respond with JSON: { "example": "exact poem excerpt", "author": "poet name", "ti
         }
       ],
       response_format: { type: "json_object" },
-      temperature: 1.0,
+      temperature: 0.7,
+      extra_body: {
+        search_parameters: {
+          mode: "always",
+          return_citations: true,
+          max_search_results: 10,
+          sources: [
+            { type: "web" }
+          ]
+        }
+      }
     });
 
     const jsonText = response.choices[0].message.content || "{}";
     const parsedJson = JSON.parse(jsonText);
     
+    // Include any citations from the search
+    if (response.citations) {
+      parsedJson.citations = response.citations;
+    }
+    
     res.json(parsedJson);
   } catch (error) {
     logger.error("Error fetching poetry example from XAI", error);
     res.status(500).json({ 
-      error: "Failed to generate example. The model may be unavailable or the request could not be fulfilled.",
+      error: "Failed to find example. The search may be unavailable or no matching poems were found.",
       details: error.message 
     });
   }
