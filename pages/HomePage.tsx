@@ -65,11 +65,53 @@ export const HomePage: React.FC = () => {
     loadData();
   }, []);
 
+  const filteredData = useMemo(() => {
+    const query = searchQuery.toLowerCase();
+    const hasQuery = query.length > 0;
+    const filterType = activeFilter;
+
+    const filtered = allData.filter(item => {
+      if (filterType !== 'all' && item.type !== filterType) {
+        return false;
+      }
+
+      if (activeTagFilter && (!item.tags || !item.tags.includes(activeTagFilter))) {
+        return false;
+      }
+
+      if (hasQuery) {
+        const matchesName = item.name.toLowerCase().includes(query);
+        const matchesDescription = item.description.toLowerCase().includes(query);
+        const matchesTags = item.tags && item.tags.some(tag => tag.toLowerCase().includes(query));
+
+        if (!matchesName && !matchesDescription && !matchesTags) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+    const pinned = filtered.filter(item => isPinned(item.name));
+    const unpinned = filtered.filter(item => !isPinned(item.name));
+    
+    let sortedUnpinned: PoetryItem[];
+    
+    if (filterType === 'all') {
+      sortedUnpinned = seededShuffle(unpinned, randomSeedRef.current);
+    } else {
+      sortedUnpinned = [...unpinned].sort((a, b) => a.name.localeCompare(b.name));
+    }
+    
+    const sortedPinned = [...pinned].sort((a, b) => a.name.localeCompare(b.name));
+    
+    return [...sortedPinned, ...sortedUnpinned];
+  }, [searchQuery, activeFilter, activeTagFilter, allData, isPinned]);
+
   useEffect(() => {
-    setItemsToShow(20); // Reset to initial chunk size
+    setItemsToShow(20);
   }, [searchQuery, activeFilter, activeTagFilter]);
 
-  // Auto-load more items when scrolling to bottom
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -79,7 +121,7 @@ export const HomePage: React.FC = () => {
       },
       {
         threshold: 0.1,
-        rootMargin: '100px' // Start loading 100px before reaching bottom
+        rootMargin: '100px'
       }
     );
 
@@ -116,59 +158,6 @@ export const HomePage: React.FC = () => {
   const handleClearTagFilter = () => {
     setActiveTagFilter(null);
   };
-
-  const filteredData = useMemo(() => {
-    // Combine filters into single pass for better performance
-    const query = searchQuery.toLowerCase();
-    const hasQuery = query.length > 0;
-    const filterType = activeFilter;
-
-    // First, filter the data
-    const filtered = allData.filter(item => {
-      // Type filter
-      if (filterType !== 'all' && item.type !== filterType) {
-        return false;
-      }
-
-      // Tag filter
-      if (activeTagFilter && (!item.tags || !item.tags.includes(activeTagFilter))) {
-        return false;
-      }
-
-      // Search query filter
-      if (hasQuery) {
-        const matchesName = item.name.toLowerCase().includes(query);
-        const matchesDescription = item.description.toLowerCase().includes(query);
-        const matchesTags = item.tags && item.tags.some(tag => tag.toLowerCase().includes(query));
-
-        if (!matchesName && !matchesDescription && !matchesTags) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-
-    // Split into pinned and unpinned first
-    const pinned = filtered.filter(item => isPinned(item.name));
-    const unpinned = filtered.filter(item => !isPinned(item.name));
-    
-    // Apply sorting/shuffling only to unpinned items
-    let sortedUnpinned: PoetryItem[];
-    
-    if (filterType === 'all') {
-      // Random shuffle for "All" view (only unpinned)
-      sortedUnpinned = seededShuffle(unpinned, randomSeedRef.current);
-    } else {
-      // Alphabetical sort for specific category views
-      sortedUnpinned = [...unpinned].sort((a, b) => a.name.localeCompare(b.name));
-    }
-    
-    // Pinned items stay at top (sorted alphabetically for consistency)
-    const sortedPinned = [...pinned].sort((a, b) => a.name.localeCompare(b.name));
-    
-    return [...sortedPinned, ...sortedUnpinned];
-  }, [searchQuery, activeFilter, activeTagFilter, allData, isPinned]);
 
   const displayedData = useMemo(() => {
     return filteredData.slice(0, itemsToShow);

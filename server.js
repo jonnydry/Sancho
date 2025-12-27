@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import compression from 'compression';
-import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import crypto from 'crypto';
 import OpenAI from 'openai';
@@ -176,24 +175,6 @@ app.use(cors(corsOptions));
 // Cookie parser for CSRF tokens
 app.use(cookieParser());
 
-// Security headers with helmet
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"], // unsafe-inline needed for Vite in dev
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "https://replit.com"], // For auth
-      fontSrc: ["'self'", "data:"],
-    },
-  },
-  hsts: {
-    maxAge: 31536000, // 1 year
-    includeSubDomains: true,
-    preload: true,
-  },
-}));
 
 // CSRF Protection Middleware (Double-Submit Cookie Pattern)
 function generateCsrfToken() {
