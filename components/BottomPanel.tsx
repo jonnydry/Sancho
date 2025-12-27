@@ -318,7 +318,7 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
                     <SpinnerIcon className="w-3.5 h-3.5 animate-spin" />
                   }
                 >
-                  Find Example
+                  {example !== null ? "Regenerate" : "Find Example"}
                 </ActionButton>
               </div>
 

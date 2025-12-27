@@ -332,14 +332,15 @@ app.post('/api/poetry-example', rateLimit(10, 60000), async (req, res) => { // 1
       });
     }
 
-    const prompt = `Please provide a famous, concise example of a ${topic} in poetry. Include the author, the title, and a brief explanation of how it fits the conventions. Respond with JSON in this format: { "example": "string", "author": "string", "title": "string", "explanation": "string" }`;
+    const randomSeed = Math.floor(Math.random() * 10000);
+    const prompt = `Please provide a famous, concise example of a ${topic} in poetry (seed: ${randomSeed}). Choose a DIFFERENT example each time - vary your selections widely across different poets, eras, and styles. Include the author, the title, and a brief explanation of how it fits the conventions. Respond with JSON in this format: { "example": "string", "author": "string", "title": "string", "explanation": "string" }`;
 
     const response = await openai.chat.completions.create({
       model: "grok-4-1-fast-non-reasoning",
       messages: [
         {
           role: "system",
-          content: "You are a poetry expert. Provide famous poetic examples with detailed explanations."
+          content: "You are a poetry expert. Provide famous poetic examples with detailed explanations. Always choose different examples when asked multiple times - draw from a wide variety of poets, time periods, and literary traditions."
         },
         {
           role: "user",
@@ -347,7 +348,7 @@ app.post('/api/poetry-example', rateLimit(10, 60000), async (req, res) => { // 1
         }
       ],
       response_format: { type: "json_object" },
-      temperature: 0.5,
+      temperature: 0.9,
     });
 
     const jsonText = response.choices[0].message.content || "{}";
