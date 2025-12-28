@@ -56,12 +56,17 @@ interface ResizeHandleProps {
 const ResizeHandle: React.FC<ResizeHandleProps> = ({ onResize, className }) => {
   const [isDragging, setIsDragging] = useState(false);
   const startPosRef = useRef<{ x: number; y: number } | null>(null);
+  const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!isDragging) return;
 
     const handleMouseMove = (e: MouseEvent) => {
-      onResize(e.movementX);
+      // Throttle with requestAnimationFrame
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => {
+        onResize(e.movementX);
+      });
     };
 
     const handleTouchMove = (e: TouchEvent) => {
@@ -69,7 +74,11 @@ const ResizeHandle: React.FC<ResizeHandleProps> = ({ onResize, className }) => {
       if (!startPosRef.current) return;
       const touch = e.touches[0];
       const delta = touch.clientX - startPosRef.current.x;
-      onResize(delta);
+      // Throttle with requestAnimationFrame
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => {
+        onResize(delta);
+      });
       startPosRef.current.x = touch.clientX;
     };
 
@@ -122,6 +131,7 @@ const ResizeHandle: React.FC<ResizeHandleProps> = ({ onResize, className }) => {
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.cursor = "";
       document.body.style.userSelect = "";
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, [isDragging, onResize]);
 
@@ -168,6 +178,7 @@ export const JournalEditor: React.FC = () => {
   const { pinnedItems } = usePinnedItems();
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const [entries, setEntries] = useState<JournalEntry[]>([]);
+  const [isLoadingEntries, setIsLoadingEntries] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
@@ -279,15 +290,26 @@ export const JournalEditor: React.FC = () => {
     }));
   }, [dailyProgress]);
 
+  // Reset word count ref when switching entries to prevent incorrect tracking
+  const currentEntryIdRef = useRef<string | null>(null);
+
   // Track word count changes for daily goal
   useEffect(() => {
     const wordCount = content.trim().split(/\s+/).filter(w => w.length > 0).length;
+
+    // If we switched entries, reset the baseline without counting the diff
+    if (currentEntryIdRef.current !== selectedId) {
+      currentEntryIdRef.current = selectedId;
+      previousWordCountRef.current = wordCount;
+      return;
+    }
+
     const diff = wordCount - previousWordCountRef.current;
     if (diff > 0 && previousWordCountRef.current > 0) {
-      setDailyProgress(prev => prev + diff);
+      setDailyProgress((prev: number) => prev + diff);
     }
     previousWordCountRef.current = wordCount;
-  }, [content]);
+  }, [content, selectedId]);
 
   // Computed stats
   const wordCount = useMemo(() => {
@@ -431,15 +453,20 @@ export const JournalEditor: React.FC = () => {
 
   useEffect(() => {
     const loadEntries = async () => {
-      if (JournalStorage.needsMigration()) {
-        await JournalStorage.migrateToServer();
-      }
-      const loadedEntries = await JournalStorage.getAll();
-      setEntries(loadedEntries);
-      if (loadedEntries.length > 0) {
-        selectEntryDirect(loadedEntries[0]);
-      } else {
-        await createNewEntry();
+      setIsLoadingEntries(true);
+      try {
+        if (JournalStorage.needsMigration()) {
+          await JournalStorage.migrateToServer();
+        }
+        const loadedEntries = await JournalStorage.getAll();
+        setEntries(loadedEntries);
+        if (loadedEntries.length > 0) {
+          selectEntryDirect(loadedEntries[0]);
+        } else {
+          await createNewEntry();
+        }
+      } finally {
+        setIsLoadingEntries(false);
       }
     };
     loadEntries();
@@ -464,7 +491,9 @@ export const JournalEditor: React.FC = () => {
           currentEntry &&
           (currentEntry.title !== state.title ||
             currentEntry.content !== state.content ||
-            currentEntry.templateRef !== state.activeTemplate);
+            currentEntry.templateRef !== state.activeTemplate ||
+            currentEntry.isStarred !== state.isStarred ||
+            JSON.stringify(currentEntry.tags || []) !== JSON.stringify(state.tags));
 
         if (hasUnsavedChanges) {
           // Check if user wants to save before switching
@@ -529,84 +558,86 @@ export const JournalEditor: React.FC = () => {
     setPendingEntrySwitch(null);
   }, []);
 
+  const isDeletingRef = useRef(false);
+
   const deleteEntry = useCallback(
     async (id: string) => {
+      // Prevent concurrent deletions
+      if (isDeletingRef.current) return;
+      isDeletingRef.current = true;
+
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
         saveTimeoutRef.current = null;
       }
 
-      // Calculate what to do based on current state
-      setEntries((prevEntries) => {
-        const remaining = prevEntries.filter((e) => e.id !== id);
+      // Get current entries to determine next state
+      const currentEntries = currentStateRef.current.entries;
+      const remaining = currentEntries.filter((e) => e.id !== id);
+      const wasSelected = previousSelectedIdRef.current === id;
 
-        // Use flushSync pattern - update all state synchronously
-        if (remaining.length > 0) {
-          // Select next entry if we deleted the currently selected one
-          if (selectedId === id) {
-            const nextEntry = remaining[0];
-            // Schedule state updates to happen after this render
-            Promise.resolve().then(() => {
-              setSelectedId(nextEntry.id);
-              setTitle(nextEntry.title);
-              setContent(nextEntry.content);
-              setActiveTemplate(nextEntry.templateRef);
-              setTags(nextEntry.tags || []);
-              setIsStarred(nextEntry.isStarred || false);
-              previousSelectedIdRef.current = nextEntry.id;
-            });
-          }
-          return remaining;
-        } else {
-          // No entries left - create a new blank one
-          const newEntry: JournalEntry = {
-            id: generateUUID(),
-            title: "",
-            content: "",
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
-            tags: [],
-            isStarred: false,
-          };
+      if (remaining.length > 0) {
+        // Update entries list
+        setEntries(remaining);
 
-          // Schedule state updates and save
-          Promise.resolve().then(() => {
-            setSelectedId(newEntry.id);
-            setTitle("");
-            setContent("");
-            setActiveTemplate(undefined);
-            setTags([]);
-            setIsStarred(false);
-            previousSelectedIdRef.current = newEntry.id;
-
-            // Save new entry to server
-            JournalStorage.save(newEntry).catch((error) => {
-              console.error("Failed to save new entry:", error);
-            });
-          });
-
-          return [newEntry];
+        // Select next entry if we deleted the currently selected one
+        if (wasSelected) {
+          const nextEntry = remaining[0];
+          setSelectedId(nextEntry.id);
+          setTitle(nextEntry.title);
+          setContent(nextEntry.content);
+          setActiveTemplate(nextEntry.templateRef);
+          setTags(nextEntry.tags || []);
+          setIsStarred(nextEntry.isStarred || false);
+          previousSelectedIdRef.current = nextEntry.id;
         }
-      });
+      } else {
+        // No entries left - create a new blank one
+        const newEntry: JournalEntry = {
+          id: generateUUID(),
+          title: "",
+          content: "",
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+          tags: [],
+          isStarred: false,
+        };
+
+        setEntries([newEntry]);
+        setSelectedId(newEntry.id);
+        setTitle("");
+        setContent("");
+        setActiveTemplate(undefined);
+        setTags([]);
+        setIsStarred(false);
+        previousSelectedIdRef.current = newEntry.id;
+
+        // Save new entry to server
+        JournalStorage.save(newEntry).catch((error) => {
+          console.error("Failed to save new entry:", error);
+        });
+      }
 
       // Delete from server in background
       try {
         await JournalStorage.delete(id);
       } catch (error) {
         console.error("Failed to delete entry from server:", error);
+      } finally {
+        isDeletingRef.current = false;
       }
     },
-    [selectedId],
+    [],
   );
+
+  // Use a ref to hold the latest handleSave to avoid stale closures in retry
+  const handleSaveRef = useRef<(isManual?: boolean, retryAttempt?: number) => Promise<void>>();
 
   const handleSave = useCallback(
     async (isManual = false, retryAttempt = 0) => {
       const state = currentStateRef.current;
-      const currentSelectedId = state.entries.find((e) =>
-        e.id === previousSelectedIdRef.current ||
-        e.title === state.title ||
-        e.content === state.content
-      )?.id;
+      // Use the ref directly - it's always kept up to date
+      const currentSelectedId = previousSelectedIdRef.current;
 
       if (!currentSelectedId) return;
 
@@ -674,10 +705,13 @@ export const JournalEditor: React.FC = () => {
           }
 
           retryTimeoutRef.current = setTimeout(() => {
-            console.log(
-              `Retrying save (attempt ${retryAttempt + 1}/${maxRetries})...`,
-            );
-            handleSave(false, retryAttempt + 1);
+            if (process.env.NODE_ENV === 'development') {
+              console.log(
+                `Retrying save (attempt ${retryAttempt + 1}/${maxRetries})...`,
+              );
+            }
+            // Use ref to avoid stale closure
+            handleSaveRef.current?.(false, retryAttempt + 1);
           }, retryDelay);
         } else {
           // Clear error message after 5 seconds on final failure
@@ -697,6 +731,11 @@ export const JournalEditor: React.FC = () => {
     },
     [], // No dependencies - all values accessed via refs
   );
+
+  // Keep ref updated with latest handleSave
+  useEffect(() => {
+    handleSaveRef.current = handleSave;
+  }, [handleSave]);
 
   const handleManualSave = useCallback(async () => {
     setIsSaving(true);
@@ -966,7 +1005,7 @@ export const JournalEditor: React.FC = () => {
         }
         return currentTags;
       });
-    }, 1000); // 1 second debounce
+    }, 2000); // 2 second debounce (reduced CPU usage)
 
     return () => {
       if (tagExtractionTimeoutRef.current) {
@@ -1040,7 +1079,7 @@ export const JournalEditor: React.FC = () => {
 
     saveTimeoutRef.current = setTimeout(() => {
       handleSave(false);
-    }, 2000);
+    }, 3000); // Increased from 2s to 3s for better performance
 
     return () => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
@@ -1093,6 +1132,35 @@ export const JournalEditor: React.FC = () => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleManualSave, createNewEntry, isZenMode, toggleZenMode, togglePreviewMode]);
+
+  // Loading skeleton component
+  if (isLoadingEntries) {
+    return (
+      <div className="flex flex-col h-full overflow-hidden bg-bg">
+        <div className="flex flex-1 overflow-hidden">
+          {/* Sidebar skeleton */}
+          <div className="w-64 border-r border-default bg-bg-alt/30 p-3 space-y-3">
+            <div className="h-4 bg-default/10 rounded w-16 animate-pulse" />
+            <div className="space-y-2">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="h-8 bg-default/10 rounded animate-pulse" style={{ animationDelay: `${i * 100}ms` }} />
+              ))}
+            </div>
+          </div>
+          {/* Editor skeleton */}
+          <div className="flex-1 p-6 space-y-4">
+            <div className="h-8 bg-default/10 rounded w-1/3 animate-pulse" />
+            <div className="h-4 bg-default/10 rounded w-1/4 animate-pulse" />
+            <div className="space-y-2 mt-6">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="h-4 bg-default/5 rounded animate-pulse" style={{ width: `${70 + Math.random() * 30}%`, animationDelay: `${i * 50}ms` }} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Zen mode wrapper
   const editorContent = (
@@ -1172,28 +1240,38 @@ export const JournalEditor: React.FC = () => {
               </div>
               
               {/* Daily goal widget */}
-              {dailyGoal > 0 && (
-                <>
-                  <span className="h-4 w-px bg-default/20 mx-1"></span>
-                  <div 
-                    className="flex items-center gap-2 cursor-pointer group"
-                    onClick={() => setIsEditingGoal(true)}
-                    title="Click to edit daily goal"
-                  >
-                    <div className="w-16 h-1.5 bg-default/10 rounded-full overflow-hidden">
-                      <div 
-                        className={`h-full transition-all duration-500 ${goalProgress >= 100 ? 'bg-green-500' : 'bg-accent'}`}
-                        style={{ width: `${goalProgress}%` }}
-                      />
-                    </div>
-                    <span className={`text-[10px] font-medium ${goalProgress >= 100 ? 'text-green-500' : 'text-muted'}`}>
-                      {dailyProgress}/{dailyGoal}
-                    </span>
-                    {goalProgress >= 100 && (
-                      <span className="text-[10px]" title="Goal reached!">🎉</span>
-                    )}
+              <span className="h-4 w-px bg-default/20 mx-1"></span>
+              {dailyGoal > 0 ? (
+                <div
+                  className="flex items-center gap-2 cursor-pointer group"
+                  onClick={() => setIsEditingGoal(true)}
+                  title="Click to edit daily goal"
+                >
+                  <div className="w-16 h-1.5 bg-default/10 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full transition-all duration-500 ${goalProgress >= 100 ? 'bg-green-500' : 'bg-accent'}`}
+                      style={{ width: `${goalProgress}%` }}
+                    />
                   </div>
-                </>
+                  <span className={`text-[10px] font-medium ${goalProgress >= 100 ? 'text-green-500' : 'text-muted'}`}>
+                    {dailyProgress}/{dailyGoal}
+                  </span>
+                  {goalProgress >= 100 && (
+                    <span className="text-[10px]" title="Goal reached!">🎉</span>
+                  )}
+                </div>
+              ) : (
+                <button
+                  onClick={() => setIsEditingGoal(true)}
+                  className="text-[10px] text-muted hover:text-accent transition-colors flex items-center gap-1"
+                  title="Set a daily writing goal"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 20h9"/>
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                  Set goal
+                </button>
               )}
               
               {showSaveConfirm && (

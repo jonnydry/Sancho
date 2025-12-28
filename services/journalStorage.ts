@@ -12,38 +12,64 @@ export interface JournalEntry {
 const LOCAL_STORAGE_KEY = 'sancho_journal_entries';
 const MIGRATION_FLAG_KEY = 'sancho_journal_migrated';
 
+// Extract CSRF token from cookie
+function getCsrfToken(): string | null {
+  const match = document.cookie.match(/(?:^|;\s*)csrf-token=([^;]*)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
 async function fetchWithAuth(url: string, options: RequestInit = {}) {
-  console.log(`[Journal] API request: ${options.method || 'GET'} ${url}`);
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[Journal] API request: ${options.method || 'GET'} ${url}`);
+  }
+
+  // Include CSRF token for mutation requests
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...options.headers as Record<string, string>,
+  };
+
+  const method = options.method?.toUpperCase() || 'GET';
+  if (!['GET', 'HEAD', 'OPTIONS'].includes(method)) {
+    const csrfToken = getCsrfToken();
+    if (csrfToken) {
+      headers['x-csrf-token'] = csrfToken;
+    }
+  }
+
   const response = await fetch(url, {
     ...options,
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
+    headers,
   });
   
   if (!response.ok) {
     const error = await response.json().catch(() => ({ error: 'Unknown error' }));
     const errorMsg = error.error || `Request failed with status ${response.status}`;
-    console.warn(`[Journal] API error (${response.status}): ${errorMsg}`);
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(`[Journal] API error (${response.status}): ${errorMsg}`);
+    }
     throw new Error(errorMsg);
   }
-  
-  console.log(`[Journal] API success: ${options.method || 'GET'} ${url}`);
+
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[Journal] API success: ${options.method || 'GET'} ${url}`);
+  }
   return response.json();
 }
+
+const isDev = process.env.NODE_ENV === 'development';
 
 export const JournalStorage = {
   getAll: async (): Promise<JournalEntry[]> => {
     try {
       const data = await fetchWithAuth('/api/journal');
-      console.log(`[Journal] Loaded ${data.entries?.length || 0} entries from server`);
+      if (isDev) console.log(`[Journal] Loaded ${data.entries?.length || 0} entries from server`);
       return data.entries || [];
     } catch (error) {
-      console.warn('[Journal] Failed to fetch from server, using local storage:', error);
+      if (isDev) console.warn('[Journal] Failed to fetch from server, using local storage:', error);
       const localEntries = JournalStorage.getLocalEntries();
-      console.log(`[Journal] Loaded ${localEntries.length} entries from local storage`);
+      if (isDev) console.log(`[Journal] Loaded ${localEntries.length} entries from local storage`);
       return localEntries;
     }
   },
@@ -59,7 +85,7 @@ export const JournalStorage = {
   },
 
   save: async (entry: JournalEntry): Promise<void> => {
-    console.log(`[Journal] Saving entry "${entry.title || 'Untitled'}" (${entry.id})`);
+    if (isDev) console.log(`[Journal] Saving entry "${entry.title || 'Untitled'}" (${entry.id})`);
     try {
       await fetchWithAuth(`/api/journal/${entry.id}`, {
         method: 'PATCH',
@@ -71,13 +97,13 @@ export const JournalStorage = {
           isStarred: entry.isStarred || false,
         }),
       });
-      console.log(`[Journal] Entry saved to server successfully`);
+      if (isDev) console.log(`[Journal] Entry saved to server successfully`);
     } catch (error: unknown) {
       const errorMsg = error instanceof Error ? error.message.toLowerCase() : '';
       const isNotFound = errorMsg.includes('404') || errorMsg.includes('not found');
-      
+
       if (isNotFound) {
-        console.log(`[Journal] Entry not found, creating new entry on server`);
+        if (isDev) console.log(`[Journal] Entry not found, creating new entry on server`);
         try {
           await fetchWithAuth('/api/journal', {
             method: 'POST',
@@ -90,38 +116,38 @@ export const JournalStorage = {
               isStarred: entry.isStarred || false,
             }),
           });
-          console.log(`[Journal] Entry created on server successfully`);
+          if (isDev) console.log(`[Journal] Entry created on server successfully`);
           return;
         } catch (createError) {
-          console.warn('[Journal] Failed to create on server, saving locally:', createError);
+          if (isDev) console.warn('[Journal] Failed to create on server, saving locally:', createError);
           JournalStorage.saveLocal(entry);
           return;
         }
       }
-      console.warn('[Journal] Failed to save to server, saving locally:', error);
+      if (isDev) console.warn('[Journal] Failed to save to server, saving locally:', error);
       JournalStorage.saveLocal(entry);
     }
   },
 
   saveLocal: (entry: JournalEntry): void => {
-    console.log(`[Journal] Saving entry locally: "${entry.title || 'Untitled'}" (${entry.id})`);
+    if (isDev) console.log(`[Journal] Saving entry locally: "${entry.title || 'Untitled'}" (${entry.id})`);
     try {
       const entries = JournalStorage.getLocalEntries();
       const index = entries.findIndex(e => e.id === entry.id);
-      
+
       if (index >= 0) {
         entries[index] = { ...entry, updatedAt: Date.now() };
-        console.log(`[Journal] Updated existing local entry`);
+        if (isDev) console.log(`[Journal] Updated existing local entry`);
       } else {
         entries.push({ ...entry, createdAt: Date.now(), updatedAt: Date.now() });
-        console.log(`[Journal] Created new local entry`);
+        if (isDev) console.log(`[Journal] Created new local entry`);
       }
-      
+
       entries.sort((a, b) => b.createdAt - a.createdAt);
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(entries));
-      console.log(`[Journal] Local storage now has ${entries.length} entries`);
+      if (isDev) console.log(`[Journal] Local storage now has ${entries.length} entries`);
     } catch (error) {
-      console.error('[Journal] Failed to save locally:', error);
+      if (isDev) console.error('[Journal] Failed to save locally:', error);
     }
   },
 
@@ -131,7 +157,7 @@ export const JournalStorage = {
         method: 'DELETE',
       });
     } catch (error) {
-      console.error('Error deleting journal entry from server:', error);
+      if (isDev) console.error('Error deleting journal entry from server:', error);
       JournalStorage.deleteLocal(id);
     }
   },
@@ -142,7 +168,7 @@ export const JournalStorage = {
       const filtered = entries.filter(e => e.id !== id);
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(filtered));
     } catch (error) {
-      console.error('Error deleting local journal entry:', error);
+      if (isDev) console.error('Error deleting local journal entry:', error);
     }
   },
 
@@ -173,10 +199,10 @@ export const JournalStorage = {
 
       localStorage.setItem(MIGRATION_FLAG_KEY, 'true');
       localStorage.removeItem(LOCAL_STORAGE_KEY);
-      
+
       return { success: true, migrated: data.migrated || 0 };
     } catch (error) {
-      console.error('Error migrating journal entries to server:', error);
+      if (isDev) console.error('Error migrating journal entries to server:', error);
       return { success: false, migrated: 0 };
     }
   },

@@ -14,7 +14,7 @@ interface SlashMenuProps {
   selectedIndex: number;
   onSelect: (command: SlashCommand) => void;
   onClose: () => void;
-  onNavigate: (direction: 'up' | 'down') => void;
+  onNavigate: (direction: 'up' | 'down' | number) => void;
 }
 
 // Icons for slash commands
@@ -169,7 +169,7 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
                 : 'hover:bg-bg-alt text-default'
             }`}
             onClick={() => onSelect(cmd)}
-            onMouseEnter={() => onNavigate(index as any)} // Slight hack to set index directly
+            onMouseEnter={() => onNavigate(index)}
           >
             <div className={`flex items-center justify-center w-7 h-7 rounded border ${
               index === selectedIndex
