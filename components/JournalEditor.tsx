@@ -164,7 +164,7 @@ const ResizeHandle: React.FC<ResizeHandleProps> = memo(
 
     return (
       <div
-        className={`w-[3px] cursor-col-resize z-10 flex flex-col justify-center items-center group relative ${isDragging ? "bg-accent/40" : "bg-transparent hover:bg-accent/30"} ${className || ""}`}
+        className={`w-[12px] cursor-col-resize z-10 flex flex-col justify-center items-center group relative ${className || ""}`}
         onMouseDown={(e) => handleStart(e.clientX)}
         onTouchStart={(e) => {
           const touch = e.touches[0];
@@ -181,9 +181,14 @@ const ResizeHandle: React.FC<ResizeHandleProps> = memo(
           }
         }}
       >
+        {/* Visible indicator - stays thin while hit area is larger */}
         <div
-          className={`w-px h-5 rounded-full ${isDragging ? "bg-accent" : "bg-border/40 group-hover:bg-accent/60"}`}
-        />
+          className={`w-[3px] h-full flex flex-col justify-center items-center ${isDragging ? "bg-accent/40" : "bg-transparent group-hover:bg-accent/30"}`}
+        >
+          <div
+            className={`w-px h-5 rounded-full ${isDragging ? "bg-accent" : "bg-border/40 group-hover:bg-accent/60"}`}
+          />
+        </div>
       </div>
     );
   },
