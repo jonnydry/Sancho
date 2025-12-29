@@ -316,7 +316,7 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
                   </h4>
                 </div>
                 <a
-                  href={`https://grokipedia.com/page/${item.name.replace(/\s+/g, "_")}`}
+                  href={`https://grokipedia.com/page/${encodeURIComponent(item.name.replace(/\s+/g, "_"))}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors"

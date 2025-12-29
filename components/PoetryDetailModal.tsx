@@ -283,7 +283,7 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
             </div>
             <ActionButton
               as="a"
-              href={`https://grokipedia.com/page/${item.name.replace(/\s+/g, '_')}`}
+              href={`https://grokipedia.com/page/${encodeURIComponent(item.name.replace(/\s+/g, '_'))}`}
               icon={<ArrowUpRightIcon className="w-3.5 h-3.5" />}
             >
               Grokipedia
