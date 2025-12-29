@@ -1345,12 +1345,12 @@ export const JournalEditor: React.FC = () => {
               )}
 
               {/* Stats display */}
-              <div className="flex items-center gap-2 text-[10px] text-muted font-medium uppercase tracking-wide">
+              <div className="flex items-center gap-2 text-xs text-muted font-medium uppercase tracking-wide">
                 <span>{wordCount} words</span>
                 <span className="opacity-50">•</span>
                 <span>{readingTime} min</span>
                 <span className="opacity-50">•</span>
-                <span className="font-mono text-[11px] normal-case">
+                <span className="font-mono text-xs normal-case">
                   {content.length} chars
                 </span>
               </div>
@@ -1370,12 +1370,12 @@ export const JournalEditor: React.FC = () => {
                     />
                   </div>
                   <span
-                    className={`text-[10px] font-medium ${goalProgress >= 100 ? "text-green-500" : "text-muted"}`}
+                    className={`text-xs font-medium ${goalProgress >= 100 ? "text-green-500" : "text-muted"}`}
                   >
                     {dailyProgress}/{dailyGoal}
                   </span>
                   {goalProgress >= 100 && (
-                    <span className="text-[10px]" title="Goal reached!">
+                    <span className="text-xs" title="Goal reached!">
                       🎉
                     </span>
                   )}
@@ -1383,7 +1383,7 @@ export const JournalEditor: React.FC = () => {
               ) : (
                 <button
                   onClick={() => setIsEditingGoal(true)}
-                  className="text-[10px] text-muted hover:text-accent transition-colors flex items-center gap-1"
+                  className="text-xs text-muted hover:text-accent transition-colors flex items-center gap-1"
                   title="Set a daily writing goal"
                 >
                   <svg

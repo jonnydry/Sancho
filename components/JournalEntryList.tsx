@@ -156,7 +156,7 @@ const EntryItem: React.FC<{
               {entry.title || "Untitled"}
             </div>
             {/* Inline date */}
-            <span className="hidden sm:block text-[9px] text-muted/60 shrink-0">
+            <span className="hidden sm:block text-[11px] text-muted/60 shrink-0">
               {new Date(entry.updatedAt).toLocaleDateString(undefined, {
                 month: "numeric",
                 day: "numeric",
@@ -166,7 +166,7 @@ const EntryItem: React.FC<{
 
           {/* Mobile Date (fallback) */}
           {!compact && (
-            <div className="sm:hidden text-[9px] text-muted text-center mt-0.5">
+            <div className="sm:hidden text-[11px] text-muted text-center mt-0.5">
               {new Date(entry.updatedAt).getDate()}
             </div>
           )}
@@ -211,7 +211,7 @@ const EntryItem: React.FC<{
                   e.stopPropagation();
                   onConfirmDelete();
                 }}
-                className="px-2 py-1 sm:px-1.5 sm:py-0.5 rounded text-[10px] font-medium bg-red-500 text-white hover:bg-red-600 transition-colors animate-pulse"
+                className="px-2 py-1 sm:px-1.5 sm:py-0.5 rounded text-xs font-medium bg-red-500 text-white hover:bg-red-600 transition-colors animate-pulse"
               >
                 Confirm
               </button>
@@ -281,7 +281,7 @@ const TagFolder: React.FC<{
           className={`w-3 h-3 text-muted transition-transform ${isExpanded ? "" : "-rotate-90"}`}
         />
         <span className="text-xs font-medium text-accent">#{tag}</span>
-        <span className="text-[10px] text-muted ml-auto">{count}</span>
+        <span className="text-xs text-muted ml-auto">{count}</span>
       </button>
 
       {isExpanded && (
@@ -358,7 +358,7 @@ const VirtualRowRenderer: React.FC<VirtualRowProps> = memo(({
     return (
       <div
         style={style}
-        className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 border-b border-default/30 bg-bg-alt/30"
+        className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider flex items-center gap-1 border-b border-default/30 bg-bg-alt/30"
       >
         {row.icon === "star" && (
           <svg
@@ -649,7 +649,7 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
         <div className="flex gap-1 p-0.5 bg-bg rounded-md">
           <button
             onClick={() => setViewMode("all")}
-            className={`flex-1 px-2 py-1 text-[10px] font-medium rounded transition-colors ${
+            className={`flex-1 px-2 py-1 text-xs font-medium rounded transition-colors ${
               viewMode === "all"
                 ? "bg-accent/15 text-accent"
                 : "text-muted hover:text-default"
@@ -659,7 +659,7 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
           </button>
           <button
             onClick={() => setViewMode("tags")}
-            className={`flex-1 px-2 py-1 text-[10px] font-medium rounded transition-colors ${
+            className={`flex-1 px-2 py-1 text-xs font-medium rounded transition-colors ${
               viewMode === "tags"
                 ? "bg-accent/15 text-accent"
                 : "text-muted hover:text-default"
@@ -698,7 +698,7 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
               {/* Starred Section */}
               {starredEntries.length > 0 && (
                 <div className="border-b border-default/30">
-                  <div className="px-3 py-1.5 text-[10px] font-bold text-yellow-500/80 uppercase tracking-wider flex items-center gap-1">
+                  <div className="px-3 py-1.5 text-xs font-bold text-yellow-500/80 uppercase tracking-wider flex items-center gap-1">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="10"
@@ -734,7 +734,7 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
               {/* Recent Section */}
               {recentEntries.length > 0 && (
                 <div className="border-b border-default/30">
-                  <div className="px-3 py-1.5 text-[10px] font-bold text-muted uppercase tracking-wider flex items-center gap-1">
+                  <div className="px-3 py-1.5 text-xs font-bold text-muted uppercase tracking-wider flex items-center gap-1">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="10"
@@ -773,7 +773,7 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
               {/* Older Entries - only show if there are more than 5 non-starred entries */}
               {filteredEntries.filter((e) => !e.isStarred).length > 5 && (
                 <div>
-                  <div className="px-3 py-1.5 text-[10px] font-bold text-muted uppercase tracking-wider">
+                  <div className="px-3 py-1.5 text-xs font-bold text-muted uppercase tracking-wider">
                     Older Notes (
                     {filteredEntries.filter((e) => !e.isStarred).length - 5})
                   </div>
@@ -860,7 +860,7 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
               starredEntries.length === 0 && (
                 <div className="p-4 text-center">
                   <p className="text-xs text-muted">No tags yet</p>
-                  <p className="text-[10px] text-muted/60 mt-1">
+                  <p className="text-xs text-muted/60 mt-1">
                     Add #tags to your notes
                   </p>
                 </div>
