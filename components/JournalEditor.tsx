@@ -6,6 +6,7 @@ import React, {
   useMemo,
   lazy,
   Suspense,
+  memo,
 } from "react";
 import remarkGfm from "remark-gfm";
 import { JournalEntry, JournalStorage } from "../services/journalStorage";
@@ -15,17 +16,26 @@ import { useFont } from "../hooks/useFont";
 import { JournalEntryList } from "./JournalEntryList";
 import { ReferencePane } from "./ReferencePane";
 import { BottomPanel } from "./BottomPanel";
-import { SlashMenu, SLASH_COMMANDS, SlashCommand, replaceSlashCommand } from "./SlashMenu";
+import {
+  SlashMenu,
+  SLASH_COMMANDS,
+  SlashCommand,
+  replaceSlashCommand,
+} from "./SlashMenu";
 import { TagInput } from "./TagInput";
 import { GridIcon } from "./icons/GridIcon";
 import { poetryData } from "../data/poetryData";
 import { poeticDevicesData } from "../data/poeticDevicesData";
 import { getCaretCoordinates } from "../utils/cursor";
-import { extractTagsFromContent, mergeTags, getAllTagsFromEntries } from "../utils/tagUtils";
-import { useLocalStorageSync } from '../hooks/useLocalStorageSync';
+import {
+  extractTagsFromContent,
+  mergeTags,
+  getAllTagsFromEntries,
+} from "../utils/tagUtils";
+import { useLocalStorageSync } from "../hooks/useLocalStorageSync";
 
 // Lazy load ReactMarkdown - only loads when preview mode is activated
-const ReactMarkdown = lazy(() => import('react-markdown'));
+const ReactMarkdown = lazy(() => import("react-markdown"));
 
 // Loading fallback for preview mode
 const PreviewLoadingFallback: React.FC = () => (
@@ -54,131 +64,142 @@ interface ResizeHandleProps {
   className?: string;
 }
 
-const ResizeHandle: React.FC<ResizeHandleProps> = ({ onResize, className }) => {
-  const [isDragging, setIsDragging] = useState(false);
-  const startPosRef = useRef<{ x: number; y: number } | null>(null);
-  const rafRef = useRef<number | null>(null);
+const ResizeHandle: React.FC<ResizeHandleProps> = memo(
+  ({ onResize, className }) => {
+    const [isDragging, setIsDragging] = useState(false);
+    const startPosRef = useRef<{ x: number; y: number } | null>(null);
+    const rafRef = useRef<number | null>(null);
 
-  useEffect(() => {
-    if (!isDragging) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      // Throttle with requestAnimationFrame
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(() => {
-        onResize(e.movementX);
-      });
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      e.preventDefault();
-      if (!startPosRef.current) return;
-      const touch = e.touches[0];
-      const delta = touch.clientX - startPosRef.current.x;
-      // Throttle with requestAnimationFrame
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(() => {
-        onResize(delta);
-      });
-      startPosRef.current.x = touch.clientX;
-    };
-
-    const handleMouseUp = () => {
-      setIsDragging(false);
-      startPosRef.current = null;
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
-    };
-
-    const handleTouchEnd = () => {
-      setIsDragging(false);
-      startPosRef.current = null;
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => {
+    useEffect(() => {
       if (!isDragging) return;
-      if (e.key === "Escape") {
+
+      const handleMouseMove = (e: MouseEvent) => {
+        // Throttle with requestAnimationFrame
+        if (rafRef.current) cancelAnimationFrame(rafRef.current);
+        rafRef.current = requestAnimationFrame(() => {
+          onResize(e.movementX);
+        });
+      };
+
+      const handleTouchMove = (e: TouchEvent) => {
+        e.preventDefault();
+        if (!startPosRef.current) return;
+        const touch = e.touches[0];
+        const delta = touch.clientX - startPosRef.current.x;
+        // Throttle with requestAnimationFrame
+        if (rafRef.current) cancelAnimationFrame(rafRef.current);
+        rafRef.current = requestAnimationFrame(() => {
+          onResize(delta);
+        });
+        startPosRef.current.x = touch.clientX;
+      };
+
+      const handleMouseUp = () => {
         setIsDragging(false);
         startPosRef.current = null;
         document.body.style.cursor = "";
         document.body.style.userSelect = "";
-        return;
-      }
-      const step = e.shiftKey ? 10 : 1;
-      if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        onResize(-step);
-      } else if (e.key === "ArrowRight") {
-        e.preventDefault();
-        onResize(step);
-      }
-    };
+      };
 
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
-    document.addEventListener("touchmove", handleTouchMove, { passive: false });
-    document.addEventListener("touchend", handleTouchEnd);
-    document.addEventListener("keydown", handleKeyDown);
-    document.body.style.cursor = "col-resize";
-    document.body.style.userSelect = "none";
+      const handleTouchEnd = () => {
+        setIsDragging(false);
+        startPosRef.current = null;
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+      };
 
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-      document.removeEventListener("touchmove", handleTouchMove);
-      document.removeEventListener("touchend", handleTouchEnd);
-      document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, [isDragging, onResize]);
-
-  // Cleanup effect to ensure styles are reset on unmount even if dragging
-  useEffect(() => {
-    return () => {
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
-    };
-  }, []);
-
-  const handleStart = (clientX: number) => {
-    setIsDragging(true);
-    startPosRef.current = { x: clientX, y: 0 };
-  };
-
-  return (
-    <div
-      className={`w-[3px] cursor-col-resize z-10 flex flex-col justify-center items-center group relative ${isDragging ? "bg-accent/40" : "bg-transparent hover:bg-accent/30"} ${className || ""}`}
-      onMouseDown={(e) => handleStart(e.clientX)}
-      onTouchStart={(e) => {
-        const touch = e.touches[0];
-        handleStart(touch.clientX);
-      }}
-      role="separator"
-      aria-orientation="vertical"
-      aria-label="Resize panel"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          setIsDragging(true);
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (!isDragging) return;
+        if (e.key === "Escape") {
+          setIsDragging(false);
+          startPosRef.current = null;
+          document.body.style.cursor = "";
+          document.body.style.userSelect = "";
+          return;
         }
-      }}
-    >
+        const step = e.shiftKey ? 10 : 1;
+        if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          onResize(-step);
+        } else if (e.key === "ArrowRight") {
+          e.preventDefault();
+          onResize(step);
+        }
+      };
+
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+      document.addEventListener("touchmove", handleTouchMove, {
+        passive: false,
+      });
+      document.addEventListener("touchend", handleTouchEnd);
+      document.addEventListener("keydown", handleKeyDown);
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
+
+      return () => {
+        document.removeEventListener("mousemove", handleMouseMove);
+        document.removeEventListener("mouseup", handleMouseUp);
+        document.removeEventListener("touchmove", handleTouchMove);
+        document.removeEventListener("touchend", handleTouchEnd);
+        document.removeEventListener("keydown", handleKeyDown);
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+        if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      };
+    }, [isDragging, onResize]);
+
+    // Cleanup effect to ensure styles are reset on unmount even if dragging
+    useEffect(() => {
+      return () => {
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+      };
+    }, []);
+
+    const handleStart = (clientX: number) => {
+      setIsDragging(true);
+      startPosRef.current = { x: clientX, y: 0 };
+    };
+
+    return (
       <div
-        className={`w-px h-5 rounded-full ${isDragging ? "bg-accent" : "bg-border/40 group-hover:bg-accent/60"}`}
-      />
-    </div>
-  );
-};
+        className={`w-[3px] cursor-col-resize z-10 flex flex-col justify-center items-center group relative ${isDragging ? "bg-accent/40" : "bg-transparent hover:bg-accent/30"} ${className || ""}`}
+        onMouseDown={(e) => handleStart(e.clientX)}
+        onTouchStart={(e) => {
+          const touch = e.touches[0];
+          handleStart(touch.clientX);
+        }}
+        role="separator"
+        aria-orientation="vertical"
+        aria-label="Resize panel"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setIsDragging(true);
+          }
+        }}
+      >
+        <div
+          className={`w-px h-5 rounded-full ${isDragging ? "bg-accent" : "bg-border/40 group-hover:bg-accent/60"}`}
+        />
+      </div>
+    );
+  },
+);
 
 export const JournalEditor: React.FC = () => {
   const { pinnedItems } = usePinnedItems();
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
-  const { fontFace, fontSize, setFontFace, setFontSize, increaseFontSize, decreaseFontSize } = useFont();
+  const {
+    fontFace,
+    fontSize,
+    setFontFace,
+    setFontSize,
+    increaseFontSize,
+    decreaseFontSize,
+  } = useFont();
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [isLoadingEntries, setIsLoadingEntries] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -218,10 +239,13 @@ export const JournalEditor: React.FC = () => {
 
   // Slash command state
   const [showSlashMenu, setShowSlashMenu] = useState(false);
-  const [slashMenuPosition, setSlashMenuPosition] = useState({ top: 0, left: 0 });
+  const [slashMenuPosition, setSlashMenuPosition] = useState({
+    top: 0,
+    left: 0,
+  });
   const [slashQuery, setSlashQuery] = useState("");
   const [slashSelectedIndex, setSlashSelectedIndex] = useState(0);
-  
+
   // Daily goal state
   const [dailyGoal, setDailyGoal] = useState(() => {
     const saved = localStorage.getItem("sancho_daily_goal");
@@ -284,8 +308,8 @@ export const JournalEditor: React.FC = () => {
   useEffect(() => {
     if (!showFontMenu) return;
     const handleClickOutside = () => setShowFontMenu(false);
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, [showFontMenu]);
 
   // Persist daily goal
@@ -295,10 +319,13 @@ export const JournalEditor: React.FC = () => {
 
   // Persist daily progress
   useEffect(() => {
-    localStorage.setItem("sancho_daily_progress", JSON.stringify({
-      date: new Date().toDateString(),
-      count: dailyProgress,
-    }));
+    localStorage.setItem(
+      "sancho_daily_progress",
+      JSON.stringify({
+        date: new Date().toDateString(),
+        count: dailyProgress,
+      }),
+    );
   }, [dailyProgress]);
 
   // Reset word count ref when switching entries to prevent incorrect tracking
@@ -306,7 +333,10 @@ export const JournalEditor: React.FC = () => {
 
   // Track word count changes for daily goal
   useEffect(() => {
-    const wordCount = content.trim().split(/\s+/).filter(w => w.length > 0).length;
+    const wordCount = content
+      .trim()
+      .split(/\s+/)
+      .filter((w) => w.length > 0).length;
 
     // If we switched entries, reset the baseline without counting the diff
     if (currentEntryIdRef.current !== selectedId) {
@@ -322,9 +352,12 @@ export const JournalEditor: React.FC = () => {
     previousWordCountRef.current = wordCount;
   }, [content, selectedId]);
 
-  // Computed stats
+  // Computed stats - optimized with early returns
   const wordCount = useMemo(() => {
-    return content.trim().split(/\s+/).filter(w => w.length > 0).length;
+    if (!content) return 0;
+    const trimmed = content.trim();
+    if (!trimmed) return 0;
+    return trimmed.split(/\s+/).filter((w) => w.length > 0).length;
   }, [content]);
 
   const readingTime = useMemo(() => {
@@ -400,7 +433,14 @@ export const JournalEditor: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    currentStateRef.current = { title, content, activeTemplate, tags, isStarred, entries };
+    currentStateRef.current = {
+      title,
+      content,
+      activeTemplate,
+      tags,
+      isStarred,
+      entries,
+    };
   }, [title, content, activeTemplate, tags, isStarred, entries]);
 
   useEffect(() => {
@@ -504,7 +544,8 @@ export const JournalEditor: React.FC = () => {
             currentEntry.content !== state.content ||
             currentEntry.templateRef !== state.activeTemplate ||
             currentEntry.isStarred !== state.isStarred ||
-            JSON.stringify(currentEntry.tags || []) !== JSON.stringify(state.tags));
+            JSON.stringify(currentEntry.tags || []) !==
+              JSON.stringify(state.tags));
 
         if (hasUnsavedChanges) {
           // Check if user wants to save before switching
@@ -546,7 +587,9 @@ export const JournalEditor: React.FC = () => {
         console.error("Failed to save entry before switching:", error);
         // Notify user about the save failure
         const errorMessage =
-          error instanceof Error ? error.message : "Failed to save before switching";
+          error instanceof Error
+            ? error.message
+            : "Failed to save before switching";
         setAutosaveError(errorMessage);
         setSyncStatus("error");
 
@@ -571,78 +614,76 @@ export const JournalEditor: React.FC = () => {
 
   const isDeletingRef = useRef(false);
 
-  const deleteEntry = useCallback(
-    async (id: string) => {
-      // Prevent concurrent deletions
-      if (isDeletingRef.current) return;
-      isDeletingRef.current = true;
+  const deleteEntry = useCallback(async (id: string) => {
+    // Prevent concurrent deletions
+    if (isDeletingRef.current) return;
+    isDeletingRef.current = true;
 
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
-        saveTimeoutRef.current = null;
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+      saveTimeoutRef.current = null;
+    }
+
+    // Get current entries to determine next state
+    const currentEntries = currentStateRef.current.entries;
+    const remaining = currentEntries.filter((e) => e.id !== id);
+    const wasSelected = previousSelectedIdRef.current === id;
+
+    if (remaining.length > 0) {
+      // Update entries list
+      setEntries(remaining);
+
+      // Select next entry if we deleted the currently selected one
+      if (wasSelected) {
+        const nextEntry = remaining[0];
+        setSelectedId(nextEntry.id);
+        setTitle(nextEntry.title);
+        setContent(nextEntry.content);
+        setActiveTemplate(nextEntry.templateRef);
+        setTags(nextEntry.tags || []);
+        setIsStarred(nextEntry.isStarred || false);
+        previousSelectedIdRef.current = nextEntry.id;
       }
+    } else {
+      // No entries left - create a new blank one
+      const newEntry: JournalEntry = {
+        id: generateUUID(),
+        title: "",
+        content: "",
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        tags: [],
+        isStarred: false,
+      };
 
-      // Get current entries to determine next state
-      const currentEntries = currentStateRef.current.entries;
-      const remaining = currentEntries.filter((e) => e.id !== id);
-      const wasSelected = previousSelectedIdRef.current === id;
+      setEntries([newEntry]);
+      setSelectedId(newEntry.id);
+      setTitle("");
+      setContent("");
+      setActiveTemplate(undefined);
+      setTags([]);
+      setIsStarred(false);
+      previousSelectedIdRef.current = newEntry.id;
 
-      if (remaining.length > 0) {
-        // Update entries list
-        setEntries(remaining);
+      // Save new entry to server
+      JournalStorage.save(newEntry).catch((error) => {
+        console.error("Failed to save new entry:", error);
+      });
+    }
 
-        // Select next entry if we deleted the currently selected one
-        if (wasSelected) {
-          const nextEntry = remaining[0];
-          setSelectedId(nextEntry.id);
-          setTitle(nextEntry.title);
-          setContent(nextEntry.content);
-          setActiveTemplate(nextEntry.templateRef);
-          setTags(nextEntry.tags || []);
-          setIsStarred(nextEntry.isStarred || false);
-          previousSelectedIdRef.current = nextEntry.id;
-        }
-      } else {
-        // No entries left - create a new blank one
-        const newEntry: JournalEntry = {
-          id: generateUUID(),
-          title: "",
-          content: "",
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
-          tags: [],
-          isStarred: false,
-        };
-
-        setEntries([newEntry]);
-        setSelectedId(newEntry.id);
-        setTitle("");
-        setContent("");
-        setActiveTemplate(undefined);
-        setTags([]);
-        setIsStarred(false);
-        previousSelectedIdRef.current = newEntry.id;
-
-        // Save new entry to server
-        JournalStorage.save(newEntry).catch((error) => {
-          console.error("Failed to save new entry:", error);
-        });
-      }
-
-      // Delete from server in background
-      try {
-        await JournalStorage.delete(id);
-      } catch (error) {
-        console.error("Failed to delete entry from server:", error);
-      } finally {
-        isDeletingRef.current = false;
-      }
-    },
-    [],
-  );
+    // Delete from server in background
+    try {
+      await JournalStorage.delete(id);
+    } catch (error) {
+      console.error("Failed to delete entry from server:", error);
+    } finally {
+      isDeletingRef.current = false;
+    }
+  }, []);
 
   // Use a ref to hold the latest handleSave to avoid stale closures in retry
-  const handleSaveRef = useRef<(isManual?: boolean, retryAttempt?: number) => Promise<void>>();
+  const handleSaveRef =
+    useRef<(isManual?: boolean, retryAttempt?: number) => Promise<void>>();
 
   const handleSave = useCallback(
     async (isManual = false, retryAttempt = 0) => {
@@ -652,7 +693,9 @@ export const JournalEditor: React.FC = () => {
 
       if (!currentSelectedId) return;
 
-      const currentEntry = state.entries.find((e) => e.id === currentSelectedId);
+      const currentEntry = state.entries.find(
+        (e) => e.id === currentSelectedId,
+      );
       if (!currentEntry) return;
 
       let entryTitle = state.title;
@@ -716,7 +759,7 @@ export const JournalEditor: React.FC = () => {
           }
 
           retryTimeoutRef.current = setTimeout(() => {
-            if (process.env.NODE_ENV === 'development') {
+            if (process.env.NODE_ENV === "development") {
               console.log(
                 `Retrying save (attempt ${retryAttempt + 1}/${maxRetries})...`,
               );
@@ -798,225 +841,264 @@ export const JournalEditor: React.FC = () => {
   }, []);
 
   // Slash command detection on input
-  const handleTextareaInput = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-    const cursorPos = e.target.selectionStart;
-    
-    setContent(value);
-    
-    // Slash command detection
-    const textBefore = value.substring(0, cursorPos);
-    const match = textBefore.match(/\/([a-zA-Z0-9]*)$/);
-    
-    if (match) {
-      setShowSlashMenu(true);
-      setSlashQuery(match[1]);
-      setSlashSelectedIndex(0);
-      
-      // Calculate position for menu
-      const coords = getCaretCoordinates(e.target, cursorPos);
-      const rect = e.target.getBoundingClientRect();
-      const scrollTop = e.target.scrollTop;
-      
-      setSlashMenuPosition({
-        top: coords.top - scrollTop + 24,
-        left: Math.min(coords.left + 10, rect.width - 240),
-      });
-    } else {
-      setShowSlashMenu(false);
-    }
-  }, []);
+  const handleTextareaInput = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const value = e.target.value;
+      const cursorPos = e.target.selectionStart;
 
-  // Handle slash command keyboard navigation and list auto-continuation
-  const handleTextareaKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (showSlashMenu) {
-      const filteredCommands = SLASH_COMMANDS.filter(cmd =>
-        cmd.label.toLowerCase().includes(slashQuery.toLowerCase()) ||
-        cmd.id.includes(slashQuery.toLowerCase())
-      );
-      
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        setSlashSelectedIndex(prev => (prev + 1) % filteredCommands.length);
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        setSlashSelectedIndex(prev => (prev - 1 + filteredCommands.length) % filteredCommands.length);
-      } else if (e.key === 'Enter') {
-        e.preventDefault();
-        const command = filteredCommands[slashSelectedIndex];
-        if (command) {
-          executeSlashCommand(command);
-        }
-      } else if (e.key === 'Escape') {
+      setContent(value);
+
+      // Slash command detection
+      const textBefore = value.substring(0, cursorPos);
+      const match = textBefore.match(/\/([a-zA-Z0-9]*)$/);
+
+      if (match) {
+        setShowSlashMenu(true);
+        setSlashQuery(match[1]);
+        setSlashSelectedIndex(0);
+
+        // Calculate position for menu
+        const coords = getCaretCoordinates(e.target, cursorPos);
+        const rect = e.target.getBoundingClientRect();
+        const scrollTop = e.target.scrollTop;
+
+        setSlashMenuPosition({
+          top: coords.top - scrollTop + 24,
+          left: Math.min(coords.left + 10, rect.width - 240),
+        });
+      } else {
         setShowSlashMenu(false);
       }
-    } else if (e.key === 'Enter' && !e.shiftKey) {
-      // List auto-continuation
-      const textarea = e.currentTarget;
-      const cursorPos = textarea.selectionStart;
-      const textBefore = content.substring(0, cursorPos);
-      
-      // Find the current line
-      const lastNewline = textBefore.lastIndexOf('\n');
-      const currentLine = textBefore.substring(lastNewline + 1);
-      
-      // Check for list patterns (order matters: checklist before bullet since checklist starts with -)
-      const checklistMatch = currentLine.match(/^(\s*)-\s\[[x\s]\]\s(.*)$/i);
-      const bulletMatch = currentLine.match(/^(\s*)-\s(.*)$/);
-      const numberedMatch = currentLine.match(/^(\s*)(\d+)\.\s(.*)$/);
-      
-      let listPrefix: string | null = null;
-      let isEmptyItem = false;
-      let lineStartPos = lastNewline + 1;
-      
-      if (checklistMatch) {
-        const [, indent, itemContent] = checklistMatch;
-        isEmptyItem = itemContent.trim() === '';
-        listPrefix = `\n${indent}- [ ] `;
-      } else if (bulletMatch) {
-        const [, indent, itemContent] = bulletMatch;
-        isEmptyItem = itemContent.trim() === '';
-        listPrefix = `\n${indent}- `;
-      } else if (numberedMatch) {
-        const [, indent, num, itemContent] = numberedMatch;
-        isEmptyItem = itemContent.trim() === '';
-        listPrefix = `\n${indent}${parseInt(num, 10) + 1}. `;
-      }
-      
-      if (listPrefix !== null) {
-        e.preventDefault();
-        
-        if (isEmptyItem) {
-          // Remove the empty list item prefix (exit the list)
-          const beforeLine = content.substring(0, lineStartPos);
-          const afterCursor = content.substring(cursorPos);
-          const newContent = beforeLine + afterCursor;
-          
-          setContent(newContent);
-          
-          // Set cursor at the start of what was the list line
-          requestAnimationFrame(() => {
-            if (textareaRef.current) {
-              textareaRef.current.focus();
-              textareaRef.current.setSelectionRange(lineStartPos, lineStartPos);
-            }
-          });
-        } else {
-          // Insert the list continuation prefix
-          const beforeCursor = content.substring(0, cursorPos);
-          const afterCursor = content.substring(cursorPos);
-          const newContent = beforeCursor + listPrefix + afterCursor;
-          const newCursorPos = cursorPos + listPrefix.length;
-          
-          setContent(newContent);
-          
-          requestAnimationFrame(() => {
-            if (textareaRef.current) {
-              textareaRef.current.focus();
-              textareaRef.current.setSelectionRange(newCursorPos, newCursorPos);
-            }
-          });
+    },
+    [],
+  );
+
+  // Handle slash command keyboard navigation and list auto-continuation
+  const handleTextareaKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (showSlashMenu) {
+        const filteredCommands = SLASH_COMMANDS.filter(
+          (cmd) =>
+            cmd.label.toLowerCase().includes(slashQuery.toLowerCase()) ||
+            cmd.id.includes(slashQuery.toLowerCase()),
+        );
+
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          setSlashSelectedIndex((prev) => (prev + 1) % filteredCommands.length);
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          setSlashSelectedIndex(
+            (prev) =>
+              (prev - 1 + filteredCommands.length) % filteredCommands.length,
+          );
+        } else if (e.key === "Enter") {
+          e.preventDefault();
+          const command = filteredCommands[slashSelectedIndex];
+          if (command) {
+            executeSlashCommand(command);
+          }
+        } else if (e.key === "Escape") {
+          setShowSlashMenu(false);
+        }
+      } else if (e.key === "Enter" && !e.shiftKey) {
+        // List auto-continuation
+        const textarea = e.currentTarget;
+        const cursorPos = textarea.selectionStart;
+        const textBefore = content.substring(0, cursorPos);
+
+        // Find the current line
+        const lastNewline = textBefore.lastIndexOf("\n");
+        const currentLine = textBefore.substring(lastNewline + 1);
+
+        // Check for list patterns (order matters: checklist before bullet since checklist starts with -)
+        const checklistMatch = currentLine.match(/^(\s*)-\s\[[x\s]\]\s(.*)$/i);
+        const bulletMatch = currentLine.match(/^(\s*)-\s(.*)$/);
+        const numberedMatch = currentLine.match(/^(\s*)(\d+)\.\s(.*)$/);
+
+        let listPrefix: string | null = null;
+        let isEmptyItem = false;
+        let lineStartPos = lastNewline + 1;
+
+        if (checklistMatch) {
+          const [, indent, itemContent] = checklistMatch;
+          isEmptyItem = itemContent.trim() === "";
+          listPrefix = `\n${indent}- [ ] `;
+        } else if (bulletMatch) {
+          const [, indent, itemContent] = bulletMatch;
+          isEmptyItem = itemContent.trim() === "";
+          listPrefix = `\n${indent}- `;
+        } else if (numberedMatch) {
+          const [, indent, num, itemContent] = numberedMatch;
+          isEmptyItem = itemContent.trim() === "";
+          listPrefix = `\n${indent}${parseInt(num, 10) + 1}. `;
+        }
+
+        if (listPrefix !== null) {
+          e.preventDefault();
+
+          if (isEmptyItem) {
+            // Remove the empty list item prefix (exit the list)
+            const beforeLine = content.substring(0, lineStartPos);
+            const afterCursor = content.substring(cursorPos);
+            const newContent = beforeLine + afterCursor;
+
+            setContent(newContent);
+
+            // Set cursor at the start of what was the list line
+            requestAnimationFrame(() => {
+              if (textareaRef.current) {
+                textareaRef.current.focus();
+                textareaRef.current.setSelectionRange(
+                  lineStartPos,
+                  lineStartPos,
+                );
+              }
+            });
+          } else {
+            // Insert the list continuation prefix
+            const beforeCursor = content.substring(0, cursorPos);
+            const afterCursor = content.substring(cursorPos);
+            const newContent = beforeCursor + listPrefix + afterCursor;
+            const newCursorPos = cursorPos + listPrefix.length;
+
+            setContent(newContent);
+
+            requestAnimationFrame(() => {
+              if (textareaRef.current) {
+                textareaRef.current.focus();
+                textareaRef.current.setSelectionRange(
+                  newCursorPos,
+                  newCursorPos,
+                );
+              }
+            });
+          }
         }
       }
-    }
-  }, [showSlashMenu, slashQuery, slashSelectedIndex, content]);
+    },
+    [showSlashMenu, slashQuery, slashSelectedIndex, content],
+  );
 
   // Execute a slash command
-  const executeSlashCommand = useCallback((command: SlashCommand) => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-    
-    const cursorPos = textarea.selectionStart;
-    const { text, newCursor } = replaceSlashCommand(content, cursorPos, command.action);
-    
-    setContent(text);
-    setShowSlashMenu(false);
-    
-    // Set cursor position after state update
-    requestAnimationFrame(() => {
-      if (textareaRef.current) {
-        textareaRef.current.focus();
-        textareaRef.current.setSelectionRange(newCursor, newCursor);
-      }
-    });
-  }, [content]);
+  const executeSlashCommand = useCallback(
+    (command: SlashCommand) => {
+      const textarea = textareaRef.current;
+      if (!textarea) return;
+
+      const cursorPos = textarea.selectionStart;
+      const { text, newCursor } = replaceSlashCommand(
+        content,
+        cursorPos,
+        command.action,
+      );
+
+      setContent(text);
+      setShowSlashMenu(false);
+
+      // Set cursor position after state update
+      requestAnimationFrame(() => {
+        if (textareaRef.current) {
+          textareaRef.current.focus();
+          textareaRef.current.setSelectionRange(newCursor, newCursor);
+        }
+      });
+    },
+    [content],
+  );
 
   // Download entry as markdown
   const handleDownload = useCallback(() => {
-    const blob = new Blob([content], { type: 'text/markdown' });
+    const blob = new Blob([content], { type: "text/markdown" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `${title || 'untitled'}.md`;
+    a.download = `${title || "untitled"}.md`;
     a.click();
     URL.revokeObjectURL(url);
   }, [content, title]);
 
   // Handle goal submit
-  const handleGoalSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
-    const val = parseInt(tempGoal, 10);
-    if (!isNaN(val) && val > 0) {
-      setDailyGoal(val);
-    } else {
-      setDailyGoal(0);
-    }
-    setIsEditingGoal(false);
-  }, [tempGoal]);
+  const handleGoalSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      const val = parseInt(tempGoal, 10);
+      if (!isNaN(val) && val > 0) {
+        setDailyGoal(val);
+      } else {
+        setDailyGoal(0);
+      }
+      setIsEditingGoal(false);
+    },
+    [tempGoal],
+  );
 
   // Toggle star for an entry
-  const handleToggleStar = useCallback(async (id: string) => {
-    const entry = entries.find((e) => e.id === id);
-    if (!entry) return;
+  const handleToggleStar = useCallback(
+    async (id: string) => {
+      const entry = entries.find((e) => e.id === id);
+      if (!entry) return;
 
-    const newStarred = !entry.isStarred;
-    
-    // Optimistic update
-    setEntries((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, isStarred: newStarred } : e))
-    );
-    
-    // Update current entry state if it's the selected one
-    if (id === selectedId) {
-      setIsStarred(newStarred);
-    }
+      const newStarred = !entry.isStarred;
 
-    // Save to server
-    try {
-      await JournalStorage.save({ ...entry, isStarred: newStarred, updatedAt: Date.now() });
-    } catch (error) {
-      console.error("Failed to toggle star:", error);
-      // Revert on error
+      // Optimistic update
       setEntries((prev) =>
-        prev.map((e) => (e.id === id ? { ...e, isStarred: !newStarred } : e))
+        prev.map((e) => (e.id === id ? { ...e, isStarred: newStarred } : e)),
       );
+
+      // Update current entry state if it's the selected one
       if (id === selectedId) {
-        setIsStarred(!newStarred);
+        setIsStarred(newStarred);
       }
-    }
-  }, [entries, selectedId]);
+
+      // Save to server
+      try {
+        await JournalStorage.save({
+          ...entry,
+          isStarred: newStarred,
+          updatedAt: Date.now(),
+        });
+      } catch (error) {
+        console.error("Failed to toggle star:", error);
+        // Revert on error
+        setEntries((prev) =>
+          prev.map((e) => (e.id === id ? { ...e, isStarred: !newStarred } : e)),
+        );
+        if (id === selectedId) {
+          setIsStarred(!newStarred);
+        }
+      }
+    },
+    [entries, selectedId],
+  );
 
   // Get all tags from entries for autocomplete
-  const allAvailableTags = useMemo(() => getAllTagsFromEntries(entries), [entries]);
+  const allAvailableTags = useMemo(
+    () => getAllTagsFromEntries(entries),
+    [entries],
+  );
 
   // Auto-extract tags from content (debounced)
   useEffect(() => {
     if (tagExtractionTimeoutRef.current) {
       clearTimeout(tagExtractionTimeoutRef.current);
     }
-    
+
     tagExtractionTimeoutRef.current = setTimeout(() => {
       const extractedTags = extractTagsFromContent(content);
       // Merge with existing manual tags, keeping all unique tags
       setTags((currentTags) => {
         const merged = mergeTags(currentTags, extractedTags);
         // Only update if there are new tags from content
-        if (merged.length !== currentTags.length || !merged.every((t) => currentTags.includes(t))) {
+        if (
+          merged.length !== currentTags.length ||
+          !merged.every((t) => currentTags.includes(t))
+        ) {
           return merged;
         }
         return currentTags;
       });
-    }, 2000); // 2 second debounce (reduced CPU usage)
+    }, 1500); // 1.5 second debounce (balanced performance)
 
     return () => {
       if (tagExtractionTimeoutRef.current) {
@@ -1027,12 +1109,12 @@ export const JournalEditor: React.FC = () => {
 
   // Toggle zen mode
   const toggleZenMode = useCallback(() => {
-    setIsZenMode(prev => !prev);
+    setIsZenMode((prev) => !prev);
   }, []);
 
   // Toggle preview mode
   const togglePreviewMode = useCallback(() => {
-    setIsPreviewMode(prev => !prev);
+    setIsPreviewMode((prev) => !prev);
   }, []);
 
   const handleInsert = useCallback(
@@ -1090,7 +1172,7 @@ export const JournalEditor: React.FC = () => {
 
     saveTimeoutRef.current = setTimeout(() => {
       handleSave(false);
-    }, 3000); // Increased from 2s to 3s for better performance
+    }, 2500); // Optimized debounce timing
 
     return () => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
@@ -1142,7 +1224,13 @@ export const JournalEditor: React.FC = () => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleManualSave, createNewEntry, isZenMode, toggleZenMode, togglePreviewMode]);
+  }, [
+    handleManualSave,
+    createNewEntry,
+    isZenMode,
+    toggleZenMode,
+    togglePreviewMode,
+  ]);
 
   // Loading skeleton component
   if (isLoadingEntries) {
@@ -1154,7 +1242,11 @@ export const JournalEditor: React.FC = () => {
             <div className="h-4 bg-default/10 rounded w-16 animate-pulse" />
             <div className="space-y-2">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-8 bg-default/10 rounded animate-pulse" style={{ animationDelay: `${i * 100}ms` }} />
+                <div
+                  key={i}
+                  className="h-8 bg-default/10 rounded animate-pulse"
+                  style={{ animationDelay: `${i * 100}ms` }}
+                />
               ))}
             </div>
           </div>
@@ -1164,7 +1256,14 @@ export const JournalEditor: React.FC = () => {
             <div className="h-4 bg-default/10 rounded w-1/4 animate-pulse" />
             <div className="space-y-2 mt-6">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="h-4 bg-default/5 rounded animate-pulse" style={{ width: `${70 + Math.random() * 30}%`, animationDelay: `${i * 50}ms` }} />
+                <div
+                  key={i}
+                  className="h-4 bg-default/5 rounded animate-pulse"
+                  style={{
+                    width: `${70 + Math.random() * 30}%`,
+                    animationDelay: `${i * 50}ms`,
+                  }}
+                />
               ))}
             </div>
           </div>
@@ -1175,7 +1274,9 @@ export const JournalEditor: React.FC = () => {
 
   // Zen mode wrapper
   const editorContent = (
-    <div className={`flex flex-col h-full overflow-hidden bg-bg relative ${isZenMode ? 'fixed inset-0 z-[100]' : ''}`}>
+    <div
+      className={`flex flex-col h-full overflow-hidden bg-bg relative ${isZenMode ? "fixed inset-0 z-[100]" : ""}`}
+    >
       {!isAuthLoading && !isAuthenticated && !isZenMode && (
         <div className="bg-yellow-500/10 border-b border-yellow-500/30 px-4 py-2 flex items-center gap-2 shrink-0">
           <svg
@@ -1223,7 +1324,9 @@ export const JournalEditor: React.FC = () => {
           </>
         )}
 
-        <div className={`flex-1 flex flex-col min-w-[300px] transition-all duration-300 ${isZenMode ? 'max-w-3xl mx-auto w-full' : ''}`}>
+        <div
+          className={`flex-1 flex flex-col min-w-[300px] transition-all duration-300 ${isZenMode ? "max-w-3xl mx-auto w-full" : ""}`}
+        >
           <div className="flex items-center justify-between px-3 py-2 border-b border-default bg-bg/50 backdrop-blur-sm sticky top-0 z-10">
             <div className="flex items-center gap-3">
               {!isZenMode && (
@@ -1240,16 +1343,18 @@ export const JournalEditor: React.FC = () => {
                   <span className="h-4 w-px bg-default/20 mx-1"></span>
                 </>
               )}
-              
+
               {/* Stats display */}
               <div className="flex items-center gap-2 text-[10px] text-muted font-medium uppercase tracking-wide">
                 <span>{wordCount} words</span>
                 <span className="opacity-50">•</span>
                 <span>{readingTime} min</span>
                 <span className="opacity-50">•</span>
-                <span className="font-mono text-[11px] normal-case">{content.length} chars</span>
+                <span className="font-mono text-[11px] normal-case">
+                  {content.length} chars
+                </span>
               </div>
-              
+
               {/* Daily goal widget */}
               <span className="h-4 w-px bg-default/20 mx-1"></span>
               {dailyGoal > 0 ? (
@@ -1260,15 +1365,19 @@ export const JournalEditor: React.FC = () => {
                 >
                   <div className="w-16 h-1.5 bg-default/10 rounded-full overflow-hidden">
                     <div
-                      className={`h-full transition-all duration-500 ${goalProgress >= 100 ? 'bg-green-500' : 'bg-accent'}`}
+                      className={`h-full transition-all duration-500 ${goalProgress >= 100 ? "bg-green-500" : "bg-accent"}`}
                       style={{ width: `${goalProgress}%` }}
                     />
                   </div>
-                  <span className={`text-[10px] font-medium ${goalProgress >= 100 ? 'text-green-500' : 'text-muted'}`}>
+                  <span
+                    className={`text-[10px] font-medium ${goalProgress >= 100 ? "text-green-500" : "text-muted"}`}
+                  >
                     {dailyProgress}/{dailyGoal}
                   </span>
                   {goalProgress >= 100 && (
-                    <span className="text-[10px]" title="Goal reached!">🎉</span>
+                    <span className="text-[10px]" title="Goal reached!">
+                      🎉
+                    </span>
                   )}
                 </div>
               ) : (
@@ -1277,14 +1386,24 @@ export const JournalEditor: React.FC = () => {
                   className="text-[10px] text-muted hover:text-accent transition-colors flex items-center gap-1"
                   title="Set a daily writing goal"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 20h9"/>
-                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12 20h9" />
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
                   </svg>
                   Set goal
                 </button>
               )}
-              
+
               {showSaveConfirm && (
                 <span className="text-xs text-green-500 font-medium animate-pulse">
                   Saved
@@ -1351,64 +1470,114 @@ export const JournalEditor: React.FC = () => {
               <button
                 onClick={toggleZenMode}
                 className={`p-1.5 rounded-md transition-all duration-200 ${
-                  isZenMode 
-                    ? "text-accent bg-accent/10" 
+                  isZenMode
+                    ? "text-accent bg-accent/10"
                     : "text-muted hover:text-default hover:bg-bg-alt"
                 }`}
                 title={isZenMode ? "Exit Zen Mode (Esc)" : "Zen Mode (⌘⇧Z)"}
               >
                 {isZenMode ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="4 14 10 14 10 20"/>
-                    <polyline points="20 10 14 10 14 4"/>
-                    <line x1="14" x2="21" y1="10" y2="3"/>
-                    <line x1="3" x2="10" y1="21" y2="14"/>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="4 14 10 14 10 20" />
+                    <polyline points="20 10 14 10 14 4" />
+                    <line x1="14" x2="21" y1="10" y2="3" />
+                    <line x1="3" x2="10" y1="21" y2="14" />
                   </svg>
                 ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="15 3 21 3 21 9"/>
-                    <polyline points="9 21 3 21 3 15"/>
-                    <line x1="21" x2="14" y1="3" y2="10"/>
-                    <line x1="3" x2="10" y1="21" y2="14"/>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="15 3 21 3 21 9" />
+                    <polyline points="9 21 3 21 3 15" />
+                    <line x1="21" x2="14" y1="3" y2="10" />
+                    <line x1="3" x2="10" y1="21" y2="14" />
                   </svg>
                 )}
               </button>
-              
+
               <span className="h-4 w-px bg-default/20 mx-1"></span>
-              
+
               {/* Preview toggle */}
               <button
                 onClick={togglePreviewMode}
                 className={`p-1.5 rounded-md transition-all duration-200 ${
-                  isPreviewMode 
-                    ? "text-accent bg-accent/10" 
+                  isPreviewMode
+                    ? "text-accent bg-accent/10"
                     : "text-muted hover:text-default hover:bg-bg-alt"
                 }`}
                 title={isPreviewMode ? "Edit Mode (⌘⇧P)" : "Preview Mode (⌘⇧P)"}
               >
                 {isPreviewMode ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                    <line x1="1" x2="23" y1="1" y2="23"/>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                    <line x1="1" x2="23" y1="1" y2="23" />
                   </svg>
                 ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                    <circle cx="12" cy="12" r="3"/>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
                   </svg>
                 )}
               </button>
-              
+
               {/* Download */}
               <button
                 onClick={handleDownload}
                 className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-default hover:bg-bg-alt"
                 title="Download as Markdown"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                  <polyline points="7 10 12 15 17 10"/>
-                  <line x1="12" x2="12" y1="15" y2="3"/>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" x2="12" y1="15" y2="3" />
                 </svg>
               </button>
 
@@ -1424,29 +1593,45 @@ export const JournalEditor: React.FC = () => {
                   className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-default hover:bg-bg-alt"
                   title="Font Face"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M4 7V4h16v3"/>
-                    <path d="M9 20h6"/>
-                    <path d="M12 4v16"/>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M4 7V4h16v3" />
+                    <path d="M9 20h6" />
+                    <path d="M12 4v16" />
                   </svg>
                 </button>
 
                 {showFontMenu && (
                   <div className="absolute top-full left-0 mt-1 bg-bg-alt border border-default rounded-md shadow-lg z-50 py-1 min-w-[140px] animate-fade-in-fast">
-                    {(['monospace', 'serif', 'sans-serif'] as const).map((face) => (
-                      <button
-                        key={face}
-                        onClick={() => {
-                          setFontFace(face);
-                          setShowFontMenu(false);
-                        }}
-                        className={`w-full text-left px-3 py-1.5 hover:bg-bg transition-colors ${
-                          fontFace === face ? 'text-accent' : 'text-default'
-                        }`}
-                      >
-                        {face === 'monospace' ? 'Monospace' : face === 'serif' ? 'Serif' : 'Sans-serif'}
-                      </button>
-                    ))}
+                    {(["monospace", "serif", "sans-serif"] as const).map(
+                      (face) => (
+                        <button
+                          key={face}
+                          onClick={() => {
+                            setFontFace(face);
+                            setShowFontMenu(false);
+                          }}
+                          className={`w-full text-left px-3 py-1.5 hover:bg-bg transition-colors ${
+                            fontFace === face ? "text-accent" : "text-default"
+                          }`}
+                        >
+                          {face === "monospace"
+                            ? "Monospace"
+                            : face === "serif"
+                              ? "Serif"
+                              : "Sans-serif"}
+                        </button>
+                      ),
+                    )}
                   </div>
                 )}
               </div>
@@ -1458,12 +1643,24 @@ export const JournalEditor: React.FC = () => {
                 className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-default hover:bg-bg-alt disabled:opacity-30 disabled:cursor-not-allowed"
                 title="Decrease Font Size"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="5" x2="19" y1="12" y2="12"/>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="5" x2="19" y1="12" y2="12" />
                 </svg>
               </button>
 
-              <span className="text-xs text-muted px-1 min-w-[32px] text-center">{fontSize}px</span>
+              <span className="text-xs text-muted px-1 min-w-[32px] text-center">
+                {fontSize}px
+              </span>
 
               <button
                 onClick={increaseFontSize}
@@ -1471,9 +1668,19 @@ export const JournalEditor: React.FC = () => {
                 className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-default hover:bg-bg-alt disabled:opacity-30 disabled:cursor-not-allowed"
                 title="Increase Font Size"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="12" x2="12" y1="5" y2="19"/>
-                  <line x1="5" x2="19" y1="12" y2="12"/>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="12" x2="12" y1="5" y2="19" />
+                  <line x1="5" x2="19" y1="12" y2="12" />
                 </svg>
               </button>
 
@@ -1519,7 +1726,7 @@ export const JournalEditor: React.FC = () => {
                   <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
               </button>
-              
+
               {!isZenMode && (
                 <>
                   <span className="h-4 w-px bg-default/20"></span>
@@ -1564,7 +1771,7 @@ export const JournalEditor: React.FC = () => {
                 <Suspense fallback={<PreviewLoadingFallback />}>
                   <div className="markdown-preview prose prose-sm max-w-none text-default">
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                      {content || '*Start writing to see preview...*'}
+                      {content || "*Start writing to see preview...*"}
                     </ReactMarkdown>
                   </div>
                 </Suspense>
@@ -1579,7 +1786,7 @@ export const JournalEditor: React.FC = () => {
                     placeholder="Start writing... Type '/' for commands"
                     className="journal-font w-full h-full min-h-[300px] bg-transparent border-none outline-none resize-none leading-relaxed text-default placeholder:text-muted/30"
                   />
-                  
+
                   {/* Slash command menu */}
                   {showSlashMenu && (
                     <SlashMenu
@@ -1589,7 +1796,7 @@ export const JournalEditor: React.FC = () => {
                       onSelect={executeSlashCommand}
                       onClose={() => setShowSlashMenu(false)}
                       onNavigate={(dir) => {
-                        if (typeof dir === 'number') {
+                        if (typeof dir === "number") {
                           setSlashSelectedIndex(dir);
                         }
                       }}

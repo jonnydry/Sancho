@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, memo } from "react";
 import { PoetryItem } from "../types";
 import { fetchLearnMoreContext } from "../services/apiService";
 import { HistoryIcon } from "./icons/HistoryIcon";
@@ -18,88 +18,89 @@ interface BottomPanelProps {
   onSeeAlsoClick?: (name: string) => void;
 }
 
-const VerticalResizeHandle: React.FC<{ onResize: (delta: number) => void }> = ({
-  onResize,
-}) => {
-  const [isDragging, setIsDragging] = useState(false);
-  const startPosRef = useRef<number | null>(null);
+const VerticalResizeHandle: React.FC<{ onResize: (delta: number) => void }> =
+  memo(({ onResize }) => {
+    const [isDragging, setIsDragging] = useState(false);
+    const startPosRef = useRef<number | null>(null);
 
-  useEffect(() => {
-    if (!isDragging) return;
+    useEffect(() => {
+      if (!isDragging) return;
 
-    const handleMouseMove = (e: MouseEvent) => {
-      onResize(-e.movementY);
-    };
+      const handleMouseMove = (e: MouseEvent) => {
+        onResize(-e.movementY);
+      };
 
-    const handleTouchMove = (e: TouchEvent) => {
-      e.preventDefault();
-      if (startPosRef.current === null) return;
-      const touch = e.touches[0];
-      const delta = startPosRef.current - touch.clientY;
-      onResize(delta);
-      startPosRef.current = touch.clientY;
-    };
+      const handleTouchMove = (e: TouchEvent) => {
+        e.preventDefault();
+        if (startPosRef.current === null) return;
+        const touch = e.touches[0];
+        const delta = startPosRef.current - touch.clientY;
+        onResize(delta);
+        startPosRef.current = touch.clientY;
+      };
 
-    const handleEnd = () => {
-      setIsDragging(false);
-      startPosRef.current = null;
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
-    };
+      const handleEnd = () => {
+        setIsDragging(false);
+        startPosRef.current = null;
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+      };
 
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleEnd);
-    document.addEventListener("touchmove", handleTouchMove, { passive: false });
-    document.addEventListener("touchend", handleEnd);
-    document.body.style.cursor = "row-resize";
-    document.body.style.userSelect = "none";
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleEnd);
+      document.addEventListener("touchmove", handleTouchMove, {
+        passive: false,
+      });
+      document.addEventListener("touchend", handleEnd);
+      document.body.style.cursor = "row-resize";
+      document.body.style.userSelect = "none";
 
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleEnd);
-      document.removeEventListener("touchmove", handleTouchMove);
-      document.removeEventListener("touchend", handleEnd);
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
-    };
-  }, [isDragging, onResize]);
+      return () => {
+        document.removeEventListener("mousemove", handleMouseMove);
+        document.removeEventListener("mouseup", handleEnd);
+        document.removeEventListener("touchmove", handleTouchMove);
+        document.removeEventListener("touchend", handleEnd);
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+      };
+    }, [isDragging, onResize]);
 
-  return (
-    <div
-      className={`h-px cursor-row-resize flex items-center justify-center group ${
-        isDragging ? "bg-accent/40" : "bg-transparent hover:bg-accent/30"
-      }`}
-      onMouseDown={() => setIsDragging(true)}
-      onTouchStart={(e) => {
-        setIsDragging(true);
-        startPosRef.current = e.touches[0].clientY;
-      }}
-      role="separator"
-      aria-orientation="horizontal"
-      aria-label="Resize panel"
-      tabIndex={0}
-      style={{ marginTop: -1 }}
-    >
+    return (
       <div
-        className={`w-8 h-0.5 rounded-full ${
-          isDragging ? "bg-accent" : "bg-transparent group-hover:bg-accent/60"
+        className={`h-px cursor-row-resize flex items-center justify-center group ${
+          isDragging ? "bg-accent/40" : "bg-transparent hover:bg-accent/30"
         }`}
-      />
-    </div>
-  );
-};
+        onMouseDown={() => setIsDragging(true)}
+        onTouchStart={(e) => {
+          setIsDragging(true);
+          startPosRef.current = e.touches[0].clientY;
+        }}
+        role="separator"
+        aria-orientation="horizontal"
+        aria-label="Resize panel"
+        tabIndex={0}
+        style={{ marginTop: -1 }}
+      >
+        <div
+          className={`w-8 h-0.5 rounded-full ${
+            isDragging ? "bg-accent" : "bg-transparent group-hover:bg-accent/60"
+          }`}
+        />
+      </div>
+    );
+  });
 
 const TagButton: React.FC<{
   onClick?: () => void;
   children: React.ReactNode;
-}> = ({ onClick, children }) => (
+}> = memo(({ onClick, children }) => (
   <button
     onClick={onClick}
     className="px-2.5 py-1 text-xs font-medium rounded-full bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
   >
     {children}
   </button>
-);
+));
 
 type PanelTab = "context" | "links";
 
@@ -267,7 +268,6 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
               )}
             </div>
           )}
-
 
           {activeTab === "links" && (
             <div className="space-y-5">
