@@ -84,9 +84,6 @@ html {
   --app-tag-device: 115 115 115;
   --app-tag-device-text: 237 237 237;
 
-  /* Journal Font Customization */
-  --journal-font-family: 'Source Code Pro', 'Menlo', 'Monaco', 'Courier New', monospace;
-  --journal-font-size: 16px;
 }
 
 /* --- THEME: Light (Canvas Theory) - Default --- */
@@ -191,10 +188,8 @@ html.light.theme-paper {
 .bg-accent-hover { background-color: rgb(var(--app-accent-hover)); }
 .text-accent-text { color: rgb(var(--app-accent-text)); }
 
-/* Journal Font Utility */
+/* Journal Font Utility - Now inherits from body, kept for line-height */
 .journal-font {
-  font-family: var(--journal-font-family);
-  font-size: var(--journal-font-size);
   line-height: 1.6;
 }
 
