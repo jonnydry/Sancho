@@ -64,7 +64,8 @@ export const FontProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (!isBrowser) return;
     document.body.style.fontFamily = getFontFamily(fontFace);
-    document.body.style.fontSize = `${fontSize}px`;
+    // Use CSS custom property so styles.css can reference it
+    document.documentElement.style.setProperty('--app-font-size', `${fontSize}px`);
 
     // Save to localStorage
     window.localStorage.setItem('app_font_face', fontFace);
