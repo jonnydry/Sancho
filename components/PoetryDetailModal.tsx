@@ -1,7 +1,6 @@
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { PoetryItem, LearnMoreResponse } from '../types';
-import { ExampleFinder } from './ExampleFinder';
 import { XIcon } from './icons/XIcon';
 import { fetchLearnMoreContext } from '../services/apiService';
 import { LightbulbIcon } from './icons/LightbulbIcon';
@@ -273,9 +272,6 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
               </div>
             )}
           </div>
-
-          {/* AI Example */}
-          <ExampleFinder topic={item.name} embedded />
         </div>
 
         {/* ===== ZONE 4: FURTHER READING ===== */}

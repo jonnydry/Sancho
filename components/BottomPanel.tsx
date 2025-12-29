@@ -1,16 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { PoetryItem, PoetryExampleResponse } from "../types";
-import {
-  fetchLearnMoreContext,
-  findPoetryExample,
-} from "../services/apiService";
+import { PoetryItem } from "../types";
+import { fetchLearnMoreContext } from "../services/apiService";
 import { HistoryIcon } from "./icons/HistoryIcon";
-import { AiExamplesIcon } from "./icons/AiExamplesIcon";
 import { SparklesIcon } from "./icons/SparklesIcon";
 import { ArrowUpRightIcon } from "./icons/ArrowUpRightIcon";
 import { SpinnerIcon } from "./icons/SpinnerIcon";
 import { LightbulbIcon } from "./icons/LightbulbIcon";
-import { SearchSparkleIcon } from "./icons/SearchSparkleIcon";
 import { ActionButton } from "./PoetryDetailModal";
 
 interface BottomPanelProps {
@@ -106,7 +101,7 @@ const TagButton: React.FC<{
   </button>
 );
 
-type PanelTab = "context" | "example" | "links";
+type PanelTab = "context" | "links";
 
 export const BottomPanel: React.FC<BottomPanelProps> = ({
   item,
@@ -121,17 +116,12 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
   const [learnMoreContext, setLearnMoreContext] = useState<string | null>(null);
   const [isLoadingLearnMore, setIsLoadingLearnMore] = useState(false);
   const [learnMoreError, setLearnMoreError] = useState<string | null>(null);
-  const [example, setExample] = useState<PoetryExampleResponse | null>(null);
-  const [isLoadingExample, setIsLoadingExample] = useState(false);
-  const [exampleError, setExampleError] = useState<string | null>(null);
   const previousItemRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (item && item.name !== previousItemRef.current) {
       setLearnMoreContext(null);
       setLearnMoreError(null);
-      setExample(null);
-      setExampleError(null);
       previousItemRef.current = item.name;
     }
   }, [item]);
@@ -152,23 +142,6 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
     }
   }, [item]);
 
-  const handleFindExample = useCallback(async () => {
-    if (!item) return;
-    setIsLoadingExample(true);
-    setExampleError(null);
-    try {
-      // Pass the current example so the AI knows to pick something different
-      const result = await findPoetryExample(item.name, example?.example);
-      setExample(result);
-    } catch (err) {
-      setExampleError(
-        err instanceof Error ? err.message : "An unknown error occurred.",
-      );
-    } finally {
-      setIsLoadingExample(false);
-    }
-  }, [item, example]);
-
   if (!item) return null;
 
   const tabs: { id: PanelTab; label: string; icon: React.ReactNode }[] = [
@@ -176,11 +149,6 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
       id: "context",
       label: "Context",
       icon: <HistoryIcon className="w-3.5 h-3.5" />,
-    },
-    {
-      id: "example",
-      label: "Example",
-      icon: <AiExamplesIcon className="w-3.5 h-3.5" />,
     },
     {
       id: "links",
@@ -294,74 +262,6 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
               {!learnMoreContext && !learnMoreError && !isLoadingLearnMore && (
                 <p className="text-muted text-sm">
                   Click "Learn More" to generate historical context about{" "}
-                  {item.name}.
-                </p>
-              )}
-            </div>
-          )}
-
-          {activeTab === "example" && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <AiExamplesIcon className="w-4 h-4 text-accent" />
-                  <h4 className="font-semibold text-sm text-default">
-                    AI-Powered Example
-                  </h4>
-                </div>
-                <ActionButton
-                  onClick={handleFindExample}
-                  disabled={isLoadingExample}
-                  loading={isLoadingExample}
-                  loadingText="Generating..."
-                  icon={<SearchSparkleIcon className="w-3.5 h-3.5" />}
-                  loadingIcon={
-                    <SpinnerIcon className="w-3.5 h-3.5 animate-spin" />
-                  }
-                >
-                  {example !== null ? "Regenerate" : "Find Example"}
-                </ActionButton>
-              </div>
-
-              {exampleError && (
-                <div className="p-3 text-sm text-red-600 border border-red-200 bg-red-50 dark:bg-red-900/10 dark:border-red-900 dark:text-red-400 rounded-md">
-                  {exampleError}
-                </div>
-              )}
-
-              {example && (
-                <div className="space-y-4 animate-fade-in">
-                  <blockquote className="p-4 bg-bg-alt/30 border border-default/20 rounded-md">
-                    <p className="whitespace-pre-wrap italic text-default text-sm leading-relaxed">
-                      {example.example}
-                    </p>
-                    <cite className="block text-right mt-3 not-italic text-xs text-muted">
-                      — {example.author},{" "}
-                      <span className="italic">{example.title}</span>
-                    </cite>
-                  </blockquote>
-                  <div className="p-4 bg-bg-alt/30 border border-default/20 rounded-md">
-                    <h5 className="font-semibold text-xs text-default uppercase tracking-wide mb-2">
-                      Explanation
-                    </h5>
-                    <p className="text-sm text-muted leading-relaxed">
-                      {example.explanation}
-                    </p>
-                  </div>
-                  {example.sourceUrl && (
-                    <div className="text-xs text-muted">
-                      <span className="opacity-70">Source: </span>
-                      <a href={example.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
-                        {(() => { try { return new URL(example.sourceUrl).hostname; } catch { return example.sourceUrl; } })()}
-                      </a>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {!example && !exampleError && !isLoadingExample && (
-                <p className="text-muted text-sm">
-                  Click "Find Example" to generate an AI-powered example of{" "}
                   {item.name}.
                 </p>
               )}

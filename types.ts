@@ -25,15 +25,6 @@ export interface ThemeContextType extends Theme {
   toggleMode: () => void;
 }
 
-export interface PoetryExampleResponse {
-  example: string;
-  author: string;
-  title: string;
-  explanation: string;
-  sourceUrl?: string | null;
-  citations?: string[];
-}
-
 export interface SanchoQuoteResponse {
   quote: string;
   context: string;
