@@ -285,14 +285,14 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
 
               {learnMoreContext && (
                 <div className="p-4 bg-bg-alt/30 border border-default/20 rounded-md animate-fade-in">
-                  <p className="text-default/90 text-sm leading-relaxed whitespace-pre-wrap">
+                  <p className="journal-font text-default/90 leading-relaxed whitespace-pre-wrap">
                     {learnMoreContext}
                   </p>
                 </div>
               )}
 
               {!learnMoreContext && !learnMoreError && !isLoadingLearnMore && (
-                <p className="text-muted text-sm">
+                <p className="journal-font text-muted">
                   Click "Learn More" to generate historical context about{" "}
                   {item.name}.
                 </p>
@@ -332,10 +332,10 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
               {example && (
                 <div className="space-y-4 animate-fade-in">
                   <blockquote className="p-4 bg-bg-alt/30 border border-default/20 rounded-md">
-                    <p className="whitespace-pre-wrap italic text-default text-sm leading-relaxed">
+                    <p className="journal-font whitespace-pre-wrap italic text-default leading-relaxed">
                       {example.example}
                     </p>
-                    <cite className="block text-right mt-3 not-italic text-xs text-muted">
+                    <cite className="journal-font block text-right mt-3 not-italic text-muted">
                       — {example.author},{" "}
                       <span className="italic">{example.title}</span>
                     </cite>
@@ -344,7 +344,7 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
                     <h5 className="font-semibold text-xs text-default uppercase tracking-wide mb-2">
                       Explanation
                     </h5>
-                    <p className="text-sm text-muted leading-relaxed">
+                    <p className="journal-font text-muted leading-relaxed">
                       {example.explanation}
                     </p>
                   </div>
@@ -360,7 +360,7 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
               )}
 
               {!example && !exampleError && !isLoadingExample && (
-                <p className="text-muted text-sm">
+                <p className="journal-font text-muted">
                   Click "Find Example" to generate an AI-powered example of{" "}
                   {item.name}.
                 </p>

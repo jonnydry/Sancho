@@ -131,7 +131,7 @@ const EntryItem: React.FC<{
             </svg>
           )}
           {/* Title */}
-          <div className="font-medium text-default truncate text-xs flex-1">
+          <div className="journal-font font-medium text-default truncate flex-1">
             {entry.title || 'Untitled'}
           </div>
           {/* Inline date */}
