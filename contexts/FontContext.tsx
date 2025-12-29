@@ -15,7 +15,7 @@ const isBrowser = typeof window !== 'undefined';
 
 const MIN_FONT_SIZE = 14;
 const MAX_FONT_SIZE = 24;
-const DEFAULT_FONT_SIZE = 16;
+const DEFAULT_FONT_SIZE = 18;
 
 // Helper function to map font face to CSS font-family string
 const getFontFamily = (face: FontFace): string => {
