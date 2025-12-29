@@ -232,7 +232,7 @@ const EntryItem: React.FC<{
       </div>
     </div>
   );
-}), (prevProps, nextProps) => {
+}, (prevProps, nextProps) => {
   // Custom comparison function for memo optimization
   return (
     prevProps.entry.id === nextProps.entry.id &&
@@ -309,7 +309,7 @@ const TagFolder: React.FC<{
       )}
     </div>
   );
-}), (prevProps, nextProps) => {
+}, (prevProps, nextProps) => {
   // Only re-render if relevant props changed
   return (
     prevProps.tag === nextProps.tag &&
