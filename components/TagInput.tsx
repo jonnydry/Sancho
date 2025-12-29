@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { XIcon } from './icons/XIcon';
-import { isValidTag, normalizeTag } from '../utils/tagUtils';
+import { isValidTag, normalizeTag, parseTagInput } from '../utils/tagUtils';
 
 interface TagInputProps {
   tags: string[];
@@ -55,14 +55,32 @@ export const TagInput: React.FC<TagInputProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const addTag = useCallback((tag: string) => {
-    const normalized = normalizeTag(tag);
+  const addTag = useCallback((input: string) => {
+    // Parse the input to handle multiple tags (space/comma separated)
+    const parsedTags = parseTagInput(input);
     
-    if (!normalized || !isValidTag(normalized)) return;
-    if (tags.includes(normalized)) return;
-    if (tags.length >= maxTags) return;
-
-    onChange([...tags, normalized]);
+    if (parsedTags.length === 0) {
+      // If parsing returns nothing, try single tag validation
+      const normalized = normalizeTag(input);
+      if (!normalized || !isValidTag(normalized)) return;
+      if (tags.includes(normalized)) return;
+      if (tags.length >= maxTags) return;
+      
+      onChange([...tags, normalized]);
+    } else {
+      // Add all valid parsed tags (up to maxTags limit)
+      const newTags = [...tags];
+      for (const tag of parsedTags) {
+        if (newTags.length >= maxTags) break;
+        if (!newTags.includes(tag)) {
+          newTags.push(tag);
+        }
+      }
+      if (newTags.length > tags.length) {
+        onChange(newTags);
+      }
+    }
+    
     setInputValue('');
     setShowSuggestions(false);
   }, [tags, onChange, maxTags]);
@@ -183,10 +201,17 @@ export const TagInput: React.FC<TagInputProps> = ({
         </div>
       )}
 
-      {/* Helper text */}
-      {inputValue && !isValidTag(normalizeTag(inputValue)) && (
+      {/* Helper text - only show error if input has content but no valid tags can be parsed */}
+      {inputValue && parseTagInput(inputValue).length === 0 && !isValidTag(normalizeTag(inputValue)) && (
         <p className="mt-1 text-[10px] text-red-500/80">
           Tags must start with a letter and contain only letters, numbers, hyphens, or underscores
+        </p>
+      )}
+      
+      {/* Positive feedback showing recognized tags */}
+      {inputValue && parseTagInput(inputValue).length > 0 && (
+        <p className="mt-1 text-[10px] text-muted">
+          Press Enter to add: {parseTagInput(inputValue).map(t => `#${t}`).join(' ')}
         </p>
       )}
     </div>
