@@ -118,9 +118,9 @@ const EntryItem: React.FC<{
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
+        onClick={onSelect}
       >
       <div 
-        onClick={onSelect}
         className="flex-1 w-full overflow-hidden"
       >
         <div className="flex items-center gap-1.5">
