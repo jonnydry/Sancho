@@ -46,7 +46,9 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
   if (!response.ok) {
     const error = await response.json().catch(() => ({ error: 'Unknown error' }));
     const errorMsg = error.error || `Request failed with status ${response.status}`;
-    if (process.env.NODE_ENV === 'development') {
+    // Only log unexpected errors - 404 on PATCH is expected for new entries
+    const isExpected404 = response.status === 404 && method === 'PATCH';
+    if (process.env.NODE_ENV === 'development' && !isExpected404) {
       console.warn(`[Journal] API error (${response.status}): ${errorMsg}`);
     }
     throw new Error(errorMsg);
