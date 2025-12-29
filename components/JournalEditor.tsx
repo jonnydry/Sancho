@@ -48,6 +48,8 @@ const generateUUID = (): string => {
   });
 };
 
+type FontFace = 'monospace' | 'serif' | 'sans-serif';
+
 interface ResizeHandleProps {
   onResize: (delta: number) => void;
   className?: string;
@@ -174,6 +176,18 @@ const ResizeHandle: React.FC<ResizeHandleProps> = ({ onResize, className }) => {
   );
 };
 
+// Helper function to map font face to CSS font-family string
+const getFontFamily = (face: FontFace): string => {
+  switch (face) {
+    case 'monospace':
+      return "'Source Code Pro', 'Menlo', 'Monaco', 'Courier New', monospace";
+    case 'serif':
+      return "'Source Serif Pro', 'Georgia', 'Times New Roman', serif";
+    case 'sans-serif':
+      return "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif";
+  }
+};
+
 export const JournalEditor: React.FC = () => {
   const { pinnedItems } = usePinnedItems();
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
@@ -212,7 +226,18 @@ export const JournalEditor: React.FC = () => {
   // New feature states
   const [isZenMode, setIsZenMode] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
-  
+
+  // Font customization state
+  const [fontFace, setFontFace] = useState<FontFace>(() => {
+    const saved = localStorage.getItem('journal_font_face');
+    return (saved as FontFace) || 'monospace';
+  });
+  const [fontSize, setFontSize] = useState(() => {
+    const saved = localStorage.getItem('journal_font_size');
+    return saved ? parseInt(saved, 10) : 16;
+  });
+  const [showFontMenu, setShowFontMenu] = useState(false);
+
   // Slash command state
   const [showSlashMenu, setShowSlashMenu] = useState(false);
   const [slashMenuPosition, setSlashMenuPosition] = useState({ top: 0, left: 0 });
@@ -276,6 +301,24 @@ export const JournalEditor: React.FC = () => {
   // Debounced localStorage sync for panel widths (prevents excessive writes during resize)
   useLocalStorageSync("journal_entry_width", entryListWidth.toString(), 500);
   useLocalStorageSync("journal_ref_width", referencePaneWidth.toString(), 500);
+
+  // Persist font customization settings
+  useLocalStorageSync("journal_font_face", fontFace, 0);
+  useLocalStorageSync("journal_font_size", fontSize.toString(), 0);
+
+  // Inject CSS variables for font customization
+  useEffect(() => {
+    document.documentElement.style.setProperty('--journal-font-family', getFontFamily(fontFace));
+    document.documentElement.style.setProperty('--journal-font-size', `${fontSize}px`);
+  }, [fontFace, fontSize]);
+
+  // Close font menu when clicking outside
+  useEffect(() => {
+    if (!showFontMenu) return;
+    const handleClickOutside = () => setShowFontMenu(false);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [showFontMenu]);
 
   // Persist daily goal
   useEffect(() => {
@@ -1400,9 +1443,74 @@ export const JournalEditor: React.FC = () => {
                   <line x1="12" x2="12" y1="15" y2="3"/>
                 </svg>
               </button>
-              
+
               <span className="h-4 w-px bg-default/20 mx-1"></span>
-              
+
+              {/* Font controls */}
+              <div className="relative">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowFontMenu(!showFontMenu);
+                  }}
+                  className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-default hover:bg-bg-alt"
+                  title="Font Face"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 7V4h16v3"/>
+                    <path d="M9 20h6"/>
+                    <path d="M12 4v16"/>
+                  </svg>
+                </button>
+
+                {showFontMenu && (
+                  <div className="absolute top-full left-0 mt-1 bg-bg-alt border border-default rounded-md shadow-lg z-50 py-1 min-w-[140px] animate-fade-in-fast">
+                    {(['monospace', 'serif', 'sans-serif'] as FontFace[]).map((face) => (
+                      <button
+                        key={face}
+                        onClick={() => {
+                          setFontFace(face);
+                          setShowFontMenu(false);
+                        }}
+                        className={`w-full text-left px-3 py-1.5 hover:bg-bg transition-colors ${
+                          fontFace === face ? 'text-accent' : 'text-default'
+                        }`}
+                      >
+                        {face === 'monospace' ? 'Monospace' : face === 'serif' ? 'Serif' : 'Sans-serif'}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Font size controls */}
+              <button
+                onClick={() => setFontSize(prev => Math.max(14, prev - 1))}
+                disabled={fontSize <= 14}
+                className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-default hover:bg-bg-alt disabled:opacity-30 disabled:cursor-not-allowed"
+                title="Decrease Font Size"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="5" x2="19" y1="12" y2="12"/>
+                </svg>
+              </button>
+
+              <span className="text-xs text-muted px-1 min-w-[32px] text-center">{fontSize}px</span>
+
+              <button
+                onClick={() => setFontSize(prev => Math.min(24, prev + 1))}
+                disabled={fontSize >= 24}
+                className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-default hover:bg-bg-alt disabled:opacity-30 disabled:cursor-not-allowed"
+                title="Increase Font Size"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="12" x2="12" y1="5" y2="19"/>
+                  <line x1="5" x2="19" y1="12" y2="12"/>
+                </svg>
+              </button>
+
+              <span className="h-4 w-px bg-default/20 mx-1"></span>
+
               <button
                 onClick={handleManualSave}
                 disabled={isSaving}
@@ -1501,7 +1609,7 @@ export const JournalEditor: React.FC = () => {
                     onKeyDown={handleTextareaKeyDown}
                     onBlur={handleTextareaBlur}
                     placeholder="Start writing... Type '/' for commands"
-                    className="w-full h-full min-h-[300px] bg-transparent border-none outline-none resize-none text-sm leading-relaxed text-default placeholder:text-muted/30"
+                    className="journal-font w-full h-full min-h-[300px] bg-transparent border-none outline-none resize-none leading-relaxed text-default placeholder:text-muted/30"
                   />
                   
                   {/* Slash command menu */}

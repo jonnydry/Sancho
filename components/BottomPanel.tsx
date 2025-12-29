@@ -253,20 +253,21 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
 
               {learnMoreContext && (
                 <div className="p-4 bg-bg-alt/30 border border-default/20 rounded-md animate-fade-in">
-                  <p className="text-default/90 text-sm leading-relaxed whitespace-pre-wrap">
+                  <p className="journal-font text-default/90 leading-relaxed whitespace-pre-wrap">
                     {learnMoreContext}
                   </p>
                 </div>
               )}
 
               {!learnMoreContext && !learnMoreError && !isLoadingLearnMore && (
-                <p className="text-muted text-sm">
+                <p className="journal-font text-muted">
                   Click "Learn More" to generate historical context about{" "}
                   {item.name}.
                 </p>
               )}
             </div>
           )}
+
 
           {activeTab === "links" && (
             <div className="space-y-5">
