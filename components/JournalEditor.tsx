@@ -11,6 +11,7 @@ import remarkGfm from "remark-gfm";
 import { JournalEntry, JournalStorage } from "../services/journalStorage";
 import { usePinnedItems } from "../contexts/PinnedItemsContext";
 import { useAuth } from "../hooks/useAuth";
+import { useFont } from "../hooks/useFont";
 import { JournalEntryList } from "./JournalEntryList";
 import { ReferencePane } from "./ReferencePane";
 import { BottomPanel } from "./BottomPanel";
@@ -47,8 +48,6 @@ const generateUUID = (): string => {
     return v.toString(16);
   });
 };
-
-type FontFace = 'monospace' | 'serif' | 'sans-serif';
 
 interface ResizeHandleProps {
   onResize: (delta: number) => void;
@@ -176,21 +175,10 @@ const ResizeHandle: React.FC<ResizeHandleProps> = ({ onResize, className }) => {
   );
 };
 
-// Helper function to map font face to CSS font-family string
-const getFontFamily = (face: FontFace): string => {
-  switch (face) {
-    case 'monospace':
-      return "'Source Code Pro', 'Menlo', 'Monaco', 'Courier New', monospace";
-    case 'serif':
-      return "'Source Serif Pro', 'Georgia', 'Times New Roman', serif";
-    case 'sans-serif':
-      return "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif";
-  }
-};
-
 export const JournalEditor: React.FC = () => {
   const { pinnedItems } = usePinnedItems();
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const { fontFace, fontSize, setFontFace, setFontSize, increaseFontSize, decreaseFontSize } = useFont();
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [isLoadingEntries, setIsLoadingEntries] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -226,16 +214,6 @@ export const JournalEditor: React.FC = () => {
   // New feature states
   const [isZenMode, setIsZenMode] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
-
-  // Font customization state
-  const [fontFace, setFontFace] = useState<FontFace>(() => {
-    const saved = localStorage.getItem('journal_font_face');
-    return (saved as FontFace) || 'monospace';
-  });
-  const [fontSize, setFontSize] = useState(() => {
-    const saved = localStorage.getItem('journal_font_size');
-    return saved ? parseInt(saved, 10) : 16;
-  });
   const [showFontMenu, setShowFontMenu] = useState(false);
 
   // Slash command state
@@ -301,16 +279,6 @@ export const JournalEditor: React.FC = () => {
   // Debounced localStorage sync for panel widths (prevents excessive writes during resize)
   useLocalStorageSync("journal_entry_width", entryListWidth.toString(), 500);
   useLocalStorageSync("journal_ref_width", referencePaneWidth.toString(), 500);
-
-  // Persist font customization settings
-  useLocalStorageSync("journal_font_face", fontFace, 0);
-  useLocalStorageSync("journal_font_size", fontSize.toString(), 0);
-
-  // Inject CSS variables for font customization
-  useEffect(() => {
-    document.documentElement.style.setProperty('--journal-font-family', getFontFamily(fontFace));
-    document.documentElement.style.setProperty('--journal-font-size', `${fontSize}px`);
-  }, [fontFace, fontSize]);
 
   // Close font menu when clicking outside
   useEffect(() => {
@@ -1465,7 +1433,7 @@ export const JournalEditor: React.FC = () => {
 
                 {showFontMenu && (
                   <div className="absolute top-full left-0 mt-1 bg-bg-alt border border-default rounded-md shadow-lg z-50 py-1 min-w-[140px] animate-fade-in-fast">
-                    {(['monospace', 'serif', 'sans-serif'] as FontFace[]).map((face) => (
+                    {(['monospace', 'serif', 'sans-serif'] as const).map((face) => (
                       <button
                         key={face}
                         onClick={() => {
@@ -1485,7 +1453,7 @@ export const JournalEditor: React.FC = () => {
 
               {/* Font size controls */}
               <button
-                onClick={() => setFontSize(prev => Math.max(14, prev - 1))}
+                onClick={decreaseFontSize}
                 disabled={fontSize <= 14}
                 className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-default hover:bg-bg-alt disabled:opacity-30 disabled:cursor-not-allowed"
                 title="Decrease Font Size"
@@ -1498,7 +1466,7 @@ export const JournalEditor: React.FC = () => {
               <span className="text-xs text-muted px-1 min-w-[32px] text-center">{fontSize}px</span>
 
               <button
-                onClick={() => setFontSize(prev => Math.min(24, prev + 1))}
+                onClick={increaseFontSize}
                 disabled={fontSize >= 24}
                 className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-default hover:bg-bg-alt disabled:opacity-30 disabled:cursor-not-allowed"
                 title="Increase Font Size"

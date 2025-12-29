@@ -1,6 +1,7 @@
 import React, { useState, Suspense, lazy, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ThemeSwitcher } from './ThemeSwitcher';
+import { FontControls } from './FontControls';
 import { useAuth } from '../hooks/useAuth.js';
 import { BookPenIcon } from './icons/BookPenIcon';
 import { useTheme } from '../hooks/useTheme';
@@ -55,6 +56,8 @@ export const Header: React.FC = () => {
                 <BookPenIcon className="w-4 h-4 sm:w-5 sm:h-5" heartFilled={isNotebookHovered} />
               </button>
             )}
+            <FontControls />
+            <span className="h-4 w-px bg-default/20"></span>
             <ThemeSwitcher />
             <div className="flex items-center gap-1.5 sm:gap-3 pl-1.5 sm:pl-3 border-l border-default">
               {isLoading ? (

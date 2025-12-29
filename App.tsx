@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { Header } from './components/Header';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { FontProvider } from './contexts/FontContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { PinnedItemsProvider } from './contexts/PinnedItemsContext';
 import { NotificationProvider } from './contexts/NotificationContext';
@@ -23,10 +24,11 @@ const RouteLoadingFallback: React.FC = () => (
 const App: React.FC = () => {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <NotificationProvider>
-          <PinnedItemsProvider>
-            <BrowserRouter>
+      <FontProvider>
+        <AuthProvider>
+          <NotificationProvider>
+            <PinnedItemsProvider>
+              <BrowserRouter>
           <div className="min-h-screen flex flex-col bg-bg text-default">
             <Header />
             <div className="flex-grow">
@@ -51,10 +53,11 @@ const App: React.FC = () => {
               </p>
             </footer>
           </div>
-        </BrowserRouter>
-      </PinnedItemsProvider>
-      </NotificationProvider>
-      </AuthProvider>
+              </BrowserRouter>
+            </PinnedItemsProvider>
+          </NotificationProvider>
+        </AuthProvider>
+      </FontProvider>
     </ThemeProvider>
   );
 };
