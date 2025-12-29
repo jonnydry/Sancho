@@ -5,13 +5,38 @@ import { PoetryItem } from '../types';
 import { XIcon } from './icons/XIcon';
 import { BookPenIcon } from './icons/BookPenIcon';
 import { PoetryCard } from './PoetryCard';
-import { JournalEditor } from './JournalEditor';
 
+const JournalEditor = lazy(() => import('./JournalEditor').then(module => ({ default: module.JournalEditor })));
 const PoetryDetailModal = lazy(() => import('./PoetryDetailModal').then(module => ({ default: module.PoetryDetailModal })));
 
 const ModalFallback = () => (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-bg/70">
     <p className="text-muted font-mono text-sm animate-pulse">Loading context...</p>
+  </div>
+);
+
+const JournalEditorFallback = () => (
+  <div className="flex h-full animate-pulse">
+    <div className="w-64 border-r border-default/20 p-3 space-y-2">
+      <div className="h-8 bg-bg-alt/50 rounded-md" />
+      <div className="h-6 bg-bg-alt/30 rounded-md w-3/4" />
+      <div className="h-6 bg-bg-alt/30 rounded-md w-1/2" />
+      <div className="h-6 bg-bg-alt/30 rounded-md w-2/3" />
+    </div>
+    <div className="flex-1 p-4 space-y-4">
+      <div className="flex items-center gap-3">
+        <div className="h-6 bg-bg-alt/40 rounded w-24" />
+        <div className="h-6 bg-bg-alt/30 rounded w-16" />
+        <div className="h-6 bg-bg-alt/30 rounded w-20" />
+      </div>
+      <div className="h-10 bg-bg-alt/30 rounded-md w-1/3" />
+      <div className="space-y-2 pt-4">
+        <div className="h-4 bg-bg-alt/20 rounded w-full" />
+        <div className="h-4 bg-bg-alt/20 rounded w-5/6" />
+        <div className="h-4 bg-bg-alt/20 rounded w-4/5" />
+        <div className="h-4 bg-bg-alt/20 rounded w-2/3" />
+      </div>
+    </div>
   </div>
 );
 
@@ -223,7 +248,9 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
           </>
         ) : (
           <div className="flex-1 overflow-hidden">
-            <JournalEditor />
+            <Suspense fallback={<JournalEditorFallback />}>
+              <JournalEditor />
+            </Suspense>
           </div>
         )}
       </div>

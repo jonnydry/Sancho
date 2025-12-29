@@ -277,6 +277,8 @@ export const JournalEditor: React.FC = () => {
   const previousSelectedIdRef = useRef<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const savedSelectionRef = useRef<{ start: number; end: number } | null>(null);
+  // Ref to avoid recreating callbacks on every keystroke
+  const contentRef = useRef<string>("");
   const currentStateRef = useRef<{
     title: string;
     content: string;
@@ -451,6 +453,7 @@ export const JournalEditor: React.FC = () => {
     setSelectedId(entry.id);
     setTitle(entry.title);
     setContent(entry.content);
+    contentRef.current = entry.content; // Keep ref in sync
     setActiveTemplate(entry.templateRef);
     setTags(entry.tags || []);
     setIsStarred(entry.isStarred || false);
@@ -476,6 +479,7 @@ export const JournalEditor: React.FC = () => {
     setSelectedId(newEntry.id);
     setTitle(newEntry.title);
     setContent(newEntry.content);
+    contentRef.current = newEntry.content; // Keep ref in sync
     setActiveTemplate(newEntry.templateRef);
     setTags([]);
     setIsStarred(false);
@@ -504,16 +508,55 @@ export const JournalEditor: React.FC = () => {
 
   useEffect(() => {
     const loadEntries = async () => {
-      setIsLoadingEntries(true);
+      // Step 1: Try to load cached entries immediately for instant display
+      const cachedEntries = JournalStorage.getCached();
+      if (cachedEntries && cachedEntries.length > 0) {
+        setEntries(cachedEntries);
+        selectEntryDirect(cachedEntries[0]);
+        setIsLoadingEntries(false);
+      } else {
+        setIsLoadingEntries(true);
+      }
+
+      // Step 2: Fetch fresh data from server in background
       try {
         if (JournalStorage.needsMigration()) {
           await JournalStorage.migrateToServer();
         }
         const loadedEntries = await JournalStorage.getAll();
-        setEntries(loadedEntries);
+        
+        // Only update if we have entries or didn't have cached ones
         if (loadedEntries.length > 0) {
-          selectEntryDirect(loadedEntries[0]);
+          setEntries(loadedEntries);
+          // Refresh editor state if server data differs from cache
+          if (cachedEntries && cachedEntries.length > 0) {
+            const currentSelectedId = previousSelectedIdRef.current;
+            if (currentSelectedId) {
+              const freshEntry = loadedEntries.find(e => e.id === currentSelectedId);
+              const cachedEntry = cachedEntries.find(e => e.id === currentSelectedId);
+              // Resync if entry disappeared or any field changed
+              if (!freshEntry) {
+                // Entry no longer exists on server, select first available
+                selectEntryDirect(loadedEntries[0]);
+              } else if (cachedEntry && (
+                freshEntry.content !== cachedEntry.content ||
+                freshEntry.title !== cachedEntry.title ||
+                freshEntry.templateRef !== cachedEntry.templateRef ||
+                freshEntry.isStarred !== cachedEntry.isStarred ||
+                JSON.stringify(freshEntry.tags || []) !== JSON.stringify(cachedEntry.tags || [])
+              )) {
+                // Any field differs, update editor with fresh server data
+                selectEntryDirect(freshEntry);
+              }
+            }
+          } else {
+            // Select first entry if we didn't have cached data
+            selectEntryDirect(loadedEntries[0]);
+          }
         } else {
+          // Server returned empty list - clear stale cache and create new entry
+          // This handles both: 1) no cached entries, 2) cached entries but server is empty
+          setEntries([]);
           await createNewEntry();
         }
       } finally {
@@ -639,6 +682,7 @@ export const JournalEditor: React.FC = () => {
         setSelectedId(nextEntry.id);
         setTitle(nextEntry.title);
         setContent(nextEntry.content);
+        contentRef.current = nextEntry.content; // Keep ref in sync
         setActiveTemplate(nextEntry.templateRef);
         setTags(nextEntry.tags || []);
         setIsStarred(nextEntry.isStarred || false);
@@ -660,6 +704,7 @@ export const JournalEditor: React.FC = () => {
       setSelectedId(newEntry.id);
       setTitle("");
       setContent("");
+      contentRef.current = ""; // Keep ref in sync
       setActiveTemplate(undefined);
       setTags([]);
       setIsStarred(false);
@@ -822,7 +867,7 @@ export const JournalEditor: React.FC = () => {
 
   const handleRetrySave = useCallback(async () => {
     setAutosaveError(null);
-    await handleSave();
+    await handleSave(false);
   }, [handleSave]);
 
   const handleDeleteCurrent = useCallback(async () => {
@@ -847,6 +892,7 @@ export const JournalEditor: React.FC = () => {
       const cursorPos = e.target.selectionStart;
 
       setContent(value);
+      contentRef.current = value; // Keep ref in sync for stable callbacks
 
       // Slash command detection
       const textBefore = value.substring(0, cursorPos);
@@ -902,10 +948,11 @@ export const JournalEditor: React.FC = () => {
           setShowSlashMenu(false);
         }
       } else if (e.key === "Enter" && !e.shiftKey) {
-        // List auto-continuation
+        // List auto-continuation - use contentRef to avoid callback recreation on every keystroke
+        const currentContent = contentRef.current;
         const textarea = e.currentTarget;
         const cursorPos = textarea.selectionStart;
-        const textBefore = content.substring(0, cursorPos);
+        const textBefore = currentContent.substring(0, cursorPos);
 
         // Find the current line
         const lastNewline = textBefore.lastIndexOf("\n");
@@ -939,11 +986,12 @@ export const JournalEditor: React.FC = () => {
 
           if (isEmptyItem) {
             // Remove the empty list item prefix (exit the list)
-            const beforeLine = content.substring(0, lineStartPos);
-            const afterCursor = content.substring(cursorPos);
+            const beforeLine = currentContent.substring(0, lineStartPos);
+            const afterCursor = currentContent.substring(cursorPos);
             const newContent = beforeLine + afterCursor;
 
             setContent(newContent);
+            contentRef.current = newContent;
 
             // Set cursor at the start of what was the list line
             requestAnimationFrame(() => {
@@ -957,12 +1005,13 @@ export const JournalEditor: React.FC = () => {
             });
           } else {
             // Insert the list continuation prefix
-            const beforeCursor = content.substring(0, cursorPos);
-            const afterCursor = content.substring(cursorPos);
+            const beforeCursor = currentContent.substring(0, cursorPos);
+            const afterCursor = currentContent.substring(cursorPos);
             const newContent = beforeCursor + listPrefix + afterCursor;
             const newCursorPos = cursorPos + listPrefix.length;
 
             setContent(newContent);
+            contentRef.current = newContent;
 
             requestAnimationFrame(() => {
               if (textareaRef.current) {
@@ -977,7 +1026,7 @@ export const JournalEditor: React.FC = () => {
         }
       }
     },
-    [showSlashMenu, slashQuery, slashSelectedIndex, content],
+    [showSlashMenu, slashQuery, slashSelectedIndex],
   );
 
   // Execute a slash command
@@ -988,12 +1037,13 @@ export const JournalEditor: React.FC = () => {
 
       const cursorPos = textarea.selectionStart;
       const { text, newCursor } = replaceSlashCommand(
-        content,
+        contentRef.current,
         cursorPos,
         command.action,
       );
 
       setContent(text);
+      contentRef.current = text;
       setShowSlashMenu(false);
 
       // Set cursor position after state update
@@ -1004,7 +1054,7 @@ export const JournalEditor: React.FC = () => {
         }
       });
     },
-    [content],
+    [],
   );
 
   // Download entry as markdown

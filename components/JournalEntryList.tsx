@@ -419,7 +419,7 @@ const VirtualRowRenderer: React.FC<VirtualRowProps> = memo(({
   );
 });
 
-export const JournalEntryList: React.FC<JournalEntryListProps> = ({
+const JournalEntryListComponent: React.FC<JournalEntryListProps> = ({
   entries,
   selectedId,
   onSelect,
@@ -871,3 +871,6 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
     </div>
   );
 };
+
+// Memoize to prevent re-renders when parent state changes (e.g., during typing)
+export const JournalEntryList = memo(JournalEntryListComponent);

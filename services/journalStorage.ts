@@ -60,18 +60,56 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
 
 const isDev = process.env.NODE_ENV === 'development';
 
+// In-memory cache for faster subsequent access
+let entriesCache: JournalEntry[] | null = null;
+let cacheTimestamp: number = 0;
+const CACHE_TTL = 30000; // 30 seconds
+
 export const JournalStorage = {
+  // Get entries with cache-first strategy for instant loading
   getAll: async (): Promise<JournalEntry[]> => {
     try {
       const data = await fetchWithAuth('/api/journal');
-      if (isDev) console.log(`[Journal] Loaded ${data.entries?.length || 0} entries from server`);
-      return data.entries || [];
+      const entries = data.entries || [];
+      if (isDev) console.log(`[Journal] Loaded ${entries.length} entries from server`);
+      // Update cache
+      entriesCache = entries;
+      cacheTimestamp = Date.now();
+      // Also update local storage as backup
+      if (entries.length > 0) {
+        try {
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(entries));
+        } catch (e) {
+          // Ignore localStorage errors
+        }
+      }
+      return entries;
     } catch (error) {
       if (isDev) console.warn('[Journal] Failed to fetch from server, using local storage:', error);
       const localEntries = JournalStorage.getLocalEntries();
       if (isDev) console.log(`[Journal] Loaded ${localEntries.length} entries from local storage`);
       return localEntries;
     }
+  },
+
+  // Get cached entries instantly (for initial render)
+  getCached: (): JournalEntry[] | null => {
+    // Return memory cache if fresh
+    if (entriesCache && (Date.now() - cacheTimestamp) < CACHE_TTL) {
+      return entriesCache;
+    }
+    // Fall back to localStorage
+    const localEntries = JournalStorage.getLocalEntries();
+    if (localEntries.length > 0) {
+      return localEntries;
+    }
+    return null;
+  },
+
+  // Invalidate cache (call after mutations)
+  invalidateCache: (): void => {
+    entriesCache = null;
+    cacheTimestamp = 0;
   },
 
   getLocalEntries: (): JournalEntry[] => {
