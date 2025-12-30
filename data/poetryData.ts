@@ -533,7 +533,8 @@ export const poetryData: PoetryItem[] = [
       "Often explores the relationship between visual and verbal art"
     ],
     exampleSnippet: "Thou still unravish\'d bride of quietness, / Thou foster-child of silence and slow time...", // Keats on Grecian Urn
-    tags: ["free form", "visual", "descriptive"]
+    tags: ["free form", "visual", "descriptive"],
+    grokipediaUrl: "https://grokipedia.com/page/Ekphrasis"
   },
   {
     name: "List Poem",
