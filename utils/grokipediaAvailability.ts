@@ -1,13 +1,21 @@
 /**
- * List of poetry items that have verified Grokipedia entries.
- * Based on manual verification as of December 2024.
+ * DEPRECATED: This whitelist is no longer actively used.
  * 
- * Items with underscores or spaces in names generally don't have entries.
- * Most multi-word technical terms don't have entries.
- * Common single-word forms, meters, and devices are most likely to exist.
+ * Historical Context:
+ * - Originally created December 2024 based on manual verification
+ * - Testing was done with INCORRECT URL formatting (preserving original casing)
+ * - As of December 30, 2024: URLs now use Wikipedia-style formatting (First_word_lowercase_rest)
+ * - With correct formatting, most entries work, making this whitelist unnecessary
+ * 
+ * Current Behavior:
+ * - All poetry items now show Grokipedia links (whitelist not checked)
+ * - getGrokipediaUrl() properly formats URLs for all items
+ * - If a page doesn't exist, users see Grokipedia's standard 404 page
+ * 
+ * This list is kept for historical reference only.
  */
 
-// Verified working Grokipedia entries (tested December 2024)
+// DEPRECATED: Whitelist no longer used (kept for historical reference)
 export const grokipediaAvailable = new Set([
   // Forms - Common, well-known forms
   "Sonnet",
@@ -47,18 +55,23 @@ export const grokipediaAvailable = new Set([
 ]);
 
 /**
- * Check if a poetry item has a Grokipedia entry available
+ * DEPRECATED: Check if a poetry item has a Grokipedia entry available
+ * This function is no longer used. All items now show Grokipedia links.
+ * Kept for backwards compatibility only.
  */
 export function hasGrokipediaEntry(itemName: string): boolean {
   return grokipediaAvailable.has(itemName);
 }
 
 /**
- * Get the Grokipedia URL for an item (if it exists)
+ * Get the Grokipedia URL for an item
+ * Uses Wikipedia-style formatting: First letter capitalized, rest lowercase, spaces to underscores
  */
-export function getGrokipediaUrl(itemName: string): string | null {
-  if (!hasGrokipediaEntry(itemName)) {
-    return null;
-  }
-  return `https://grokipedia.com/page/${encodeURIComponent(itemName.replace(/\s+/g, "_"))}`;
+export function getGrokipediaUrl(itemName: string): string {
+  // Wikipedia-style: First letter caps, rest lowercase, spaces to underscores
+  const formatted = itemName
+    .toLowerCase()
+    .replace(/\s+/g, "_")
+    .replace(/^./, (c) => c.toUpperCase());
+  return `https://grokipedia.com/page/${formatted}`;
 }

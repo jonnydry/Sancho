@@ -15,7 +15,7 @@ import { PenIcon } from './icons/PenIcon';
 import { InfoIcon } from './icons/InfoIcon';
 import { ClassicSnippetsIcon } from './icons/ClassicSnippetsIcon';
 import { SparklesIcon } from './icons/SparklesIcon';
-import { hasGrokipediaEntry } from '../utils/grokipediaAvailability';
+import { getGrokipediaUrl } from '../utils/grokipediaAvailability';
 
 interface PoetryDetailModalProps {
   item: PoetryItem;
@@ -276,23 +276,21 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
         </div>
 
         {/* ===== ZONE 4: FURTHER READING ===== */}
-        {hasGrokipediaEntry(item.name) && (
-          <div className="px-6 pb-6">
-            <div className="flex items-center justify-between p-5 bg-bg-alt/30 border border-default/20 rounded-lg">
-              <div>
-                <h4 className="font-semibold text-sm text-default">Further Reading</h4>
-                <p className="text-muted text-xs mt-0.5">Explore more on Grokipedia</p>
-              </div>
-              <ActionButton
-                as="a"
-                href={`https://grokipedia.com/page/${encodeURIComponent(item.name.replace(/\s+/g, '_'))}`}
-                icon={<ArrowUpRightIcon className="w-3.5 h-3.5" />}
-              >
-                Grokipedia
-              </ActionButton>
+        <div className="px-6 pb-6">
+          <div className="flex items-center justify-between p-5 bg-bg-alt/30 border border-default/20 rounded-lg">
+            <div>
+              <h4 className="font-semibold text-sm text-default">Further Reading</h4>
+              <p className="text-muted text-xs mt-0.5">Explore more on Grokipedia</p>
             </div>
+            <ActionButton
+              as="a"
+              href={getGrokipediaUrl(item.name)}
+              icon={<ArrowUpRightIcon className="w-3.5 h-3.5" />}
+            >
+              Grokipedia
+            </ActionButton>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

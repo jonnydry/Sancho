@@ -7,7 +7,7 @@ import { ArrowUpRightIcon } from "./icons/ArrowUpRightIcon";
 import { SpinnerIcon } from "./icons/SpinnerIcon";
 import { LightbulbIcon } from "./icons/LightbulbIcon";
 import { ActionButton } from "./PoetryDetailModal";
-import { hasGrokipediaEntry } from "../utils/grokipediaAvailability";
+import { getGrokipediaUrl } from "../utils/grokipediaAvailability";
 
 interface BottomPanelProps {
   item: PoetryItem | null;
@@ -309,25 +309,23 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
                 </div>
               )}
 
-              {hasGrokipediaEntry(item.name) && (
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <ArrowUpRightIcon className="w-4 h-4 text-accent" />
-                    <h4 className="font-semibold text-sm text-default">
-                      Further Reading
-                    </h4>
-                  </div>
-                  <a
-                    href={`https://grokipedia.com/page/${encodeURIComponent(item.name.replace(/\s+/g, "_"))}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
-                  >
-                    <span>Grokipedia</span>
-                    <ArrowUpRightIcon className="w-3.5 h-3.5" />
-                  </a>
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <ArrowUpRightIcon className="w-4 h-4 text-accent" />
+                  <h4 className="font-semibold text-sm text-default">
+                    Further Reading
+                  </h4>
                 </div>
-              )}
+                <a
+                  href={getGrokipediaUrl(item.name)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
+                >
+                  <span>Grokipedia</span>
+                  <ArrowUpRightIcon className="w-3.5 h-3.5" />
+                </a>
+              </div>
             </div>
           )}
         </div>
