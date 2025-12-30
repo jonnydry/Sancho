@@ -33,6 +33,7 @@ interface JournalEntryListProps {
   onDelete: (id: string) => void;
   onToggleStar?: (id: string) => void;
   width?: number | string;
+  isLoading?: boolean;
 }
 
 // Entry item component with swipe support - memoized to prevent unnecessary re-renders
@@ -427,6 +428,7 @@ const JournalEntryListComponent: React.FC<JournalEntryListProps> = ({
   onDelete,
   onToggleStar,
   width,
+  isLoading = false,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
@@ -620,9 +622,14 @@ const JournalEntryListComponent: React.FC<JournalEntryListProps> = ({
       {/* Header & Search */}
       <div className="p-2 sm:p-3 border-b border-default flex flex-col gap-2">
         <div className="flex justify-center sm:justify-between items-center">
-          <span className="hidden sm:block text-xs font-bold text-muted uppercase tracking-wider">
-            Notes
-          </span>
+          <div className="hidden sm:flex items-center gap-2">
+            <span className="text-xs font-bold text-muted uppercase tracking-wider">
+              Notes
+            </span>
+            {isLoading && (
+              <div className="w-3 h-3 border-2 border-accent/30 border-t-accent rounded-full animate-spin" title="Syncing..."></div>
+            )}
+          </div>
           <button
             onClick={onCreate}
             className="p-1.5 rounded-full text-muted hover:bg-accent/10 hover:text-default transition-colors"

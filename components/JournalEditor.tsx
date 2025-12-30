@@ -15,17 +15,17 @@ import { useAuth } from "../hooks/useAuth";
 import { useFont } from "../hooks/useFont";
 import { JournalEntryList } from "./JournalEntryList";
 import { ReferencePane } from "./ReferencePane";
-import { BottomPanel } from "./BottomPanel";
 import {
-  SlashMenu,
   SLASH_COMMANDS,
   SlashCommand,
   replaceSlashCommand,
 } from "./SlashMenu";
+
+// Lazy load non-critical components that are conditionally rendered
+const BottomPanel = lazy(() => import("./BottomPanel").then(m => ({ default: m.BottomPanel })));
+const SlashMenu = lazy(() => import("./SlashMenu").then(m => ({ default: m.SlashMenu })));
 import { TagInput } from "./TagInput";
 import { GridIcon } from "./icons/GridIcon";
-import { poetryData } from "../data/poetryData";
-import { poeticDevicesData } from "../data/poeticDevicesData";
 import { getCaretCoordinates } from "../utils/cursor";
 import {
   extractTagsFromContent,
@@ -205,14 +205,19 @@ export const JournalEditor: React.FC = () => {
     increaseFontSize,
     decreaseFontSize,
   } = useFont();
-  const [entries, setEntries] = useState<JournalEntry[]>([]);
-  const [isLoadingEntries, setIsLoadingEntries] = useState(true);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [content, setContent] = useState("");
-  const [title, setTitle] = useState("");
+  
+  // Initialize with cached entries synchronously for instant render
+  const cachedEntries = useMemo(() => JournalStorage.getCached() || [], []);
+  const [entries, setEntries] = useState<JournalEntry[]>(cachedEntries);
+  const [isLoadingEntries, setIsLoadingEntries] = useState(cachedEntries.length === 0);
+  // Initialize selection with first cached entry if available
+  const initialEntry = cachedEntries.length > 0 ? cachedEntries[0] : null;
+  const [selectedId, setSelectedId] = useState<string | null>(initialEntry?.id || null);
+  const [content, setContent] = useState(initialEntry?.content || "");
+  const [title, setTitle] = useState(initialEntry?.title || "");
   const [showTemplate, setShowTemplate] = useState(false);
   const [activeTemplate, setActiveTemplate] = useState<string | undefined>(
-    undefined,
+    initialEntry?.templateRef,
   );
   const [showSidebar, setShowSidebar] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -241,6 +246,10 @@ export const JournalEditor: React.FC = () => {
   const [isZenMode, setIsZenMode] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [showFontMenu, setShowFontMenu] = useState(false);
+
+  // Lazy loaded reference data
+  const [referenceData, setReferenceData] = useState<any[] | null>(null);
+  const [isLoadingReferenceData, setIsLoadingReferenceData] = useState(false);
 
   // Slash command state
   const [showSlashMenu, setShowSlashMenu] = useState(false);
@@ -271,19 +280,19 @@ export const JournalEditor: React.FC = () => {
   const [tempGoal, setTempGoal] = useState(dailyGoal.toString());
   const previousWordCountRef = useRef<number>(0);
 
-  // Tag state
-  const [tags, setTags] = useState<string[]>([]);
-  const [isStarred, setIsStarred] = useState(false);
+  // Tag state - initialize from cached entry
+  const [tags, setTags] = useState<string[]>(initialEntry?.tags || []);
+  const [isStarred, setIsStarred] = useState(initialEntry?.isStarred || false);
   const tagExtractionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const retryCountRef = useRef<number>(0);
-  const previousSelectedIdRef = useRef<string | null>(null);
+  const previousSelectedIdRef = useRef<string | null>(initialEntry?.id || null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const savedSelectionRef = useRef<{ start: number; end: number } | null>(null);
   // Ref to avoid recreating callbacks on every keystroke
-  const contentRef = useRef<string>("");
+  const contentRef = useRef<string>(initialEntry?.content || "");
   const currentStateRef = useRef<{
     title: string;
     content: string;
@@ -292,11 +301,12 @@ export const JournalEditor: React.FC = () => {
     isStarred: boolean;
     entries: JournalEntry[];
   }>({
-    title: "",
-    content: "",
-    tags: [],
-    isStarred: false,
-    entries: [],
+    title: initialEntry?.title || "",
+    content: initialEntry?.content || "",
+    activeTemplate: initialEntry?.templateRef,
+    tags: initialEntry?.tags || [],
+    isStarred: initialEntry?.isStarred || false,
+    entries: cachedEntries,
   });
   const autosaveErrorRef = useRef<string | null>(null);
 
@@ -306,6 +316,23 @@ export const JournalEditor: React.FC = () => {
     if (savedEntryWidth) setEntryListWidth(parseInt(savedEntryWidth));
     if (savedRefWidth) setReferencePaneWidth(parseInt(savedRefWidth));
   }, []);
+
+  // Lazy load reference data when reference pane is opened
+  useEffect(() => {
+    if (showTemplate && !referenceData && !isLoadingReferenceData) {
+      setIsLoadingReferenceData(true);
+      Promise.all([
+        import("../data/poetryData").then(m => m.poetryData),
+        import("../data/poeticDevicesData").then(m => m.poeticDevicesData)
+      ]).then(([poetry, devices]) => {
+        setReferenceData([...poetry, ...devices]);
+        setIsLoadingReferenceData(false);
+      }).catch(err => {
+        console.error("Failed to load reference data:", err);
+        setIsLoadingReferenceData(false);
+      });
+    }
+  }, [showTemplate, referenceData, isLoadingReferenceData]);
 
   // Debounced localStorage sync for panel widths (prevents excessive writes during resize)
   useLocalStorageSync("journal_entry_width", entryListWidth.toString(), 500);
@@ -423,12 +450,12 @@ export const JournalEditor: React.FC = () => {
     });
   }, []);
 
-  const allItems = useMemo(() => [...poetryData, ...poeticDevicesData], []);
+  const allItems = useMemo(() => referenceData || [], [referenceData]);
 
   const activeItem = useMemo(() => {
-    if (!activeTemplate) return null;
+    if (!activeTemplate || !referenceData) return null;
     return allItems.find((item) => item.name === activeTemplate) || null;
-  }, [activeTemplate, allItems]);
+  }, [activeTemplate, allItems, referenceData]);
 
   const handleBottomPanelTagClick = useCallback((tag: string) => {
     setShowTemplate(true);
@@ -513,17 +540,7 @@ export const JournalEditor: React.FC = () => {
 
   useEffect(() => {
     const loadEntries = async () => {
-      // Step 1: Try to load cached entries immediately for instant display
-      const cachedEntries = JournalStorage.getCached();
-      if (cachedEntries && cachedEntries.length > 0) {
-        setEntries(cachedEntries);
-        selectEntryDirect(cachedEntries[0]);
-        setIsLoadingEntries(false);
-      } else {
-        setIsLoadingEntries(true);
-      }
-
-      // Step 2: Fetch fresh data from server in background
+      // Fetch fresh data from server in background (cache already loaded synchronously)
       try {
         if (JournalStorage.needsMigration()) {
           await JournalStorage.migrateToServer();
@@ -534,7 +551,7 @@ export const JournalEditor: React.FC = () => {
         if (loadedEntries.length > 0) {
           setEntries(loadedEntries);
           // Refresh editor state if server data differs from cache
-          if (cachedEntries && cachedEntries.length > 0) {
+          if (cachedEntries.length > 0) {
             const currentSelectedId = previousSelectedIdRef.current;
             if (currentSelectedId) {
               const freshEntry = loadedEntries.find(e => e.id === currentSelectedId);
@@ -558,9 +575,8 @@ export const JournalEditor: React.FC = () => {
             // Select first entry if we didn't have cached data
             selectEntryDirect(loadedEntries[0]);
           }
-        } else {
-          // Server returned empty list - clear stale cache and create new entry
-          // This handles both: 1) no cached entries, 2) cached entries but server is empty
+        } else if (cachedEntries.length === 0) {
+          // Server returned empty list and no cache - create new entry
           setEntries([]);
           await createNewEntry();
         }
@@ -569,7 +585,7 @@ export const JournalEditor: React.FC = () => {
       }
     };
     loadEntries();
-  }, [selectEntryDirect, createNewEntry]);
+  }, [selectEntryDirect, createNewEntry, cachedEntries]);
 
   const selectEntry = useCallback(
     async (entry: JournalEntry) => {
@@ -1297,45 +1313,7 @@ export const JournalEditor: React.FC = () => {
     showFontMenu,
   ]);
 
-  // Loading skeleton component
-  if (isLoadingEntries) {
-    return (
-      <div className="flex flex-col h-full overflow-hidden bg-bg">
-        <div className="flex flex-1 overflow-hidden">
-          {/* Sidebar skeleton */}
-          <div className="w-64 border-r border-default bg-bg-alt/30 p-3 space-y-3">
-            <div className="h-4 bg-default/10 rounded w-16 animate-pulse" />
-            <div className="space-y-2">
-              {[...Array(5)].map((_, i) => (
-                <div
-                  key={i}
-                  className="h-8 bg-default/10 rounded animate-pulse"
-                  style={{ animationDelay: `${i * 100}ms` }}
-                />
-              ))}
-            </div>
-          </div>
-          {/* Editor skeleton */}
-          <div className="flex-1 p-6 space-y-4">
-            <div className="h-8 bg-default/10 rounded w-1/3 animate-pulse" />
-            <div className="h-4 bg-default/10 rounded w-1/4 animate-pulse" />
-            <div className="space-y-2 mt-6">
-              {[...Array(8)].map((_, i) => (
-                <div
-                  key={i}
-                  className="h-4 bg-default/5 rounded animate-pulse"
-                  style={{
-                    width: `${70 + Math.random() * 30}%`,
-                    animationDelay: `${i * 50}ms`,
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // No more blocking skeleton - render UI immediately with cached data or empty state
 
   // Zen mode wrapper
   const editorContent = (
@@ -1384,6 +1362,7 @@ export const JournalEditor: React.FC = () => {
               onDelete={deleteEntry}
               onToggleStar={handleToggleStar}
               width={entryListWidth}
+              isLoading={isLoadingEntries}
             />
             <ResizeHandle onResize={handleResizeEntryList} />
           </>
@@ -1893,33 +1872,37 @@ export const JournalEditor: React.FC = () => {
 
                   {/* Slash command menu */}
                   {showSlashMenu && (
-                    <SlashMenu
-                      position={slashMenuPosition}
-                      query={slashQuery}
-                      selectedIndex={slashSelectedIndex}
-                      onSelect={executeSlashCommand}
-                      onClose={() => setShowSlashMenu(false)}
-                      onNavigate={(dir) => {
-                        if (typeof dir === "number") {
-                          setSlashSelectedIndex(dir);
-                        }
-                      }}
-                    />
+                    <Suspense fallback={null}>
+                      <SlashMenu
+                        position={slashMenuPosition}
+                        query={slashQuery}
+                        selectedIndex={slashSelectedIndex}
+                        onSelect={executeSlashCommand}
+                        onClose={() => setShowSlashMenu(false)}
+                        onNavigate={(dir) => {
+                          if (typeof dir === "number") {
+                            setSlashSelectedIndex(dir);
+                          }
+                        }}
+                      />
+                    </Suspense>
                   )}
                 </div>
               )}
             </div>
 
             {activeItem && !isZenMode && (
-              <BottomPanel
-                item={activeItem}
-                isOpen={bottomPanelOpen}
-                onToggle={() => setBottomPanelOpen(!bottomPanelOpen)}
-                height={bottomPanelHeight}
-                onResize={handleResizeBottomPanel}
-                onTagClick={handleBottomPanelTagClick}
-                onSeeAlsoClick={handleBottomPanelSeeAlsoClick}
-              />
+              <Suspense fallback={<div className="h-8 bg-bg-alt/20 animate-pulse" />}>
+                <BottomPanel
+                  item={activeItem}
+                  isOpen={bottomPanelOpen}
+                  onToggle={() => setBottomPanelOpen(!bottomPanelOpen)}
+                  height={bottomPanelHeight}
+                  onResize={handleResizeBottomPanel}
+                  onTagClick={handleBottomPanelTagClick}
+                  onSeeAlsoClick={handleBottomPanelSeeAlsoClick}
+                />
+              </Suspense>
             )}
           </div>
         </div>
