@@ -369,6 +369,8 @@ export class DatabaseStorage {
         title: entry.title || '',
         content: entry.content || '',
         templateRef: entry.templateRef,
+        tags: entry.tags || [],
+        isStarred: entry.isStarred === 'true',
         createdAt: entry.createdAt ? new Date(entry.createdAt).getTime() : Date.now(),
         updatedAt: entry.updatedAt ? new Date(entry.updatedAt).getTime() : Date.now(),
       };
@@ -387,6 +389,8 @@ export class DatabaseStorage {
           title: entryData.title || '',
           content: entryData.content || '',
           templateRef: entryData.templateRef,
+          tags: entryData.tags || [],
+          isStarred: entryData.isStarred ? 'true' : 'false',
           createdAt: new Date(),
           updatedAt: new Date(),
         })
@@ -397,6 +401,8 @@ export class DatabaseStorage {
         title: entry.title || '',
         content: entry.content || '',
         templateRef: entry.templateRef,
+        tags: entry.tags || [],
+        isStarred: entry.isStarred === 'true',
         createdAt: entry.createdAt ? new Date(entry.createdAt).getTime() : Date.now(),
         updatedAt: entry.updatedAt ? new Date(entry.updatedAt).getTime() : Date.now(),
       };
@@ -413,6 +419,8 @@ export class DatabaseStorage {
           ...(updates.title !== undefined && { title: updates.title }),
           ...(updates.content !== undefined && { content: updates.content }),
           ...(updates.templateRef !== undefined && { templateRef: updates.templateRef }),
+          ...(updates.tags !== undefined && { tags: updates.tags }),
+          ...(updates.isStarred !== undefined && { isStarred: updates.isStarred ? 'true' : 'false' }),
           updatedAt: new Date(),
         })
         .where(and(
@@ -428,6 +436,8 @@ export class DatabaseStorage {
         title: entry.title || '',
         content: entry.content || '',
         templateRef: entry.templateRef,
+        tags: entry.tags || [],
+        isStarred: entry.isStarred === 'true',
         createdAt: entry.createdAt ? new Date(entry.createdAt).getTime() : Date.now(),
         updatedAt: entry.updatedAt ? new Date(entry.updatedAt).getTime() : Date.now(),
       };
@@ -462,6 +472,8 @@ export class DatabaseStorage {
         title: e.title || '',
         content: e.content || '',
         templateRef: e.templateRef,
+        tags: e.tags || [],
+        isStarred: e.isStarred ? 'true' : 'false',
         createdAt: e.createdAt ? new Date(e.createdAt) : new Date(),
         updatedAt: e.updatedAt ? new Date(e.updatedAt) : new Date(),
       }));
@@ -477,6 +489,8 @@ export class DatabaseStorage {
         title: entry.title || '',
         content: entry.content || '',
         templateRef: entry.templateRef,
+        tags: entry.tags || [],
+        isStarred: entry.isStarred === 'true',
         createdAt: entry.createdAt ? new Date(entry.createdAt).getTime() : Date.now(),
         updatedAt: entry.updatedAt ? new Date(entry.updatedAt).getTime() : Date.now(),
       }));

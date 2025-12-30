@@ -1260,10 +1260,15 @@ export const JournalEditor: React.FC = () => {
         e.preventDefault();
         setShowTemplate((prev) => !prev);
       }
-      // Escape: Exit zen mode
+      // Escape: Exit zen mode (only if no modals/menus are open)
       else if (e.key === "Escape" && isZenMode) {
-        e.preventDefault();
-        setIsZenMode(false);
+        // Check if any modal or menu is open
+        const hasOpenModal = showSlashMenu || showDeleteConfirm || showUnsavedWarning || isEditingGoal || showFontMenu;
+        
+        if (!hasOpenModal) {
+          e.preventDefault();
+          setIsZenMode(false);
+        }
       }
       // Cmd/Ctrl + Shift + Z: Toggle zen mode
       else if (isMod && e.shiftKey && e.key.toLowerCase() === "z") {
@@ -1285,6 +1290,11 @@ export const JournalEditor: React.FC = () => {
     isZenMode,
     toggleZenMode,
     togglePreviewMode,
+    showSlashMenu,
+    showDeleteConfirm,
+    showUnsavedWarning,
+    isEditingGoal,
+    showFontMenu,
   ]);
 
   // Loading skeleton component
@@ -1800,6 +1810,45 @@ export const JournalEditor: React.FC = () => {
               )}
             </div>
           </div>
+
+          {/* Unsaved Changes Banner */}
+          {!isZenMode && isAuthenticated && (syncStatus === "local" || syncStatus === "error" || autosaveError) && (
+            <div className={`px-4 py-2 flex items-center justify-between text-sm border-b ${
+              syncStatus === "error" || autosaveError
+                ? "bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-900/30 text-red-700 dark:text-red-400"
+                : "bg-yellow-50 dark:bg-yellow-900/10 border-yellow-200 dark:border-yellow-900/30 text-yellow-700 dark:text-yellow-400"
+            }`}>
+              <div className="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                  <path d="M12 9v4"/>
+                  <path d="M12 17h.01"/>
+                </svg>
+                <span className="font-medium">
+                  {autosaveError ? `Auto-save failed: ${autosaveError}` : 
+                   syncStatus === "error" ? "Failed to save changes" :
+                   "You have unsaved changes"}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                {(syncStatus === "error" || autosaveError) && (
+                  <button
+                    onClick={handleRetrySave}
+                    className="px-3 py-1 text-xs font-medium rounded-md bg-red-100 dark:bg-red-900/20 hover:bg-red-200 dark:hover:bg-red-900/30 transition-colors"
+                  >
+                    Retry Save
+                  </button>
+                )}
+                <button
+                  onClick={handleManualSave}
+                  disabled={isSaving}
+                  className="px-3 py-1 text-xs font-medium rounded-md bg-accent hover:bg-accent-hover text-accent-text transition-colors disabled:opacity-50"
+                >
+                  {isSaving ? "Saving..." : "Save Now"}
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="flex-1 flex flex-col relative overflow-hidden">
             <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-2 space-y-2">

@@ -577,7 +577,7 @@ app.get('/api/journal', isAuthenticated, async (req, res) => {
 app.post('/api/journal', csrfProtection, isAuthenticated, async (req, res) => {
   try {
     const userId = req.user.claims.sub;
-    const { id, title, content, templateRef } = req.body;
+    const { id, title, content, templateRef, tags, isStarred } = req.body;
 
     if (!id) {
       return res.status(400).json({ error: "Entry ID is required" });
@@ -588,6 +588,8 @@ app.post('/api/journal', csrfProtection, isAuthenticated, async (req, res) => {
       title: title || '',
       content: content || '',
       templateRef,
+      tags: tags || [],
+      isStarred: isStarred || false,
     });
     res.json({ entry });
   } catch (error) {
@@ -603,12 +605,14 @@ app.patch('/api/journal/:id', csrfProtection, isAuthenticated, async (req, res) 
   try {
     const userId = req.user.claims.sub;
     const { id } = req.params;
-    const { title, content, templateRef } = req.body;
+    const { title, content, templateRef, tags, isStarred } = req.body;
 
     const entry = await storage.updateJournalEntry(userId, id, {
       title,
       content,
       templateRef,
+      tags,
+      isStarred,
     });
 
     if (!entry) {

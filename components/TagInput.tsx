@@ -201,6 +201,13 @@ export const TagInput: React.FC<TagInputProps> = ({
         </div>
       )}
 
+      {/* Max tags reached feedback */}
+      {!disabled && tags.length >= maxTags && (
+        <p className="mt-1 text-[10px] text-yellow-600 dark:text-yellow-500">
+          Maximum {maxTags} tags reached. Remove a tag to add more.
+        </p>
+      )}
+      
       {/* Helper text - only show error if input has content but no valid tags can be parsed */}
       {inputValue && parseTagInput(inputValue).length === 0 && !isValidTag(normalizeTag(inputValue)) && (
         <p className="mt-1 text-[10px] text-red-500/80">

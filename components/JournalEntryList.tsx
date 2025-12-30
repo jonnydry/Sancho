@@ -103,7 +103,7 @@ const EntryItem: React.FC<{
   }, [swipeOffset, onDelete, onToggleStar]);
 
   return (
-    <div className="relative overflow-hidden">
+    <div className="relative overflow-hidden" data-entry-id={entry.id}>
       {/* Swipe action backgrounds */}
       <div className="absolute inset-y-0 left-0 w-24 bg-yellow-500/20 flex items-center justify-start pl-3">
         <svg
@@ -476,6 +476,27 @@ const JournalEntryListComponent: React.FC<JournalEntryListProps> = ({
       }
     };
   }, []);
+
+  // Scroll to selected entry when selection changes
+  useEffect(() => {
+    if (!selectedId || !listContainerRef.current) return;
+    
+    // Small delay to ensure DOM is updated
+    const timeoutId = setTimeout(() => {
+      const selectedElement = listContainerRef.current?.querySelector(
+        `[data-entry-id="${selectedId}"]`
+      ) as HTMLElement;
+      
+      if (selectedElement) {
+        selectedElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+        });
+      }
+    }, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, [selectedId]);
 
   // Filter entries by search
   const filteredEntries = useMemo(() => {
