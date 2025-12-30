@@ -49,7 +49,7 @@ export const SearchFilter: React.FC<SearchFilterProps> = memo(({
           <button
             onClick={() => setSearchQuery('')}
             type="button"
-            className="absolute inset-y-0 right-0 flex items-center text-muted hover:text-default transition-colors"
+            className="absolute inset-y-0 right-0 flex items-center text-muted hover:text-default transition-all duration-200 interactive-base interactive-scale p-1"
             aria-label="Clear search"
           >
             <XIcon className="w-4 h-4" />
@@ -72,9 +72,9 @@ export const SearchFilter: React.FC<SearchFilterProps> = memo(({
             role="radio"
             aria-checked={activeFilter === value}
             tabIndex={activeFilter === value ? 0 : -1}
-            className={`pb-2 text-xs sm:text-sm whitespace-nowrap transition-all duration-200 focus:outline-none flex items-center gap-2 ${activeFilter === value
+            className={`pb-2 text-xs sm:text-sm whitespace-nowrap transition-all duration-200 focus:outline-none flex items-center gap-2 interactive-base ${activeFilter === value
                 ? 'text-default font-bold border-b-2 border-accent'
-                : 'text-muted hover:text-default font-normal border-b-2 border-transparent hover:border-default/30'
+                : 'text-muted hover:text-default font-normal border-b-2 border-transparent hover:border-default/30 hover:bg-bg-alt/30 rounded-t-sm px-1'
               }`}
           >
             <Icon className="w-4 h-4" />

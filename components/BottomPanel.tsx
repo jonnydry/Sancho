@@ -97,7 +97,7 @@ const TagButton: React.FC<{
 }> = memo(({ onClick, children }) => (
   <button
     onClick={onClick}
-    className="px-2.5 py-1 text-xs font-medium rounded-full bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
+    className="px-2.5 py-1 text-xs font-medium rounded-full bg-accent/10 text-accent hover:bg-accent/20 transition-all duration-200 interactive-base interactive-scale"
   >
     {children}
   </button>
@@ -180,10 +180,10 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
                 if (!isOpen) onToggle();
                 setActiveTab(tab.id);
               }}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-all duration-200 interactive-base ${
                 isOpen && activeTab === tab.id
-                  ? "bg-accent/15 text-accent"
-                  : "text-muted hover:text-default hover:bg-bg-alt"
+                  ? "bg-accent/15 text-accent shadow-sm"
+                  : "text-muted hover:text-default hover:bg-bg-alt/80"
               }`}
             >
               {tab.icon}
@@ -201,7 +201,7 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
           </span>
           <button
             onClick={onToggle}
-            className="p-1 rounded text-muted hover:text-default hover:bg-bg-alt transition-colors"
+            className="p-1 rounded text-muted hover:text-default hover:bg-bg-alt transition-all duration-200 interactive-base interactive-scale"
             title={isOpen ? "Collapse panel" : "Expand panel"}
           >
             <svg
@@ -320,7 +320,7 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
                   href={getGrokipediaUrl(item.name)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
+                  className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-all duration-200 interactive-base interactive-scale"
                 >
                   <span>Grokipedia</span>
                   <ArrowUpRightIcon className="w-3.5 h-3.5" />

@@ -24,7 +24,7 @@ export const PoetryCard: React.FC<PoetryCardProps> = memo(({ item, onSelect, onT
     <div className="relative h-full group">
       <div
         onClick={() => onSelect(item)}
-        className={`w-full h-full text-left ${bgClass} border border-default hover:border-accent rounded-sm transition-all duration-300 ease-out animate-fade-in cursor-pointer p-5 flex flex-col shadow-sm`}
+        className={`w-full h-full text-left ${bgClass} border border-default hover:border-accent rounded-sm transition-all duration-300 ease-out animate-fade-in p-5 flex flex-col shadow-sm interactive-base interactive-lift hover:bg-bg-alt/50`}
         style={{ animationDelay: `${animationIndex * 50}ms` }}
         role="button"
         tabIndex={0}
@@ -66,7 +66,7 @@ export const PoetryCard: React.FC<PoetryCardProps> = memo(({ item, onSelect, onT
                     onTagClick?.(tag);
                   }}
                   aria-label={`Filter by ${tag}`}
-                  className="px-2 py-1 text-xs bg-accent/5 border border-accent/20 rounded text-muted hover:bg-accent/20 hover:text-default hover:border-accent/50 hover:scale-105 hover:shadow-sm active:scale-100 transition-all duration-150 cursor-pointer"
+                  className="px-2 py-1 text-xs bg-accent/5 border border-accent/20 rounded text-muted hover:bg-accent/20 hover:text-default hover:border-accent/50 hover:shadow-sm transition-all duration-150 interactive-base interactive-scale"
                 >
                   {tag}
                 </button>

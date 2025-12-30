@@ -23,7 +23,7 @@ export const FontControls: React.FC = () => {
             e.stopPropagation();
             setShowFontMenu(!showFontMenu);
           }}
-          className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-default hover:bg-bg-alt"
+          className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-default hover:bg-bg-alt interactive-base interactive-scale"
           title="Font Face"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -42,8 +42,8 @@ export const FontControls: React.FC = () => {
                   setFontFace(face);
                   setShowFontMenu(false);
                 }}
-                className={`w-full text-left px-3 py-1.5 hover:bg-bg transition-colors ${
-                  fontFace === face ? 'text-accent' : 'text-default'
+                className={`w-full text-left px-3 py-1.5 hover:bg-bg transition-colors interactive-base ${
+                  fontFace === face ? 'text-accent font-medium' : 'text-default'
                 }`}
               >
                 {face === 'monospace' ? 'Monospace' : face === 'serif' ? 'Serif' : 'Sans-serif'}
@@ -57,21 +57,21 @@ export const FontControls: React.FC = () => {
       <button
         onClick={decreaseFontSize}
         disabled={fontSize <= 14}
-        className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-default hover:bg-bg-alt disabled:opacity-30 disabled:cursor-not-allowed"
-        title="Decrease Font Size"
+        className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-default hover:bg-bg-alt disabled:opacity-30 disabled:cursor-not-allowed interactive-base interactive-scale interactive-disabled"
+        title={fontSize <= 14 ? "Minimum font size reached" : "Decrease Font Size"}
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="5" x2="19" y1="12" y2="12"/>
         </svg>
       </button>
 
-      <span className="text-xs text-muted px-1 min-w-[32px] text-center">{fontSize}px</span>
+      <span className="text-xs text-muted px-1 min-w-[32px] text-center select-none">{fontSize}px</span>
 
       <button
         onClick={increaseFontSize}
         disabled={fontSize >= 24}
-        className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-default hover:bg-bg-alt disabled:opacity-30 disabled:cursor-not-allowed"
-        title="Increase Font Size"
+        className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-default hover:bg-bg-alt disabled:opacity-30 disabled:cursor-not-allowed interactive-base interactive-scale interactive-disabled"
+        title={fontSize >= 24 ? "Maximum font size reached" : "Increase Font Size"}
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="12" x2="12" y1="5" y2="19"/>

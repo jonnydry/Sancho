@@ -33,11 +33,11 @@ export const Header: React.FC = () => {
       <header className="sticky top-0 w-full bg-bg/80 backdrop-blur-md border-b border-default z-50 px-4 sm:px-6 md:px-8">
         <div className="max-w-5xl mx-auto h-16 flex items-center justify-between">
           <div className="flex items-baseline gap-4 sm:gap-8">
-            <Link to="/" className="text-lg font-bold text-default hover:text-accent transition-colors tracking-tight leading-none">
+            <Link to="/" className="text-lg font-bold text-default hover:text-accent transition-colors tracking-tight leading-none interactive-base">
               Sancho.ref
             </Link>
             <nav className="flex gap-4 sm:gap-6">
-              <Link to="/about" className="text-sm text-muted hover:text-default hover:underline underline-offset-4 transition-all leading-none">
+              <Link to="/about" className="text-sm text-muted hover:text-default hover:underline underline-offset-4 transition-all leading-none interactive-base">
                 About
               </Link>
             </nav>
@@ -48,7 +48,7 @@ export const Header: React.FC = () => {
                 onClick={() => setIsNotebookOpen(true)}
                 onMouseEnter={() => setIsNotebookHovered(true)}
                 onMouseLeave={() => setIsNotebookHovered(false)}
-                className={`flex items-center justify-center p-1.5 sm:p-2 rounded-full text-muted transition-colors ${mode === 'dark' ? 'hover:bg-accent/10 hover:text-white' : 'hover:bg-accent/10 hover:text-default'
+                className={`flex items-center justify-center p-1.5 sm:p-2 rounded-full text-muted transition-all duration-200 interactive-base interactive-scale ${mode === 'dark' ? 'hover:bg-accent/10 hover:text-white' : 'hover:bg-accent/10 hover:text-default'
                   }`}
                 aria-label="Open Notebook"
                 title="Notebook"
@@ -65,28 +65,28 @@ export const Header: React.FC = () => {
               ) : isAuthenticated && user ? (
                 <a
                   href="/api/logout"
-                  className="flex items-center gap-1.5 sm:gap-2 group"
+                  className="flex items-center gap-1.5 sm:gap-2 group interactive-base"
                   title="Click to logout"
                 >
                   {user.profileImageUrl ? (
                     <img
                       src={user.profileImageUrl}
                       alt={user.email || 'User profile'}
-                      className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover ring-1 ring-transparent group-hover:ring-accent/50 transition-all"
+                      className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover ring-1 ring-transparent group-hover:ring-accent/50 transition-all shadow-sm group-hover:shadow-md"
                     />
                   ) : (
-                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-accent/20 flex items-center justify-center text-[10px] sm:text-xs text-default ring-1 ring-transparent group-hover:ring-accent/50 transition-all">
+                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-accent/20 flex items-center justify-center text-[10px] sm:text-xs text-default ring-1 ring-transparent group-hover:ring-accent/50 transition-all shadow-sm group-hover:shadow-md">
                       {user.firstName?.charAt(0) || user.email?.charAt(0) || 'U'}
                     </div>
                   )}
-                  <span className="hidden sm:inline text-xs text-muted group-hover:text-accent transition-colors">
+                  <span className="hidden sm:inline text-xs text-muted group-hover:text-accent transition-colors font-medium">
                     Logout
                   </span>
                 </a>
               ) : (
                 <a
                   href="/api/login"
-                  className="text-xs font-medium text-default hover:text-accent hover:underline underline-offset-4 transition-all"
+                  className="text-xs font-medium text-default hover:text-accent hover:underline underline-offset-4 transition-all interactive-base"
                 >
                   Login
                 </a>

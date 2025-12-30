@@ -438,6 +438,52 @@ body::-webkit-scrollbar-corner,
   animation: goalPulse 2s ease-in-out infinite;
 }
 
+/* --- INTERACTIVE UTILITIES --- */
+
+/* Base interactive class for consistent cursor and transition */
+.interactive-base {
+  cursor: pointer;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* Scale effect on hover/active */
+.interactive-scale {
+  transition-transform: 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.interactive-scale:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.interactive-scale:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* Subtle lift effect */
+.interactive-lift {
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+.interactive-lift:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+/* Glow effect for primary actions */
+.interactive-glow:hover:not(:disabled) {
+  box-shadow: 0 0 10px rgb(var(--app-accent) / 0.3);
+}
+
+/* Disabled state helper */
+.interactive-disabled:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
 /* Tag Highlight in Content */
 .tag-highlight {
   color: rgb(var(--app-accent));

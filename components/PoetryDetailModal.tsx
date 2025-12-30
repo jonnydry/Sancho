@@ -42,7 +42,7 @@ export const ActionButton: React.FC<{
   as?: 'button' | 'a';
   href?: string;
 }> = ({ onClick, disabled, loading, loadingText, icon, loadingIcon, children, as = 'button', href }) => {
-  const className = "flex items-center justify-center gap-1.5 px-3 py-1.5 h-8 text-xs font-semibold text-accent dark:text-accent-text border border-accent/50 bg-accent/5 rounded-md hover:bg-accent/15 hover:border-accent/70 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-accent/40 whitespace-nowrap leading-none box-border shrink-0";
+  const className = "flex items-center justify-center gap-1.5 px-3 py-1.5 h-8 text-xs font-semibold text-accent dark:text-accent-text border border-accent/50 bg-accent/5 rounded-md hover:bg-accent/15 hover:border-accent/70 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-accent/40 whitespace-nowrap leading-none box-border shrink-0 interactive-base interactive-scale";
   
   if (as === 'a') {
     return (
@@ -64,7 +64,7 @@ export const ActionButton: React.FC<{
 const TagButton: React.FC<{ onClick?: () => void; children: React.ReactNode }> = ({ onClick, children }) => (
   <button
     onClick={onClick}
-    className="flex items-center justify-center px-2.5 py-1 h-8 text-xs bg-bg-alt/50 border border-default/30 rounded-md text-muted hover:bg-accent/10 hover:text-default hover:border-accent/40 active:scale-[0.98] transition-all duration-150 cursor-pointer"
+    className="flex items-center justify-center px-2.5 py-1 h-8 text-xs bg-bg-alt/50 border border-default/30 rounded-md text-muted hover:bg-accent/10 hover:text-default hover:border-accent/40 hover:shadow-sm transition-all duration-150 interactive-base interactive-scale"
   >
     {children}
   </button>
@@ -158,7 +158,7 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-1 text-muted hover:text-default hover:bg-bg-alt/50 rounded-md active:scale-[0.98] transition-all duration-150"
+          className="absolute top-4 right-4 z-10 p-1 text-muted hover:text-default hover:bg-bg-alt/50 rounded-md transition-all duration-150 interactive-base interactive-scale"
           aria-label="Close"
         >
           <XIcon className="w-5 h-5" />

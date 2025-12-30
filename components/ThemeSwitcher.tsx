@@ -40,13 +40,13 @@ export const ThemeSwitcher: React.FC = () => {
                 key={theme.name}
                 onClick={() => handleThemeClick(theme.name)}
                 disabled={isDisabled}
-                className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full transition-transform duration-200 ${theme.class} ${
+                className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full transition-all duration-200 cursor-pointer ${theme.class} ${
                   isSelected
-                    ? 'ring-2 ring-offset-1 sm:ring-offset-2 ring-accent dark:ring-offset-bg-alt'
+                    ? 'ring-2 ring-offset-1 sm:ring-offset-2 ring-accent dark:ring-offset-bg-alt scale-110 shadow-sm'
                     : isDisabled
                     ? 'opacity-50 cursor-not-allowed'
-                    : 'scale-90 hover:scale-100'
-                } ${isDisabled ? 'cursor-not-allowed' : ''}`}
+                    : 'scale-90 hover:scale-110 hover:ring-2 hover:ring-offset-1 hover:ring-default/30 shadow-sm hover:shadow-md'
+                } ${isDisabled ? 'cursor-not-allowed' : 'interactive-base'}`}
                 title={tooltip}
                 aria-label={tooltip}
                 aria-pressed={isSelected}
@@ -57,7 +57,7 @@ export const ThemeSwitcher: React.FC = () => {
       )}
       <button
         onClick={toggleMode}
-        className="p-1.5 sm:p-2 rounded-full text-muted hover:bg-accent/10 transition-colors"
+        className="p-1.5 sm:p-2 rounded-full text-muted hover:bg-accent/10 hover:text-default transition-all duration-200 interactive-base interactive-scale"
         aria-label="Toggle dark mode"
       >
         {mode === 'light' ? <MoonIcon className="w-4 h-4 sm:w-5 sm:h-5" /> : <SunIcon className="w-4 h-4 sm:w-5 sm:h-5" />}

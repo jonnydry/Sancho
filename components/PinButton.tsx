@@ -81,9 +81,9 @@ export const PinButton: React.FC<PinButtonProps> = ({ item, className = '', size
     <button
       onClick={handleClick}
       disabled={isLoading || isAuthLoading}
-      className={`flex items-center justify-center transition-all duration-200 ${
+      className={`flex items-center justify-center transition-all duration-200 rounded-full hover:bg-accent/10 hover:shadow-sm interactive-base interactive-scale ${
         isPressed ? 'scale-90' : 'scale-100'
-      } text-default hover:text-default disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      } text-default hover:text-accent disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
       aria-label={pinned ? `Unpin ${item.name}` : `Pin ${item.name}`}
       title={pinned ? `Unpin ${item.name}` : `Pin ${item.name}`}
     >
