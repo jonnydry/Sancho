@@ -10,6 +10,7 @@ import { PoetryItem } from "../types";
 import { XIcon } from "./icons/XIcon";
 import { ArrowDownIcon } from "./icons/ArrowDownIcon";
 import { CheckIcon } from "./icons/CheckIcon";
+import { PinButton } from "./PinButton";
 import { usePinnedItems } from "../contexts/PinnedItemsContext";
 import { poetryData } from "../data/poetryData";
 import { poeticDevicesData } from "../data/poeticDevicesData";
@@ -151,7 +152,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
   initialSearchQuery,
   onSearchQueryConsumed,
 }) => {
-  const { pinnedItems, pinItem, unpinItem, isPinned } = usePinnedItems();
+  const { pinnedItems } = usePinnedItems();
   const [activeTab, setActiveTab] = useState<Tab>(
     pinnedItems.length > 0 ? "saved" : "search",
   );
@@ -253,15 +254,6 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
 
   const activeItemName = selectedTemplate;
   const activeItem = allItems.find((item) => item.name === activeItemName);
-
-  const handlePinToggle = async (e: React.MouseEvent, item: PoetryItem) => {
-    e.stopPropagation();
-    if (isPinned(item.name)) {
-      await unpinItem(item.name);
-    } else {
-      await pinItem(item);
-    }
-  };
 
   const handleInsert = (text: string, id: string) => {
     if (onInsert) {
@@ -395,32 +387,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                             {item.type}
                           </span>
                         </div>
-                        <button
-                          onClick={(e) => handlePinToggle(e, item)}
-                          className={`p-1 rounded-full transition-colors ${
-                            isPinned(item.name)
-                              ? "text-accent hover:text-accent-hover"
-                              : "text-muted/30 hover:text-default opacity-0 group-hover:opacity-100"
-                          }`}
-                          title={
-                            isPinned(item.name) ? "Unpin item" : "Pin item"
-                          }
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="12"
-                            height="12"
-                            viewBox="0 0 24 24"
-                            fill={isPinned(item.name) ? "currentColor" : "none"}
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <line x1="12" y1="17" x2="12" y2="22"></line>
-                            <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path>
-                          </svg>
-                        </button>
+                        <PinButton item={item} size="sm" />
                       </div>
                     </div>
                   ))}
@@ -585,30 +552,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                   <h4 className="font-bold text-sm text-default">
                     {activeItem.name}
                   </h4>
-                  <button
-                    onClick={(e) => handlePinToggle(e, activeItem)}
-                    className={`text-xs flex items-center gap-1 transition-colors px-2 py-1 rounded-md ${
-                      isPinned(activeItem.name)
-                        ? "bg-accent/10 text-accent hover:bg-accent/20"
-                        : "bg-bg-alt text-muted hover:text-default"
-                    }`}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill={isPinned(activeItem.name) ? "currentColor" : "none"}
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <line x1="12" y1="17" x2="12" y2="22"></line>
-                      <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path>
-                    </svg>
-                    {isPinned(activeItem.name) ? "Saved" : "Save"}
-                  </button>
+                  <PinButton item={activeItem} size="md" />
                 </div>
 
                 <div className="space-y-4 text-xs">
