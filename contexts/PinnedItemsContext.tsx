@@ -16,6 +16,12 @@ const PinnedItemsContext = createContext<PinnedItemsContextType | undefined>(und
 // Client-side cache TTL - 30 seconds
 const CACHE_TTL = 30000;
 
+// Extract CSRF token from cookie
+function getCsrfToken(): string | null {
+  const match = document.cookie.match(/(?:^|;\s*)csrf-token=([^;]*)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
 export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [pinnedItems, setPinnedItems] = useState<PoetryItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -109,11 +115,18 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
       if (import.meta.env.DEV) {
         console.log('Attempting to pin item:', { name: item.name, type: item.type });
       }
+      
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      const csrfToken = getCsrfToken();
+      if (csrfToken) {
+        headers['x-csrf-token'] = csrfToken;
+      }
+      
       const response = await fetch('/api/pinned-items', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         credentials: 'include',
         body: JSON.stringify({ itemData: item }),
       });
@@ -173,8 +186,16 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
       if (import.meta.env.DEV) {
         console.log('Attempting to unpin item:', itemName);
       }
+      
+      const headers: Record<string, string> = {};
+      const csrfToken = getCsrfToken();
+      if (csrfToken) {
+        headers['x-csrf-token'] = csrfToken;
+      }
+      
       const response = await fetch(`/api/pinned-items/${encodeURIComponent(itemName)}`, {
         method: 'DELETE',
+        headers,
         credentials: 'include',
       });
 
