@@ -37,7 +37,7 @@ export const Header: React.FC = () => {
               Sancho.ref
             </Link>
             <nav className="flex gap-4 sm:gap-6">
-              <Link to="/about" className="text-sm text-muted hover:text-default hover:underline underline-offset-4 transition-all leading-none interactive-base">
+              <Link to="/about" className="text-sm text-muted hover:text-accent hover:underline underline-offset-4 transition-all leading-none interactive-base">
                 About
               </Link>
             </nav>
@@ -48,7 +48,7 @@ export const Header: React.FC = () => {
                 onClick={() => setIsNotebookOpen(true)}
                 onMouseEnter={() => setIsNotebookHovered(true)}
                 onMouseLeave={() => setIsNotebookHovered(false)}
-                className={`flex items-center justify-center p-1.5 sm:p-2 rounded-full text-muted transition-all duration-200 interactive-base interactive-scale ${mode === 'dark' ? 'hover:bg-accent/10 hover:text-white' : 'hover:bg-accent/10 hover:text-default'
+                className={`flex items-center justify-center p-1.5 sm:p-2 rounded-full text-muted transition-all duration-200 interactive-base interactive-scale ${mode === 'dark' ? 'hover:bg-accent/10 hover:text-white' : 'hover:bg-accent/10 hover:text-accent'
                   }`}
                 aria-label="Open Notebook"
                 title="Notebook"
