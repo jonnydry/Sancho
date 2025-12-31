@@ -32,14 +32,9 @@ export const FloatingFooter: React.FC = () => {
           </Link>
         </nav>
         <div className="flex items-center gap-2 sm:gap-4">
-          <a 
-            href="https://x.ai" 
-            className="text-xs text-muted/60 hover:text-muted transition-colors hidden sm:inline"
-            target="_blank" 
-            rel="noopener noreferrer"
-          >
+          <span className="text-xs text-muted/60 hidden sm:inline">
             Powered by Replit and xAI Grok models
-          </a>
+          </span>
           <span className="text-xs text-muted/60">
             © {new Date().getFullYear()}
           </span>
