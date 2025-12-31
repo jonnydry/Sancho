@@ -225,6 +225,8 @@ export const JournalEditor: React.FC = () => {
   const [showSaveError, setShowSaveError] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportStatus, setExportStatus] = useState<{ success: boolean; message: string; link?: string } | null>(null);
   const [pendingEntrySwitch, setPendingEntrySwitch] =
     useState<JournalEntry | null>(null);
   const [autosaveError, setAutosaveError] = useState<string | null>(null);
@@ -896,6 +898,40 @@ export const JournalEditor: React.FC = () => {
     setShowDeleteConfirm(false);
     await deleteEntry(selectedId);
   }, [selectedId, deleteEntry]);
+
+  const handleExportToGoogleDrive = useCallback(async () => {
+    if (!selectedId || isExporting) return;
+    
+    setIsExporting(true);
+    setExportStatus(null);
+    
+    try {
+      const result = await JournalStorage.exportToGoogleDrive(selectedId);
+      
+      if (result.success) {
+        setExportStatus({
+          success: true,
+          message: `Exported "${result.fileName}" to Google Drive`,
+          link: result.webViewLink,
+        });
+      } else {
+        setExportStatus({
+          success: false,
+          message: result.error || 'Failed to export to Google Drive',
+        });
+      }
+      
+      setTimeout(() => setExportStatus(null), 5000);
+    } catch (error) {
+      setExportStatus({
+        success: false,
+        message: 'Failed to export to Google Drive',
+      });
+      setTimeout(() => setExportStatus(null), 5000);
+    } finally {
+      setIsExporting(false);
+    }
+  }, [selectedId, isExporting]);
 
   const handleTextareaBlur = useCallback(() => {
     if (textareaRef.current) {
@@ -1750,6 +1786,26 @@ export const JournalEditor: React.FC = () => {
                   <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
               </button>
+              {isAuthenticated && (
+                <button
+                  onClick={handleExportToGoogleDrive}
+                  disabled={isExporting}
+                  className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-blue-500 hover:bg-blue-500/15 hover:shadow-[0_0_10px_rgba(59,130,246,0.3)] disabled:opacity-50 disabled:hover:text-muted disabled:hover:bg-transparent disabled:hover:shadow-none interactive-base interactive-scale"
+                  title="Export to Google Drive"
+                >
+                  {isExporting ? (
+                    <svg className="animate-spin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="17 8 12 3 7 8"/>
+                      <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                  )}
+                </button>
+              )}
               <button
                 onClick={() => setShowDeleteConfirm(true)}
                 className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-red-500 hover:bg-red-500/15 hover:shadow-[0_0_10px_rgba(239,68,68,0.3)] interactive-base interactive-scale"
@@ -1824,6 +1880,50 @@ export const JournalEditor: React.FC = () => {
                   className="px-3 py-1 text-xs font-medium rounded-md bg-accent hover:bg-accent-hover text-accent-text hover:shadow-sm transition-all duration-200 disabled:opacity-50 interactive-base interactive-scale"
                 >
                   {isSaving ? "Saving..." : "Save Now"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {exportStatus && (
+            <div className={`px-4 py-2 flex items-center justify-between text-sm border-b ${
+              exportStatus.success
+                ? "bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400"
+                : "bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-900/30 text-red-700 dark:text-red-400"
+            }`}>
+              <div className="flex items-center gap-2">
+                {exportStatus.success ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="15" y1="9" x2="9" y2="15"/>
+                    <line x1="9" y1="9" x2="15" y2="15"/>
+                  </svg>
+                )}
+                <span className="font-medium">{exportStatus.message}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                {exportStatus.link && (
+                  <a
+                    href={exportStatus.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1 text-xs font-medium rounded-md bg-green-100 dark:bg-green-900/20 hover:bg-green-200 dark:hover:bg-green-900/30 hover:shadow-sm transition-all duration-200 interactive-base interactive-scale"
+                  >
+                    Open in Drive
+                  </a>
+                )}
+                <button
+                  onClick={() => setExportStatus(null)}
+                  className="p-1 rounded-md hover:bg-default/10 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
                 </button>
               </div>
             </div>

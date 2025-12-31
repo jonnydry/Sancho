@@ -29,7 +29,8 @@ The project utilizes a dual-server architecture with a React frontend (Vite) and
 - **Database**: PostgreSQL managed with Drizzle ORM for user and session data, including journal entries.
 - **Performance**: Optimized build, rate limiting on API endpoints, client-side quote caching, and aggressive model selection.
 - **Error Handling**: React Error Boundary for graceful fallback UI and improved error messages for authentication.
-- **Notebook Feature**: Allows users to save journal entries, synchronized to the server with offline fallback. Shows a warning banner when not logged in, with "Local Only" status indicator and detailed console logging for debugging.
+- **Notebook Feature**: Allows users to save journal entries, synchronized to the server with offline fallback. Shows a warning banner when not logged in, with "Local Only" status indicator and detailed console logging for debugging. Includes Google Drive export feature to save individual notes as markdown files.
+- **Google Drive Export**: Users can export individual notes to their Google Drive as markdown files. Uses Replit's Google Drive connector for OAuth authentication. Files include title, creation date, tags, and content in formatted markdown.
 - **Bottom Panel**: IDE-style collapsible panel in journal view that appears when a poetry item is selected. Contains tabbed sections for Historical Context (AI-powered), AI Example generation, and Links (tags, see also, Grokipedia). Tags are clickable and open the Reference pane with search pre-filled. Panel is resizable (150-500px height range).
 
 **System Design Choices:**

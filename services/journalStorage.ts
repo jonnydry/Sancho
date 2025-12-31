@@ -250,4 +250,21 @@ export const JournalStorage = {
   clearMigrationFlag: (): void => {
     localStorage.removeItem(MIGRATION_FLAG_KEY);
   },
+
+  exportToGoogleDrive: async (id: string): Promise<{ success: boolean; fileName?: string; webViewLink?: string; error?: string }> => {
+    try {
+      const data = await fetchWithAuth(`/api/journal/${id}/export-drive`, {
+        method: 'POST',
+      });
+      return {
+        success: true,
+        fileName: data.fileName,
+        webViewLink: data.webViewLink,
+      };
+    } catch (error: unknown) {
+      if (isDev) console.error('Error exporting to Google Drive:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to export to Google Drive';
+      return { success: false, error: errorMessage };
+    }
+  },
 };

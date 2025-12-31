@@ -9,6 +9,7 @@ import { setupAuth, isAuthenticated, getFrontendOrigin } from './server/replitAu
 import { storage } from './server/storage.js';
 import { pool } from './server/db.js';
 import { logger } from './utils/logger.js';
+import { exportNoteToGoogleDrive } from './server/googleDrive.js';
 
 // In-memory rate limiter
 // NOTE: In Autoscale deployments, each instance maintains its own rate limit store.
@@ -658,6 +659,40 @@ app.post('/api/journal/migrate', csrfProtection, isAuthenticated, async (req, re
   } catch (error) {
     logger.error("Error migrating journal entries", error);
     res.status(500).json({ error: "Failed to migrate journal entries" });
+  }
+});
+
+app.post('/api/journal/:id/export-drive', csrfProtection, isAuthenticated, rateLimit(10, 60000), async (req, res) => {
+  try {
+    const userId = req.user.claims.sub;
+    const { id } = req.params;
+
+    const entry = await storage.getJournalEntry(userId, id);
+    
+    if (!entry) {
+      return res.status(404).json({ error: "Entry not found" });
+    }
+
+    const result = await exportNoteToGoogleDrive(
+      entry.title,
+      entry.content,
+      entry.tags || [],
+      entry.createdAt
+    );
+
+    if (!result.success) {
+      return res.status(400).json({ error: result.error });
+    }
+
+    res.json({
+      success: true,
+      fileId: result.fileId,
+      fileName: result.fileName,
+      webViewLink: result.webViewLink,
+    });
+  } catch (error) {
+    logger.error("Error exporting journal entry to Google Drive", error);
+    res.status(500).json({ error: "Failed to export to Google Drive" });
   }
 });
 
