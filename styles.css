@@ -484,6 +484,16 @@ body::-webkit-scrollbar-corner,
   box-shadow: none !important;
 }
 
+/* Muted text hover to accent color */
+.interactive-muted {
+  color: rgb(var(--app-text-muted));
+  transition: color 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.interactive-muted:hover:not(:disabled) {
+  color: rgb(var(--app-accent)) !important;
+}
+
 /* Tag Highlight in Content */
 .tag-highlight {
   color: rgb(var(--app-accent));

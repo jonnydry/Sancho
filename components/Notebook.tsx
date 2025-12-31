@@ -178,7 +178,7 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
                 className={`px-2.5 py-0.5 text-xs font-medium rounded leading-none transition-all duration-200 interactive-base interactive-scale ${
                   activeTab === 'saved' 
                     ? 'bg-accent text-accent-text shadow-sm' 
-                    : 'text-muted hover:text-[rgb(var(--app-accent))] hover:bg-accent/15 hover:shadow-sm'
+                    : 'text-muted interactive-muted hover:bg-accent/15 hover:shadow-sm'
                 }`}
               >
                 Saved Items
@@ -193,7 +193,7 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
                 className={`px-2.5 py-0.5 text-xs font-medium rounded leading-none transition-all duration-200 interactive-base interactive-scale ${
                   activeTab === 'journal' 
                     ? 'bg-accent text-accent-text shadow-sm' 
-                    : 'text-muted hover:text-[rgb(var(--app-accent))] hover:bg-accent/15 hover:shadow-sm'
+                    : 'text-muted interactive-muted hover:bg-accent/15 hover:shadow-sm'
                 }`}
               >
                 Journal
@@ -203,7 +203,7 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
           
           <button
             onClick={onClose}
-            className="text-muted hover:text-[rgb(var(--app-accent))] hover:bg-bg-alt/50 rounded-md p-1 transition-all duration-200 interactive-base interactive-scale"
+            className="text-muted interactive-muted hover:bg-bg-alt/50 rounded-md p-1 transition-all duration-200 interactive-base interactive-scale"
             aria-label="Close Notebook"
           >
             <XIcon className="w-5 h-5" />

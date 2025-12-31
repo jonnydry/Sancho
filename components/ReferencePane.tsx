@@ -273,7 +273,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
         <h3 className="text-sm font-bold text-default">Reference</h3>
         <button
           onClick={onClose}
-          className="text-muted hover:text-[rgb(var(--app-accent))] hover:bg-bg-alt/50 rounded p-1 transition-all duration-200 interactive-base interactive-scale"
+          className="text-muted interactive-muted hover:bg-bg-alt/50 rounded p-1 transition-all duration-200 interactive-base interactive-scale"
           aria-label="Close reference pane"
         >
           <XIcon className="w-4 h-4" />
@@ -287,7 +287,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
           className={`flex-1 py-2 text-xs font-medium transition-all duration-200 relative interactive-base ${
             activeTab === "saved"
               ? "text-default font-bold"
-              : "text-muted hover:text-[rgb(var(--app-accent))] hover:bg-bg-alt/30"
+              : "text-muted interactive-muted hover:bg-bg-alt/30"
           }`}
         >
           Saved
@@ -300,7 +300,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
           className={`flex-1 py-2 text-xs font-medium transition-all duration-200 relative interactive-base ${
             activeTab === "search"
               ? "text-default font-bold"
-              : "text-muted hover:text-[rgb(var(--app-accent))] hover:bg-bg-alt/30"
+              : "text-muted interactive-muted hover:bg-bg-alt/30"
           }`}
         >
           Search
@@ -329,7 +329,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                     className={`w-full text-left p-2 rounded-md border text-xs transition-all duration-200 interactive-base interactive-scale ${
                       selectedTemplate === item.name
                         ? "bg-accent/10 border-accent text-default shadow-sm"
-                        : "bg-bg border-default/50 text-muted hover:border-default hover:text-[rgb(var(--app-accent))] hover:bg-bg-alt/50 hover:shadow-sm"
+                        : "bg-bg border-default/50 text-muted interactive-muted hover:border-default hover:bg-bg-alt/50 hover:shadow-sm"
                     }`}
                   >
                     <div className="flex justify-between items-center">
@@ -377,7 +377,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                       className={`group w-full text-left p-2 rounded-md border text-xs transition-all duration-200 cursor-pointer relative interactive-base interactive-lift ${
                         selectedTemplate === item.name
                           ? "bg-accent/10 border-accent text-default shadow-sm"
-                          : "bg-bg border-default/30 text-muted hover:border-default hover:text-[rgb(var(--app-accent))] hover:bg-bg-alt/50 hover:shadow-sm"
+                          : "bg-bg border-default/30 text-muted interactive-muted hover:border-default hover:bg-bg-alt/50 hover:shadow-sm"
                       }`}
                     >
                       <div className="flex justify-between items-start">
@@ -438,7 +438,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                           <button
                             key={item.name}
                             onClick={() => onSelectTemplate(item.name)}
-                            className="w-full text-left px-3 py-1.5 text-xs text-muted hover:text-[rgb(var(--app-accent))] hover:bg-accent/10 transition-all duration-200 truncate interactive-base"
+                            className="w-full text-left px-3 py-1.5 text-xs text-muted interactive-muted hover:bg-accent/10 transition-all duration-200 truncate interactive-base"
                           >
                             {item.name}
                           </button>
@@ -528,7 +528,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                           <button
                             key={item.name}
                             onClick={() => onSelectTemplate(item.name)}
-                            className="w-full text-left px-3 py-1.5 text-xs text-muted hover:text-[rgb(var(--app-accent))] hover:bg-accent/10 transition-all duration-200 truncate interactive-base"
+                            className="w-full text-left px-3 py-1.5 text-xs text-muted interactive-muted hover:bg-accent/10 transition-all duration-200 truncate interactive-base"
                           >
                             {item.name}
                           </button>

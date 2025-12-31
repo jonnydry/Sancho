@@ -632,7 +632,7 @@ const JournalEntryListComponent: React.FC<JournalEntryListProps> = ({
           </div>
           <button
             onClick={onCreate}
-            className="p-1.5 rounded-full text-muted hover:bg-accent/10 hover:text-[rgb(var(--app-accent))] hover:shadow-sm transition-all duration-200 interactive-base interactive-scale"
+            className="p-1.5 rounded-full text-muted interactive-muted hover:bg-accent/10 hover:shadow-sm transition-all duration-200 interactive-base interactive-scale"
             title="New Entry"
             aria-label="Create new journal entry"
           >
@@ -666,7 +666,7 @@ const JournalEntryListComponent: React.FC<JournalEntryListProps> = ({
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
-              className="absolute right-2 top-2 sm:top-1.5 text-muted hover:text-[rgb(var(--app-accent))] hover:bg-bg-alt/50 rounded p-0.5 transition-all duration-200 interactive-base interactive-scale"
+              className="absolute right-2 top-2 sm:top-1.5 text-muted interactive-muted hover:bg-bg-alt/50 rounded p-0.5 transition-all duration-200 interactive-base interactive-scale"
             >
               <XIcon className="w-3 h-3" />
             </button>
@@ -680,7 +680,7 @@ const JournalEntryListComponent: React.FC<JournalEntryListProps> = ({
             className={`flex-1 px-2 py-1 text-xs font-medium rounded transition-all duration-200 interactive-base ${
               viewMode === "all"
                 ? "bg-accent/15 text-accent shadow-sm"
-                : "text-muted hover:text-[rgb(var(--app-accent))] hover:bg-accent/10"
+                : "text-muted interactive-muted hover:bg-accent/10"
             }`}
           >
             All
@@ -690,7 +690,7 @@ const JournalEntryListComponent: React.FC<JournalEntryListProps> = ({
             className={`flex-1 px-2 py-1 text-xs font-medium rounded transition-all duration-200 interactive-base ${
               viewMode === "tags"
                 ? "bg-accent/15 text-accent shadow-sm"
-                : "text-muted hover:text-[rgb(var(--app-accent))] hover:bg-accent/10"
+                : "text-muted interactive-muted hover:bg-accent/10"
             }`}
           >
             By Tag
