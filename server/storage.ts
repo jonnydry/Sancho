@@ -1,14 +1,10 @@
 import { users, pinnedItems, journalEntries } from "../shared/schema.js";
 import { db } from "./db.js";
 import { eq, and, desc } from "drizzle-orm";
-import { InferSelectModel, InferInsertModel } from "drizzle-orm";
+import { InferSelectModel } from "drizzle-orm";
 
 type User = InferSelectModel<typeof users>;
-type UserInsert = InferInsertModel<typeof users>;
 type PinnedItem = InferSelectModel<typeof pinnedItems>;
-type PinnedItemInsert = InferInsertModel<typeof pinnedItems>;
-type JournalEntry = InferSelectModel<typeof journalEntries>;
-type JournalEntryInsert = InferInsertModel<typeof journalEntries>;
 
 // Simple in-memory cache with TTL for frequently accessed data
 interface CacheEntry<T> {
@@ -43,7 +39,7 @@ class SimpleCache<T = any> {
     if (this.cache.size >= this.maxSize) {
       // Remove oldest entry (simple FIFO)
       const firstKey = this.cache.keys().next().value;
-      this.cache.delete(firstKey);
+      if (firstKey) this.cache.delete(firstKey);
     }
     
     this.cache.set(key, {
@@ -78,33 +74,37 @@ const pinnedItemsCache = new SimpleCache<PinnedItem[]>();
 const USER_CACHE_TTL = 10 * 1000; // 10 seconds
 const PINNED_ITEMS_CACHE_TTL = 5 * 1000; // 5 seconds
 
-// Cache TTLs
-const USER_CACHE_TTL = 10 * 1000; // 10 seconds
-const PINNED_ITEMS_CACHE_TTL = 5 * 1000; // 5 seconds
+// Custom database error interface
+interface DatabaseError extends Error {
+  code?: string;
+  cause?: unknown;
+}
 
-// Helper function to handle database errors
-function handleDatabaseError(error, operation) {
+// Helper function to handle database errors - always throws
+function handleDatabaseError(error: unknown, operation: string): never {
   console.error(`Database error in ${operation}:`, error);
 
+  const err = error as { code?: string; message?: string; stack?: string };
+
   // Connection errors
-  if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
-    const dbError = new Error('Database connection failed');
+  if (err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT') {
+    const dbError: DatabaseError = new Error('Database connection failed');
     dbError.code = 'DB_CONNECTION_ERROR';
-    dbError.cause = error; // ES2022 Error.cause for stack trace preservation
-    dbError.stack = error.stack; // Preserve original stack
+    dbError.cause = error;
+    if (err.stack) dbError.stack = err.stack;
     throw dbError;
   }
 
   // Query timeout
-  if (error.code === 'ETIMEDOUT' || error.message?.includes('timeout')) {
-    const dbError = new Error('Database query timeout');
+  if (err.code === 'ETIMEDOUT' || err.message?.includes('timeout')) {
+    const dbError: DatabaseError = new Error('Database query timeout');
     dbError.code = 'DB_TIMEOUT';
-    dbError.cause = error; // ES2022 Error.cause for stack trace preservation
-    dbError.stack = error.stack; // Preserve original stack
+    dbError.cause = error;
+    if (err.stack) dbError.stack = err.stack;
     throw dbError;
   }
 
-  // Re-throw with original error for other cases (stack preserved automatically)
+  // Re-throw with original error for other cases
   throw error;
 }
 
@@ -167,21 +167,14 @@ export class DatabaseStorage {
     }
 
     try {
-      let query = db
+      // Build query with pagination applied directly to avoid TypeScript chaining issues
+      const items = await db
         .select()
         .from(pinnedItems)
         .where(eq(pinnedItems.userId, userId))
-        .orderBy(desc(pinnedItems.createdAt));
-
-      // Add pagination
-      if (limit) {
-        query = query.limit(limit);
-      }
-      if (offset) {
-        query = query.offset(offset);
-      }
-
-      const items = await query;
+        .orderBy(desc(pinnedItems.createdAt))
+        .limit(limit)
+        .offset(offset);
       const processedItems = items.map(item => ({
         ...item,
         itemData: typeof item.itemData === 'string' ? JSON.parse(item.itemData) : item.itemData,
@@ -227,7 +220,8 @@ export class DatabaseStorage {
       };
     } catch (error) {
       // Handle unique constraint violations (item already exists)
-      if (error?.code === '23505') {
+      const dbErr = error as { code?: string };
+      if (dbErr?.code === '23505') {
         // Race condition: item was pinned between check and insert
         const existingItem = await this.getPinnedItem(userId, itemData.name);
         if (existingItem) {
@@ -241,7 +235,7 @@ export class DatabaseStorage {
     }
   }
 
-  async getPinnedItem(userId, itemName) {
+  async getPinnedItem(userId: string, itemName: string): Promise<PinnedItem | null> {
     try {
       const [item] = await db
         .select()
@@ -284,7 +278,7 @@ export class DatabaseStorage {
     }
   }
 
-  async isItemPinned(userId, itemName) {
+  async isItemPinned(userId: string, itemName: string): Promise<boolean> {
     try {
       const [item] = await db
         .select()
@@ -330,32 +324,19 @@ export class DatabaseStorage {
   }
 
   // Journal entries operations
-  async getJournalEntries(userId, options = {}) {
+  async getJournalEntries(userId: string, options: { limit?: number; offset?: number; orderBy?: string; order?: string } = {}) {
     const { limit = 100, offset = 0, orderBy = 'createdAt', order = 'desc' } = options;
 
     try {
-      let query = db
+      // Build query with all options applied directly to avoid TypeScript chaining issues
+      const orderColumn = orderBy === 'updatedAt' ? journalEntries.updatedAt : journalEntries.createdAt;
+      const entries = await db
         .select()
         .from(journalEntries)
-        .where(eq(journalEntries.userId, userId));
-
-      // Add ordering
-      const orderColumn = orderBy === 'updatedAt' ? journalEntries.updatedAt : journalEntries.createdAt;
-      if (order === 'asc') {
-        query = query.orderBy(orderColumn);
-      } else {
-        query = query.orderBy(desc(orderColumn));
-      }
-
-      // Add pagination
-      if (limit) {
-        query = query.limit(limit);
-      }
-      if (offset) {
-        query = query.offset(offset);
-      }
-
-      const entries = await query;
+        .where(eq(journalEntries.userId, userId))
+        .orderBy(order === 'asc' ? orderColumn : desc(orderColumn))
+        .limit(limit)
+        .offset(offset);
       return entries.map(entry => ({
         id: entry.id,
         title: entry.title || '',
@@ -371,7 +352,7 @@ export class DatabaseStorage {
     }
   }
 
-  async getJournalEntry(userId, entryId) {
+  async getJournalEntry(userId: string, entryId: string) {
     try {
       const [entry] = await db
         .select()
@@ -399,7 +380,7 @@ export class DatabaseStorage {
     }
   }
 
-  async createJournalEntry(userId, entryData) {
+  async createJournalEntry(userId: string, entryData: { id: string; title?: string; content?: string; templateRef?: string; tags?: string[]; isStarred?: boolean }) {
     try {
       const [entry] = await db
         .insert(journalEntries)
@@ -431,7 +412,7 @@ export class DatabaseStorage {
     }
   }
 
-  async updateJournalEntry(userId, entryId, updates) {
+  async updateJournalEntry(userId: string, entryId: string, updates: { title?: string; content?: string; templateRef?: string; tags?: string[]; isStarred?: boolean }) {
     try {
       const [entry] = await db
         .update(journalEntries)
@@ -466,7 +447,7 @@ export class DatabaseStorage {
     }
   }
 
-  async deleteJournalEntry(userId, entryId) {
+  async deleteJournalEntry(userId: string, entryId: string) {
     try {
       const [deleted] = await db
         .delete(journalEntries)
@@ -482,11 +463,11 @@ export class DatabaseStorage {
     }
   }
 
-  async bulkCreateJournalEntries(userId, entries) {
+  async bulkCreateJournalEntries(userId: string, entries: Array<{ id: string; title?: string; content?: string; templateRef?: string; tags?: string[]; isStarred?: boolean; createdAt?: number; updatedAt?: number }>) {
     try {
       if (!entries || entries.length === 0) return [];
       
-      const values = entries.map(e => ({
+      const values = entries.map((e) => ({
         id: e.id,
         userId,
         title: e.title || '',
