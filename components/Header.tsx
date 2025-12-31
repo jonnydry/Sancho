@@ -5,6 +5,7 @@ import { FontControls } from './FontControls';
 import { useAuth } from '../hooks/useAuth.js';
 import { BookPenIcon } from './icons/BookPenIcon';
 import { useTheme } from '../hooks/useTheme';
+import { UpgradePrompt } from './UpgradePrompt';
 
 const notebookImport = () => import('./Notebook').then(module => ({ default: module.Notebook }));
 const Notebook = lazy(notebookImport);
@@ -21,6 +22,7 @@ export const Header: React.FC = () => {
   const { mode } = useTheme();
   const [isNotebookOpen, setIsNotebookOpen] = useState(false);
   const [isNotebookHovered, setIsNotebookHovered] = useState(false);
+  const [isUpgradeOpen, setIsUpgradeOpen] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -75,12 +77,20 @@ export const Header: React.FC = () => {
                   </span>
                 </a>
               ) : (
-                <a
-                  href="/api/login"
-                  className="text-xs font-medium text-default interactive-muted hover:underline underline-offset-4 transition-all interactive-base"
-                >
-                  Login
-                </a>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setIsUpgradeOpen(true)}
+                    className="text-[10px] sm:text-xs font-medium text-accent bg-accent/10 hover:bg-accent/20 px-2 py-0.5 rounded-full transition-all interactive-base interactive-scale"
+                  >
+                    Upgrade
+                  </button>
+                  <a
+                    href="/api/login"
+                    className="text-xs font-medium text-default interactive-muted hover:underline underline-offset-4 transition-all interactive-base"
+                  >
+                    Login
+                  </a>
+                </div>
               )}
             </div>
           </div>
@@ -89,6 +99,7 @@ export const Header: React.FC = () => {
       <Suspense fallback={<NotebookFallback />}>
         <Notebook isOpen={isNotebookOpen} onClose={() => setIsNotebookOpen(false)} />
       </Suspense>
+      <UpgradePrompt isOpen={isUpgradeOpen} onClose={() => setIsUpgradeOpen(false)} />
     </>
   );
 };
