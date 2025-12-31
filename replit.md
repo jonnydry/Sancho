@@ -25,7 +25,7 @@ The project utilizes a dual-server architecture with a React frontend (Vite) and
 - **Backend**: Express.js for API handling and secure communication with XAI.
 - **Styling**: Tailwind CSS v4.
 - **Authentication**: Replit Auth (OpenID Connect) integrated with PostgreSQL session storage.
-- **AI Integration**: XAI Grok API for historical context generation and Sancho Panza quotes.
+- **AI Integration**: XAI Grok API for historical context generation (learn more) and Sancho Panza quotes. Note: AI poetry example generation was removed.
 - **Database**: PostgreSQL managed with Drizzle ORM for user and session data, including journal entries.
 - **Performance**: Optimized build, rate limiting on API endpoints, client-side quote caching, and aggressive model selection.
 - **Error Handling**: React Error Boundary for graceful fallback UI and improved error messages for authentication.

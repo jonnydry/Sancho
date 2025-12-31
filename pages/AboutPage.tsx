@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { PoeticFormsIcon } from '../components/icons/PoeticFormsIcon';
 import { PoeticMetersIcon } from '../components/icons/PoeticMetersIcon';
 import { LiteraryDevicesIcon } from '../components/icons/LiteraryDevicesIcon';
-import { AiExamplesIcon } from '../components/icons/AiExamplesIcon';
 import { ClassicSnippetsIcon } from '../components/icons/ClassicSnippetsIcon';
 import { PremiumThemesIcon } from '../components/icons/PremiumThemesIcon';
 
@@ -34,7 +33,7 @@ export const AboutPage: React.FC = () => {
                 Sancho is a comprehensive poetry education platform named after Sancho Panza, the faithful squire from Miguel de Cervantes' "Don Quixote". Just as Sancho loyally served Don Quixote on his adventures, this application serves as your faithful companion on your journey through the world of poetry.
               </p>
               <p>
-                Whether you're a student, teacher, writer, or poetry enthusiast, Sancho provides instant access to essential poetic knowledge with AI-powered examples, classic snippets, and a personal journal to capture your creative thoughts.
+                Whether you're a student, teacher, writer, or poetry enthusiast, Sancho provides instant access to essential poetic knowledge with classic snippets, AI-powered historical context, and a personal journal to capture your creative thoughts.
               </p>
             </div>
           </section>
@@ -86,22 +85,13 @@ export const AboutPage: React.FC = () => {
             <div className="grid md:grid-cols-2 gap-5 sm:gap-8">
               <div className="group">
                 <h3 className="flex items-center gap-2 text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">
-                  <AiExamplesIcon className="w-5 h-5" />
-                  <span>AI-Powered Examples</span>
-                </h3>
-                <p className="text-muted text-sm leading-relaxed">
-                  Generate fresh poetry examples using XAI's Grok model. See any form, meter, or device brought to life with original compositions.
-                </p>
-              </div>
-              <div className="group">
-                <h3 className="flex items-center gap-2 text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                     <path d="M12 6.5c1.5-2 4-2.5 6-1s2.5 4 1 6l-7 8-7-8c-1.5-2-1-4.5 1-6s4.5-.5 6 1z" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                   <span>Historical Context</span>
                 </h3>
                 <p className="text-muted text-sm leading-relaxed">
-                  Select any reference item to explore its origins and evolution with AI-generated historical insights in the detail panel.
+                  Select any reference item to explore its origins and evolution with AI-generated historical insights.
                 </p>
               </div>
               <div className="group">
@@ -113,7 +103,7 @@ export const AboutPage: React.FC = () => {
                   <span>Detail Panel</span>
                 </h3>
                 <p className="text-muted text-sm leading-relaxed">
-                  Select a reference item to open a resizable bottom panel with AI examples, historical context, and related topics.
+                  Select a reference item to open a resizable bottom panel with historical context, related topics, and external links.
                 </p>
               </div>
               <div className="group">
@@ -125,6 +115,18 @@ export const AboutPage: React.FC = () => {
                 </h3>
                 <p className="text-muted text-sm leading-relaxed">
                   Clickable tags connect related concepts. Select a tag to instantly filter the reference library by that topic.
+                </p>
+              </div>
+              <div className="group">
+                <h3 className="flex items-center gap-2 text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M8 12h8M12 8v8" strokeLinecap="round"/>
+                    <circle cx="12" cy="12" r="10" />
+                  </svg>
+                  <span>Sancho Quotes</span>
+                </h3>
+                <p className="text-muted text-sm leading-relaxed">
+                  AI-generated quotes from Sancho Panza himself add a touch of literary humor throughout the experience.
                 </p>
               </div>
             </div>
@@ -204,7 +206,7 @@ export const AboutPage: React.FC = () => {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-accent">04.</span>
-                  <span>AI: XAI Grok API for examples and context</span>
+                  <span>AI: XAI Grok API for historical context and quotes</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-accent">05.</span>
@@ -226,7 +228,7 @@ export const AboutPage: React.FC = () => {
                 <strong className="text-default">Poetry Excerpts:</strong> Brief excerpts from poetry are used for educational purposes under fair use doctrine (17 U.S.C. § 107). Excerpts are used to demonstrate poetic forms, meters, and literary devices. Attribution is provided through contextual references (author names and work titles in examples). Works in the public domain are freely used.
               </p>
               <p>
-                <strong className="text-default">AI-Generated Content:</strong> Poetry examples generated by XAI's Grok models are created specifically for educational demonstration and are unique to each request. These examples illustrate poetic techniques and are not excerpts from existing works.
+                <strong className="text-default">AI-Generated Content:</strong> Historical context and Sancho Panza quotes are generated by XAI's Grok models specifically for educational purposes. This content provides background information and is unique to each request.
               </p>
               <p>
                 <strong className="text-default">Application:</strong> The Sancho application, including its user interface design, branding, database structure, and original educational content, is the intellectual property of its creators.

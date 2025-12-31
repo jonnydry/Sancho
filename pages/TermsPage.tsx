@@ -40,7 +40,7 @@ export const TermsPage: React.FC = () => {
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="w-1.5 h-1.5 bg-accent rounded-full mt-1.5 flex-shrink-0"></span>
-                      <span>Generate AI examples for education</span>
+                      <span>Explore AI-powered historical context</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="w-1.5 h-1.5 bg-accent rounded-full mt-1.5 flex-shrink-0"></span>
@@ -112,7 +112,7 @@ export const TermsPage: React.FC = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-accent">02.</span>
-                    <span>Generated examples may vary in historical accuracy</span>
+                    <span>Historical context may vary in accuracy</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-accent">03.</span>
@@ -130,7 +130,7 @@ export const TermsPage: React.FC = () => {
             </p>
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="p-4 border border-default/20 bg-bg-alt/20 rounded-sm flex items-center justify-between">
-                <span className="text-sm font-bold text-default">Poetry Examples</span>
+                <span className="text-sm font-bold text-default">Historical Context</span>
                 <span className="text-xs font-mono text-accent bg-accent/10 px-2 py-1 rounded">10 req/min</span>
               </div>
               <div className="p-4 border border-default/20 bg-bg-alt/20 rounded-sm flex items-center justify-between">
