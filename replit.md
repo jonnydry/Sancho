@@ -39,6 +39,7 @@ The project utilizes a dual-server architecture with a React frontend (Vite) and
 - **Rate Limiting**: Implemented for all AI and quote API endpoints.
 - **Multi-Page Navigation**: Utilizes React Router for client-side routing.
 - **Account Deletion**: Feature to delete user accounts and associated data.
+- **Support/Donations**: Support page at `/support` with Stripe integration for $1/month subscriptions and one-time donations. Includes success/cancel pages for payment flow feedback.
 
 ## External Dependencies
 
@@ -47,3 +48,4 @@ The project utilizes a dual-server architecture with a React frontend (Vite) and
 - **Replit Auth**: Authentication service for user login and management.
 - **Tailwind CSS v4**: Utility-first CSS framework for styling.
 - **React Router DOM v6**: For client-side routing and navigation.
+- **Stripe**: Payment processing for subscriptions and donations. Requires STRIPE_SECRET_KEY, STRIPE_SUBSCRIPTION_PRICE_ID, and STRIPE_WEBHOOK_SECRET environment variables.

@@ -13,6 +13,9 @@ import { HomePage } from './pages/HomePage';
 const AboutPage = lazy(() => import('./pages/AboutPage').then(module => ({ default: module.AboutPage })));
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage').then(module => ({ default: module.PrivacyPage })));
 const TermsPage = lazy(() => import('./pages/TermsPage').then(module => ({ default: module.TermsPage })));
+const SupportPage = lazy(() => import('./pages/SupportPage').then(module => ({ default: module.SupportPage })));
+const SupportSuccessPage = lazy(() => import('./pages/SupportSuccessPage').then(module => ({ default: module.SupportSuccessPage })));
+const SupportCancelPage = lazy(() => import('./pages/SupportCancelPage').then(module => ({ default: module.SupportCancelPage })));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage').then(module => ({ default: module.NotFoundPage })));
 
 // Loading fallback component
@@ -54,6 +57,9 @@ const App: React.FC = () => {
                             <Route path="/about" element={<AboutPage />} />
                             <Route path="/privacy" element={<PrivacyPage />} />
                             <Route path="/terms" element={<TermsPage />} />
+                            <Route path="/support" element={<SupportPage />} />
+                            <Route path="/support/success" element={<SupportSuccessPage />} />
+                            <Route path="/support/cancel" element={<SupportCancelPage />} />
                             <Route path="*" element={<NotFoundPage />} />
                           </Routes>
                         </Suspense>
@@ -65,6 +71,7 @@ const App: React.FC = () => {
                       </p>
                       <p className="text-muted text-xs">
                         <Link to="/about" className="hover:text-default transition-colors">About</Link> •
+                        <Link to="/support" className="hover:text-default transition-colors ml-2">Support</Link> •
                         <Link to="/privacy" className="hover:text-default transition-colors ml-2">Privacy</Link> •
                         <Link to="/terms" className="hover:text-default transition-colors ml-2">Terms</Link>
                       </p>

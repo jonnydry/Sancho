@@ -10,6 +10,7 @@ import { storage } from './server/storage.js';
 import { pool } from './server/db.js';
 import { logger } from './utils/logger.js';
 import { exportNoteToGoogleDrive } from './server/googleDrive.js';
+import { isStripeConfigured, createSubscriptionCheckout, createDonationCheckout, getSessionInfo, handleWebhookEvent } from './server/stripe.js';
 
 // In-memory rate limiter
 // NOTE: In Autoscale deployments, each instance maintains its own rate limit store.
@@ -176,6 +177,39 @@ app.use(cors(corsOptions));
 // Cookie parser for CSRF tokens
 app.use(cookieParser());
 
+// Stripe webhook endpoint - MUST be before express.json() to receive raw body
+// This is registered early because express.raw needs to parse the body before any JSON middleware
+app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  try {
+    const signature = req.headers['stripe-signature'] as string;
+    if (!signature) {
+      return res.status(400).json({ error: 'Missing signature' });
+    }
+
+    const event = await handleWebhookEvent(req.body, signature);
+    if (!event) {
+      return res.status(400).json({ error: 'Invalid webhook' });
+    }
+
+    // Log successful payment events
+    if (event.type === 'checkout.session.completed') {
+      logger.info('Payment completed', { 
+        sessionId: event.data.id,
+        mode: event.data.mode
+      });
+    } else if (event.type === 'customer.subscription.created') {
+      logger.info('New subscription created', {
+        subscriptionId: event.data.id
+      });
+    }
+
+    res.json({ received: true });
+  } catch (error: any) {
+    logger.error('Webhook error', error);
+    res.status(400).json({ error: 'Webhook processing failed' });
+  }
+});
+
 
 // CSRF Protection Middleware (Double-Submit Cookie Pattern)
 function generateCsrfToken() {
@@ -231,7 +265,13 @@ app.use(compression({
   threshold: 1024, // Only compress responses larger than 1KB
 }));
 
-app.use(express.json({ limit: '10mb' })); // Add payload size limit
+// Parse JSON for all routes except Stripe webhook (needs raw body)
+app.use((req, res, next) => {
+  if (req.path === '/api/stripe/webhook') {
+    return next();
+  }
+  express.json({ limit: '10mb' })(req, res, next);
+});
 
 // Caching headers middleware
 app.use((req, res, next) => {
@@ -308,8 +348,13 @@ function validateInput(req: Request, res: Response, next: NextFunction): void {
   next();
 }
 
-// Apply input validation to API routes
-app.use('/api', validateInput);
+// Apply input validation to API routes (skip Stripe webhook which needs raw body)
+app.use('/api', (req, res, next) => {
+  if (req.path === '/stripe/webhook') {
+    return next();
+  }
+  validateInput(req, res, next);
+});
 
 // Setup authentication (must be done before routes)
 await setupAuth(app);
@@ -726,6 +771,64 @@ app.delete('/api/auth/delete-account', csrfProtection, isAuthenticated, async (r
       error: "Failed to delete account. Please try again or contact support.",
       details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
     });
+  }
+});
+
+// Stripe checkout endpoint
+app.post('/api/stripe/create-checkout', csrfProtection, rateLimit(5, 60000), async (req, res) => {
+  try {
+    if (!isStripeConfigured()) {
+      return res.status(503).json({ 
+        error: 'Payment system is not configured yet. Please check back later.',
+        configured: false
+      });
+    }
+
+    const { type, amount } = req.body;
+    const origin = getFrontendOrigin();
+    
+    let result;
+    if (type === 'subscription') {
+      result = await createSubscriptionCheckout(
+        `${origin}/support/success?session_id={CHECKOUT_SESSION_ID}`,
+        `${origin}/support/cancel`
+      );
+    } else if (type === 'donation') {
+      if (!amount || amount < 100) {
+        return res.status(400).json({ error: 'Invalid donation amount. Minimum is $1.00.' });
+      }
+      result = await createDonationCheckout(
+        amount,
+        `${origin}/support/success?session_id={CHECKOUT_SESSION_ID}`,
+        `${origin}/support/cancel`
+      );
+    } else {
+      return res.status(400).json({ error: 'Invalid checkout type' });
+    }
+
+    res.json({ url: result.url, sessionId: result.sessionId });
+  } catch (error: any) {
+    logger.error('Error creating Stripe checkout', error);
+    res.status(500).json({ 
+      error: error.message || 'Failed to create checkout session'
+    });
+  }
+});
+
+// Get Stripe session info (for success page)
+app.get('/api/stripe/session/:sessionId', rateLimit(10, 60000), async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const info = await getSessionInfo(sessionId);
+    
+    if (!info) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+
+    res.json(info);
+  } catch (error: any) {
+    logger.error('Error retrieving Stripe session', error);
+    res.status(500).json({ error: 'Failed to retrieve session info' });
   }
 });
 
