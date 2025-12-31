@@ -23,7 +23,7 @@ export const FontControls: React.FC = () => {
             e.stopPropagation();
             setShowFontMenu(!showFontMenu);
           }}
-          className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-accent hover:bg-bg-alt interactive-base interactive-scale"
+          className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-[rgb(var(--app-accent))] hover:bg-bg-alt interactive-base interactive-scale"
           title="Font Face"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -57,7 +57,7 @@ export const FontControls: React.FC = () => {
       <button
         onClick={decreaseFontSize}
         disabled={fontSize <= 14}
-        className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-accent hover:bg-bg-alt disabled:opacity-30 disabled:cursor-not-allowed interactive-base interactive-scale interactive-disabled"
+        className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-[rgb(var(--app-accent))] hover:bg-bg-alt disabled:opacity-30 disabled:cursor-not-allowed interactive-base interactive-scale interactive-disabled"
         title={fontSize <= 14 ? "Minimum font size reached" : "Decrease Font Size"}
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -70,7 +70,7 @@ export const FontControls: React.FC = () => {
       <button
         onClick={increaseFontSize}
         disabled={fontSize >= 24}
-        className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-accent hover:bg-bg-alt disabled:opacity-30 disabled:cursor-not-allowed interactive-base interactive-scale interactive-disabled"
+        className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-[rgb(var(--app-accent))] hover:bg-bg-alt disabled:opacity-30 disabled:cursor-not-allowed interactive-base interactive-scale interactive-disabled"
         title={fontSize >= 24 ? "Maximum font size reached" : "Increase Font Size"}
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

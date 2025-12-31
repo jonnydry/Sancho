@@ -57,7 +57,7 @@ export const ThemeSwitcher: React.FC = () => {
       )}
       <button
         onClick={toggleMode}
-        className="p-1.5 sm:p-2 rounded-full text-muted hover:bg-accent/10 hover:text-accent transition-all duration-200 interactive-base interactive-scale"
+        className="p-1.5 sm:p-2 rounded-full text-muted hover:bg-accent/10 hover:text-[rgb(var(--app-accent))] transition-all duration-200 interactive-base interactive-scale"
         aria-label="Toggle dark mode"
       >
         {mode === 'light' ? <MoonIcon className="w-4 h-4 sm:w-5 sm:h-5" /> : <SunIcon className="w-4 h-4 sm:w-5 sm:h-5" />}

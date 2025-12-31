@@ -166,7 +166,7 @@ export const SanchoQuote: React.FC = () => {
         <button
           onClick={handleRefresh}
           disabled={isRefreshing || isLoading}
-          className="p-1.5 text-muted hover:text-accent transition-colors disabled:opacity-50"
+          className="p-1.5 text-muted hover:text-[rgb(var(--app-accent))] transition-colors disabled:opacity-50"
           title="New Wisdom"
           aria-label="Get a new quote"
         >

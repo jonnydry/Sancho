@@ -1377,7 +1377,7 @@ export const JournalEditor: React.FC = () => {
                 <>
                   <button
                     onClick={() => setShowSidebar(!showSidebar)}
-                    className={`p-1.5 rounded-md transition-all duration-200 interactive-base interactive-scale ${!showSidebar ? "bg-accent/10 text-accent shadow-sm" : "text-muted hover:text-accent hover:bg-bg-alt hover:shadow-sm"}`}
+                    className={`p-1.5 rounded-md transition-all duration-200 interactive-base interactive-scale ${!showSidebar ? "bg-accent/10 text-accent shadow-sm" : "text-muted hover:text-[rgb(var(--app-accent))] hover:bg-bg-alt hover:shadow-sm"}`}
                     title={
                       showSidebar ? "Hide Sidebar (Focus Mode)" : "Show Sidebar"
                     }
@@ -1427,7 +1427,7 @@ export const JournalEditor: React.FC = () => {
               ) : (
                 <button
                   onClick={() => setIsEditingGoal(true)}
-                  className="text-xs text-muted hover:text-accent hover:bg-accent/10 px-2 py-1 rounded-md transition-all duration-200 flex items-center gap-1 interactive-base interactive-scale"
+                  className="text-xs text-muted hover:text-[rgb(var(--app-accent))] hover:bg-accent/10 px-2 py-1 rounded-md transition-all duration-200 flex items-center gap-1 interactive-base interactive-scale"
                   title="Set a daily writing goal"
                 >
                   <svg
@@ -1516,7 +1516,7 @@ export const JournalEditor: React.FC = () => {
                 className={`p-1.5 rounded-md transition-all duration-200 interactive-base interactive-scale ${
                   isZenMode
                     ? "text-accent bg-accent/10 shadow-sm"
-                    : "text-muted hover:text-accent hover:bg-bg-alt hover:shadow-sm"
+                    : "text-muted hover:text-[rgb(var(--app-accent))] hover:bg-bg-alt hover:shadow-sm"
                 }`}
                 title={isZenMode ? "Exit Zen Mode (Esc)" : "Zen Mode (⌘⇧Z)"}
               >
@@ -1565,7 +1565,7 @@ export const JournalEditor: React.FC = () => {
                 className={`p-1.5 rounded-md transition-all duration-200 interactive-base interactive-scale ${
                   isPreviewMode
                     ? "text-accent bg-accent/10 shadow-sm"
-                    : "text-muted hover:text-accent hover:bg-bg-alt hover:shadow-sm"
+                    : "text-muted hover:text-[rgb(var(--app-accent))] hover:bg-bg-alt hover:shadow-sm"
                 }`}
                 title={isPreviewMode ? "Edit Mode (⌘⇧P)" : "Preview Mode (⌘⇧P)"}
               >
@@ -1605,7 +1605,7 @@ export const JournalEditor: React.FC = () => {
               {/* Download */}
               <button
                 onClick={handleDownload}
-                className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-accent hover:bg-bg-alt hover:shadow-sm interactive-base interactive-scale"
+                className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-[rgb(var(--app-accent))] hover:bg-bg-alt hover:shadow-sm interactive-base interactive-scale"
                 title="Download as Markdown"
               >
                 <svg
@@ -1634,7 +1634,7 @@ export const JournalEditor: React.FC = () => {
                     e.stopPropagation();
                     setShowFontMenu(!showFontMenu);
                   }}
-                  className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-accent hover:bg-bg-alt hover:shadow-sm interactive-base interactive-scale"
+                  className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-[rgb(var(--app-accent))] hover:bg-bg-alt hover:shadow-sm interactive-base interactive-scale"
                   title="Font Face"
                 >
                   <svg
@@ -1684,7 +1684,7 @@ export const JournalEditor: React.FC = () => {
               <button
                 onClick={decreaseFontSize}
                 disabled={fontSize <= 14}
-                className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-accent hover:bg-bg-alt hover:shadow-sm disabled:opacity-30 disabled:cursor-not-allowed interactive-base interactive-scale interactive-disabled"
+                className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-[rgb(var(--app-accent))] hover:bg-bg-alt hover:shadow-sm disabled:opacity-30 disabled:cursor-not-allowed interactive-base interactive-scale interactive-disabled"
                 title="Decrease Font Size"
               >
                 <svg
@@ -1709,7 +1709,7 @@ export const JournalEditor: React.FC = () => {
               <button
                 onClick={increaseFontSize}
                 disabled={fontSize >= 24}
-                className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-accent hover:bg-bg-alt hover:shadow-sm disabled:opacity-30 disabled:cursor-not-allowed interactive-base interactive-scale interactive-disabled"
+                className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-[rgb(var(--app-accent))] hover:bg-bg-alt hover:shadow-sm disabled:opacity-30 disabled:cursor-not-allowed interactive-base interactive-scale interactive-disabled"
                 title="Increase Font Size"
               >
                 <svg
@@ -1779,7 +1779,7 @@ export const JournalEditor: React.FC = () => {
                     className={`px-2 py-1 rounded-md text-xs font-medium transition-all duration-200 border interactive-base interactive-scale ${
                       showTemplate
                         ? "bg-accent text-accent-text border-accent hover:bg-accent-hover shadow-sm"
-                        : "bg-bg text-muted border-default/30 hover:text-accent hover:border-default hover:bg-bg-alt hover:shadow-sm"
+                        : "bg-bg text-muted border-default/30 hover:text-[rgb(var(--app-accent))] hover:border-default hover:bg-bg-alt hover:shadow-sm"
                     }`}
                     title="Toggle Reference Pane (⌘/)"
                   >
