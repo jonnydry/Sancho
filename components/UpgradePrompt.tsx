@@ -2,6 +2,10 @@ import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { XIcon } from './icons/XIcon';
 import { BookPenIcon } from './icons/BookPenIcon';
+import { InfinityIcon } from './icons/InfinityIcon';
+import { RefreshIcon } from './icons/RefreshIcon';
+import { CloudIcon } from './icons/CloudIcon';
+import { PenIcon } from './icons/PenIcon';
 
 interface UpgradePromptProps {
   isOpen: boolean;
@@ -34,10 +38,10 @@ export const UpgradePrompt: React.FC<UpgradePromptProps> = ({ isOpen, onClose })
   if (!isOpen) return null;
 
   const benefits = [
-    { icon: '📚', title: 'Unlimited Saves', desc: 'Save as many poetry items as you like' },
-    { icon: '📝', title: 'Journal Access', desc: 'Write and organize your poetry notes' },
-    { icon: '🔄', title: 'Sync Everywhere', desc: 'Access your notebook on any device' },
-    { icon: '☁️', title: 'Google Drive Export', desc: 'Back up notes to your Drive' },
+    { Icon: InfinityIcon, title: 'Unlimited Saves', desc: 'Save as many poetry items as you like' },
+    { Icon: PenIcon, title: 'Journal Access', desc: 'Write and organize your poetry notes' },
+    { Icon: RefreshIcon, title: 'Sync Everywhere', desc: 'Access your notebook on any device' },
+    { Icon: CloudIcon, title: 'Google Drive Export', desc: 'Back up notes to your Drive' },
   ];
 
   return (
@@ -77,7 +81,9 @@ export const UpgradePrompt: React.FC<UpgradePromptProps> = ({ isOpen, onClose })
         <div className="space-y-3 mb-6">
           {benefits.map((benefit) => (
             <div key={benefit.title} className="flex items-start gap-3 p-2.5 rounded-lg bg-bg-alt/30 border border-default/30">
-              <span className="text-lg">{benefit.icon}</span>
+              <div className="flex-shrink-0 w-5 h-5 text-accent">
+                <benefit.Icon className="w-5 h-5" />
+              </div>
               <div>
                 <p className="text-sm font-medium text-default">{benefit.title}</p>
                 <p className="text-xs text-muted">{benefit.desc}</p>
