@@ -4,97 +4,99 @@ import { LockIcon } from '../components/icons/LockIcon';
 import { CookieIcon } from '../components/icons/CookieIcon';
 import { KeyIcon } from '../components/icons/KeyIcon';
 import { ShieldIcon } from '../components/icons/ShieldIcon';
-import { HomeIcon } from '../components/icons/HomeIcon';
 
 export const PrivacyPage: React.FC = () => {
   return (
     <div className="min-h-screen py-8 sm:py-16 px-4 sm:px-6 animate-fade-in">
       <div className="max-w-3xl mx-auto">
-        <div className="mb-8 sm:mb-12 border-b border-default/20 pb-6 sm:pb-8">
+        <div className="text-center mb-12 sm:mb-16">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-6 rounded-full bg-bg-alt/50 border border-default/20 flex items-center justify-center">
+            <ShieldIcon className="w-10 h-10 sm:w-12 sm:h-12 text-accent" />
+          </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-default mb-2 tracking-tight">Privacy Policy</h1>
-          <p className="text-xs font-mono text-muted uppercase tracking-wider">Last Updated: November 22, 2025</p>
+          <p className="text-xs font-mono text-muted uppercase tracking-[0.2em]">Last Updated: November 22, 2025</p>
         </div>
 
-        <div className="space-y-8 sm:space-y-12 text-default/90">
-          <section>
-            <h2 className="text-lg font-bold text-default uppercase tracking-wider mb-4">Introduction</h2>
-            <p className="text-muted leading-relaxed">
+        <div className="space-y-8 sm:space-y-12">
+          <section className="border-l-2 border-default/20 pl-4 sm:pl-6">
+            <h2 className="text-lg sm:text-xl font-bold text-default mb-4 tracking-tight">Introduction</h2>
+            <p className="text-default/90 leading-relaxed">
               Sancho ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our poetry education platform.
             </p>
           </section>
 
           <section>
-            <h2 className="text-base sm:text-lg font-bold text-default uppercase tracking-wider mb-4">Information We Collect</h2>
-
-            <div className="grid md:grid-cols-2 gap-4 sm:gap-8">
-              <div className="bg-bg-alt/30 p-4 sm:p-6 border border-default/20 rounded-sm">
-                <h3 className="font-bold text-default mb-3 text-sm">Authentication Data</h3>
+            <h2 className="text-lg sm:text-xl font-bold text-default mb-6 sm:mb-8 tracking-tight border-b border-default/20 pb-2">Information We Collect</h2>
+            <div className="grid md:grid-cols-2 gap-5 sm:gap-8">
+              <div className="group bg-bg-alt/30 p-4 sm:p-6 border border-default/20 rounded-sm">
+                <h3 className="font-bold text-default mb-3 text-sm uppercase tracking-wider group-hover:text-accent transition-colors">Authentication Data</h3>
                 <p className="text-muted text-sm mb-3">When you log in with Replit Auth, we collect:</p>
-                <ul className="space-y-1 text-sm text-muted font-mono">
-                  <li className="flex items-center gap-2"><span className="w-1 h-1 bg-accent rounded-full"></span>Email address</li>
-                  <li className="flex items-center gap-2"><span className="w-1 h-1 bg-accent rounded-full"></span>First and last name</li>
-                  <li className="flex items-center gap-2"><span className="w-1 h-1 bg-accent rounded-full"></span>Profile image URL</li>
-                  <li className="flex items-center gap-2"><span className="w-1 h-1 bg-accent rounded-full"></span>Unique identifier</li>
+                <ul className="space-y-1.5 text-sm text-muted font-mono">
+                  <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-accent rounded-full"></span>Email address</li>
+                  <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-accent rounded-full"></span>First and last name</li>
+                  <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-accent rounded-full"></span>Profile image URL</li>
+                  <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-accent rounded-full"></span>Unique identifier</li>
                 </ul>
               </div>
 
-              <div className="bg-bg-alt/30 p-4 sm:p-6 border border-default/20 rounded-sm">
-                <h3 className="font-bold text-default mb-3 text-sm">Usage Data</h3>
+              <div className="group bg-bg-alt/30 p-4 sm:p-6 border border-default/20 rounded-sm">
+                <h3 className="font-bold text-default mb-3 text-sm uppercase tracking-wider group-hover:text-accent transition-colors">Usage Data</h3>
                 <p className="text-muted text-sm mb-3">Automatically collected during use:</p>
-                <ul className="space-y-1 text-sm text-muted font-mono">
-                  <li className="flex items-center gap-2"><span className="w-1 h-1 bg-accent rounded-full"></span>IP address (rate limiting)</li>
-                  <li className="flex items-center gap-2"><span className="w-1 h-1 bg-accent rounded-full"></span>Browser type & version</li>
-                  <li className="flex items-center gap-2"><span className="w-1 h-1 bg-accent rounded-full"></span>Pages visited</li>
-                  <li className="flex items-center gap-2"><span className="w-1 h-1 bg-accent rounded-full"></span>Search queries</li>
+                <ul className="space-y-1.5 text-sm text-muted font-mono">
+                  <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-accent rounded-full"></span>IP address (rate limiting)</li>
+                  <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-accent rounded-full"></span>Browser type & version</li>
+                  <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-accent rounded-full"></span>Pages visited</li>
+                  <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-accent rounded-full"></span>Search queries</li>
                 </ul>
               </div>
             </div>
           </section>
 
           <section>
-            <h2 className="text-base sm:text-lg font-bold text-default uppercase tracking-wider mb-4">Data Usage & Security</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-default mb-6 sm:mb-8 tracking-tight border-b border-default/20 pb-2">Data Usage & Security</h2>
             <div className="space-y-4">
-              <p className="text-muted leading-relaxed">
+              <p className="text-default/90 leading-relaxed">
                 We use collected information to provide services, manage sessions, grant premium access, and optimize the platform. Your data is protected through:
               </p>
               <ul className="grid sm:grid-cols-2 gap-3 text-sm text-muted">
-                <li className="flex items-center gap-2 p-2 border border-default/10 bg-bg-alt/20 rounded-sm">
-                  <LockIcon className="w-4 h-4 text-accent" />
+                <li className="flex items-center gap-3 p-3 border border-default/20 bg-bg-alt/20 rounded-sm group hover:border-accent/30 transition-colors">
+                  <LockIcon className="w-5 h-5 text-accent flex-shrink-0" />
                   <span>PostgreSQL Database Storage</span>
                 </li>
-                <li className="flex items-center gap-2 p-2 border border-default/10 bg-bg-alt/20 rounded-sm">
-                  <CookieIcon className="w-4 h-4 text-accent" />
+                <li className="flex items-center gap-3 p-3 border border-default/20 bg-bg-alt/20 rounded-sm group hover:border-accent/30 transition-colors">
+                  <CookieIcon className="w-5 h-5 text-accent flex-shrink-0" />
                   <span>Session Management</span>
                 </li>
-                <li className="flex items-center gap-2 p-2 border border-default/10 bg-bg-alt/20 rounded-sm">
-                  <KeyIcon className="w-4 h-4 text-accent" />
+                <li className="flex items-center gap-3 p-3 border border-default/20 bg-bg-alt/20 rounded-sm group hover:border-accent/30 transition-colors">
+                  <KeyIcon className="w-5 h-5 text-accent flex-shrink-0" />
                   <span>Replit Auth (OpenID Connect)</span>
                 </li>
-                <li className="flex items-center gap-2 p-2 border border-default/10 bg-bg-alt/20 rounded-sm">
-                  <ShieldIcon className="w-4 h-4 text-accent" />
+                <li className="flex items-center gap-3 p-3 border border-default/20 bg-bg-alt/20 rounded-sm group hover:border-accent/30 transition-colors">
+                  <ShieldIcon className="w-5 h-5 text-accent flex-shrink-0" />
                   <span>Secure Backend Proxy</span>
                 </li>
               </ul>
             </div>
           </section>
 
-          <section className="border-l-2 border-accent/30 pl-4 sm:pl-6">
-            <h2 className="text-base sm:text-lg font-bold text-default uppercase tracking-wider mb-4">Your Rights</h2>
-            <p className="text-muted mb-4 leading-relaxed">
-              You have the right to access your personal data, request account deletion, and update profile information. To exercise these rights, please contact us through the Replit platform.
-            </p>
-            <p className="text-xs text-muted/70 italic">
-              Note: Sancho does not knowingly collect information from children under 13.
-            </p>
+          <section className="bg-bg-alt/30 border border-default/20 p-5 sm:p-6 rounded-sm">
+            <h2 className="text-lg sm:text-xl font-bold text-default mb-4 tracking-tight">Your Rights</h2>
+            <div className="space-y-4 text-default/90 leading-relaxed">
+              <p>
+                You have the right to access your personal data, request account deletion, and update profile information. To exercise these rights, please contact us through the Replit platform.
+              </p>
+              <p className="text-xs text-muted/70 pt-2 border-t border-default/10 italic">
+                Note: Sancho does not knowingly collect information from children under 13.
+              </p>
+            </div>
           </section>
 
-          <div className="flex justify-center pt-8 sm:pt-12 border-t border-default/10">
+          <div className="text-center pt-8">
             <Link
               to="/"
-              className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 border border-default text-default text-sm font-semibold bg-[rgb(var(--app-bg-alt)/0.4)] backdrop-blur-sm hover:bg-[rgb(var(--app-bg-alt)/0.6)] hover:border-accent transition-all duration-300 uppercase tracking-wider rounded-lg"
+              className="inline-block px-6 sm:px-8 py-3 border border-default text-default text-sm font-semibold bg-[rgb(var(--app-bg-alt)/0.4)] backdrop-blur-sm hover:bg-[rgb(var(--app-bg-alt)/0.6)] hover:border-accent transition-all duration-300 uppercase tracking-wider rounded-lg"
             >
-              <HomeIcon className="w-4 h-4 flex-shrink-0" />
-              <span>Return Home</span>
+              Explore Poetry
             </Link>
           </div>
         </div>
