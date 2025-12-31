@@ -223,7 +223,7 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
       </div>
 
       {isOpen && (
-        <div className="flex-1 overflow-auto p-4 pb-16">
+        <div className="flex-1 overflow-auto p-4" style={{ paddingBottom: '64px' }}>
           {activeTab === "context" && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
