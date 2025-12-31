@@ -38,7 +38,7 @@ export const FloatingFooter: React.FC = () => {
             target="_blank" 
             rel="noopener noreferrer"
           >
-            Powered by Grok
+            Powered by Replit and xAI Grok models
           </a>
           <span className="text-xs text-muted/60">
             © {new Date().getFullYear()}
