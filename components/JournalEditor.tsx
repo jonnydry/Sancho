@@ -1377,7 +1377,7 @@ export const JournalEditor: React.FC = () => {
                 <>
                   <button
                     onClick={() => setShowSidebar(!showSidebar)}
-                    className={`p-1.5 rounded-md transition-colors ${!showSidebar ? "bg-accent/10 text-accent" : "text-muted hover:text-default hover:bg-bg-alt"}`}
+                    className={`p-1.5 rounded-md transition-all duration-200 interactive-base interactive-scale ${!showSidebar ? "bg-accent/10 text-accent shadow-sm" : "text-muted hover:text-default hover:bg-bg-alt hover:shadow-sm"}`}
                     title={
                       showSidebar ? "Hide Sidebar (Focus Mode)" : "Show Sidebar"
                     }
@@ -1403,7 +1403,7 @@ export const JournalEditor: React.FC = () => {
               <span className="h-4 w-px bg-default/20 mx-1"></span>
               {dailyGoal > 0 ? (
                 <div
-                  className="flex items-center gap-2 cursor-pointer group"
+                  className="flex items-center gap-2 cursor-pointer group hover:bg-accent/10 rounded-md px-2 py-1 -mx-2 -my-1 transition-all duration-200 interactive-base"
                   onClick={() => setIsEditingGoal(true)}
                   title="Click to edit daily goal"
                 >
@@ -1427,7 +1427,7 @@ export const JournalEditor: React.FC = () => {
               ) : (
                 <button
                   onClick={() => setIsEditingGoal(true)}
-                  className="text-xs text-muted hover:text-accent transition-colors flex items-center gap-1"
+                  className="text-xs text-muted hover:text-accent hover:bg-accent/10 px-2 py-1 rounded-md transition-all duration-200 flex items-center gap-1 interactive-base interactive-scale"
                   title="Set a daily writing goal"
                 >
                   <svg
@@ -1465,7 +1465,7 @@ export const JournalEditor: React.FC = () => {
                   </span>
                   <button
                     onClick={handleRetrySave}
-                    className="text-xs text-red-500 hover:text-red-600 underline"
+                    className="text-xs text-red-500 hover:text-red-600 hover:bg-red-500/10 px-2 py-1 rounded underline transition-all duration-200 interactive-base"
                     title="Retry save"
                   >
                     Retry
@@ -1513,10 +1513,10 @@ export const JournalEditor: React.FC = () => {
               {/* Focus mode toggles */}
               <button
                 onClick={toggleZenMode}
-                className={`p-1.5 rounded-md transition-all duration-200 ${
+                className={`p-1.5 rounded-md transition-all duration-200 interactive-base interactive-scale ${
                   isZenMode
-                    ? "text-accent bg-accent/10"
-                    : "text-muted hover:text-default hover:bg-bg-alt"
+                    ? "text-accent bg-accent/10 shadow-sm"
+                    : "text-muted hover:text-default hover:bg-bg-alt hover:shadow-sm"
                 }`}
                 title={isZenMode ? "Exit Zen Mode (Esc)" : "Zen Mode (⌘⇧Z)"}
               >
@@ -1562,10 +1562,10 @@ export const JournalEditor: React.FC = () => {
               {/* Preview toggle */}
               <button
                 onClick={togglePreviewMode}
-                className={`p-1.5 rounded-md transition-all duration-200 ${
+                className={`p-1.5 rounded-md transition-all duration-200 interactive-base interactive-scale ${
                   isPreviewMode
-                    ? "text-accent bg-accent/10"
-                    : "text-muted hover:text-default hover:bg-bg-alt"
+                    ? "text-accent bg-accent/10 shadow-sm"
+                    : "text-muted hover:text-default hover:bg-bg-alt hover:shadow-sm"
                 }`}
                 title={isPreviewMode ? "Edit Mode (⌘⇧P)" : "Preview Mode (⌘⇧P)"}
               >
@@ -1605,7 +1605,7 @@ export const JournalEditor: React.FC = () => {
               {/* Download */}
               <button
                 onClick={handleDownload}
-                className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-default hover:bg-bg-alt"
+                className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-default hover:bg-bg-alt hover:shadow-sm interactive-base interactive-scale"
                 title="Download as Markdown"
               >
                 <svg
@@ -1634,7 +1634,7 @@ export const JournalEditor: React.FC = () => {
                     e.stopPropagation();
                     setShowFontMenu(!showFontMenu);
                   }}
-                  className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-default hover:bg-bg-alt"
+                  className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-default hover:bg-bg-alt hover:shadow-sm interactive-base interactive-scale"
                   title="Font Face"
                 >
                   <svg
@@ -1664,8 +1664,8 @@ export const JournalEditor: React.FC = () => {
                             setFontFace(face);
                             setShowFontMenu(false);
                           }}
-                          className={`w-full text-left px-3 py-1.5 hover:bg-bg transition-colors ${
-                            fontFace === face ? "text-accent" : "text-default"
+                          className={`w-full text-left px-3 py-1.5 hover:bg-bg transition-all duration-200 interactive-base ${
+                            fontFace === face ? "text-accent font-medium" : "text-default"
                           }`}
                         >
                           {face === "monospace"
@@ -1684,7 +1684,7 @@ export const JournalEditor: React.FC = () => {
               <button
                 onClick={decreaseFontSize}
                 disabled={fontSize <= 14}
-                className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-default hover:bg-bg-alt disabled:opacity-30 disabled:cursor-not-allowed"
+                className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-default hover:bg-bg-alt hover:shadow-sm disabled:opacity-30 disabled:cursor-not-allowed interactive-base interactive-scale interactive-disabled"
                 title="Decrease Font Size"
               >
                 <svg
@@ -1709,7 +1709,7 @@ export const JournalEditor: React.FC = () => {
               <button
                 onClick={increaseFontSize}
                 disabled={fontSize >= 24}
-                className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-default hover:bg-bg-alt disabled:opacity-30 disabled:cursor-not-allowed"
+                className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-default hover:bg-bg-alt hover:shadow-sm disabled:opacity-30 disabled:cursor-not-allowed interactive-base interactive-scale interactive-disabled"
                 title="Increase Font Size"
               >
                 <svg
@@ -1733,7 +1733,7 @@ export const JournalEditor: React.FC = () => {
               <button
                 onClick={handleManualSave}
                 disabled={isSaving}
-                className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-green-500 hover:bg-green-500/15 hover:shadow-[0_0_8px_rgba(34,197,94,0.3)] disabled:opacity-50 disabled:hover:text-muted disabled:hover:bg-transparent disabled:hover:shadow-none"
+                className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-green-500 hover:bg-green-500/15 hover:shadow-[0_0_10px_rgba(34,197,94,0.3)] disabled:opacity-50 disabled:hover:text-muted disabled:hover:bg-transparent disabled:hover:shadow-none interactive-base interactive-scale"
                 title="Save Entry (⌘S)"
               >
                 <svg
@@ -1752,7 +1752,7 @@ export const JournalEditor: React.FC = () => {
               </button>
               <button
                 onClick={() => setShowDeleteConfirm(true)}
-                className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-red-500 hover:bg-red-500/15 hover:shadow-[0_0_8px_rgba(239,68,68,0.3)]"
+                className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-red-500 hover:bg-red-500/15 hover:shadow-[0_0_10px_rgba(239,68,68,0.3)] interactive-base interactive-scale"
                 title="Delete Entry"
               >
                 <svg
@@ -1776,10 +1776,10 @@ export const JournalEditor: React.FC = () => {
                   <span className="h-4 w-px bg-default/20"></span>
                   <button
                     onClick={() => setShowTemplate(!showTemplate)}
-                    className={`px-2 py-1 rounded-md text-xs font-medium transition-colors border ${
+                    className={`px-2 py-1 rounded-md text-xs font-medium transition-all duration-200 border interactive-base interactive-scale ${
                       showTemplate
-                        ? "bg-accent text-accent-text border-accent hover:bg-accent-hover"
-                        : "bg-bg text-muted border-default/30 hover:text-default hover:border-default"
+                        ? "bg-accent text-accent-text border-accent hover:bg-accent-hover shadow-sm"
+                        : "bg-bg text-muted border-default/30 hover:text-default hover:border-default hover:bg-bg-alt hover:shadow-sm"
                     }`}
                     title="Toggle Reference Pane (⌘/)"
                   >
@@ -1813,7 +1813,7 @@ export const JournalEditor: React.FC = () => {
                 {(syncStatus === "error" || autosaveError) && (
                   <button
                     onClick={handleRetrySave}
-                    className="px-3 py-1 text-xs font-medium rounded-md bg-red-100 dark:bg-red-900/20 hover:bg-red-200 dark:hover:bg-red-900/30 transition-colors"
+                    className="px-3 py-1 text-xs font-medium rounded-md bg-red-100 dark:bg-red-900/20 hover:bg-red-200 dark:hover:bg-red-900/30 hover:shadow-sm transition-all duration-200 interactive-base interactive-scale"
                   >
                     Retry Save
                   </button>
@@ -1821,7 +1821,7 @@ export const JournalEditor: React.FC = () => {
                 <button
                   onClick={handleManualSave}
                   disabled={isSaving}
-                  className="px-3 py-1 text-xs font-medium rounded-md bg-accent hover:bg-accent-hover text-accent-text transition-colors disabled:opacity-50"
+                  className="px-3 py-1 text-xs font-medium rounded-md bg-accent hover:bg-accent-hover text-accent-text hover:shadow-sm transition-all duration-200 disabled:opacity-50 interactive-base interactive-scale"
                 >
                   {isSaving ? "Saving..." : "Save Now"}
                 </button>
@@ -1937,13 +1937,13 @@ export const JournalEditor: React.FC = () => {
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="px-3 py-1.5 rounded-md text-sm font-medium bg-bg-alt text-default border border-default hover:bg-bg-alt/80 transition-colors"
+                className="px-3 py-1.5 rounded-md text-sm font-medium bg-bg-alt text-default border border-default hover:bg-bg-alt/80 hover:shadow-sm transition-all duration-200 interactive-base interactive-scale"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteCurrent}
-                className="px-3 py-1.5 rounded-md text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors"
+                className="px-3 py-1.5 rounded-md text-sm font-medium bg-red-500 text-white hover:bg-red-600 hover:shadow-md transition-all duration-200 interactive-base interactive-scale"
               >
                 Delete
               </button>
@@ -1965,7 +1965,7 @@ export const JournalEditor: React.FC = () => {
             <div className="flex justify-end gap-2">
               <button
                 onClick={handleUnsavedWarningCancel}
-                className="px-3 py-1.5 rounded-md text-sm font-medium bg-bg-alt text-default border border-default hover:bg-bg-alt/80 transition-colors"
+                className="px-3 py-1.5 rounded-md text-sm font-medium bg-bg-alt text-default border border-default hover:bg-bg-alt/80 hover:shadow-sm transition-all duration-200 interactive-base interactive-scale"
               >
                 Cancel
               </button>
@@ -1977,13 +1977,13 @@ export const JournalEditor: React.FC = () => {
                     setPendingEntrySwitch(null);
                   }
                 }}
-                className="px-3 py-1.5 rounded-md text-sm font-medium bg-bg text-default border border-default hover:bg-bg-alt transition-colors"
+                className="px-3 py-1.5 rounded-md text-sm font-medium bg-bg text-default border border-default hover:bg-bg-alt hover:shadow-sm transition-all duration-200 interactive-base interactive-scale"
               >
                 Discard
               </button>
               <button
                 onClick={handleUnsavedWarningConfirm}
-                className="px-3 py-1.5 rounded-md text-sm font-medium bg-accent text-accent-text hover:bg-accent-hover transition-colors"
+                className="px-3 py-1.5 rounded-md text-sm font-medium bg-accent text-accent-text hover:bg-accent-hover hover:shadow-md transition-all duration-200 interactive-base interactive-scale"
               >
                 Save & Switch
               </button>
@@ -2020,7 +2020,7 @@ export const JournalEditor: React.FC = () => {
                     setDailyProgress(0);
                     setIsEditingGoal(false);
                   }}
-                  className="text-xs text-muted hover:text-red-500"
+                  className="text-xs text-muted hover:text-red-500 hover:bg-red-500/10 px-2 py-1 rounded transition-all duration-200 interactive-base"
                 >
                   Reset Progress
                 </button>
@@ -2031,13 +2031,13 @@ export const JournalEditor: React.FC = () => {
                       setTempGoal(dailyGoal.toString());
                       setIsEditingGoal(false);
                     }}
-                    className="px-3 py-1.5 rounded-md text-sm font-medium bg-bg-alt text-default border border-default hover:bg-bg-alt/80 transition-colors"
+                    className="px-3 py-1.5 rounded-md text-sm font-medium bg-bg-alt text-default border border-default hover:bg-bg-alt/80 hover:shadow-sm transition-all duration-200 interactive-base interactive-scale"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-3 py-1.5 rounded-md text-sm font-medium bg-accent text-accent-text hover:bg-accent-hover transition-colors"
+                    className="px-3 py-1.5 rounded-md text-sm font-medium bg-accent text-accent-text hover:bg-accent-hover hover:shadow-md transition-all duration-200 interactive-base interactive-scale"
                   >
                     Save
                   </button>

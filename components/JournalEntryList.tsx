@@ -126,9 +126,9 @@ const EntryItem: React.FC<{
 
       {/* Main content */}
       <div
-        className={`relative group cursor-pointer border-l-2 transition-all bg-bg ${
+        className={`relative group cursor-pointer border-l-2 transition-all duration-200 bg-bg interactive-base ${
           isSwiping ? "" : "duration-200"
-        } hover:bg-bg-alt/50 ${
+        } hover:bg-bg-alt/50 hover:shadow-sm ${
           isSelected ? "border-accent bg-bg-alt" : "border-transparent"
         } ${compact ? "px-2 py-1" : "px-2 py-1.5"}`}
         style={{ transform: `translateX(${swipeOffset}px)` }}
@@ -185,10 +185,10 @@ const EntryItem: React.FC<{
                   e.stopPropagation();
                   onToggleStar();
                 }}
-                className={`p-1.5 sm:p-1 rounded transition-all duration-200 ${
+                className={`p-1.5 sm:p-1 rounded transition-all duration-200 interactive-base interactive-scale ${
                   entry.isStarred
                     ? "text-yellow-500 opacity-100"
-                    : "opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-muted/50 hover:text-yellow-500"
+                    : "opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-muted/50 hover:text-yellow-500 hover:bg-yellow-500/10"
                 }`}
                 title={entry.isStarred ? "Unstar" : "Star"}
               >
@@ -212,7 +212,7 @@ const EntryItem: React.FC<{
                   e.stopPropagation();
                   onConfirmDelete();
                 }}
-                className="px-2 py-1 sm:px-1.5 sm:py-0.5 rounded text-xs font-medium bg-red-500 text-white hover:bg-red-600 transition-colors animate-pulse"
+                className="px-2 py-1 sm:px-1.5 sm:py-0.5 rounded text-xs font-medium bg-red-500 text-white hover:bg-red-600 hover:shadow-sm transition-all duration-200 animate-pulse interactive-base interactive-scale"
               >
                 Confirm
               </button>
@@ -222,7 +222,7 @@ const EntryItem: React.FC<{
                   e.stopPropagation();
                   onDelete();
                 }}
-                className="p-1.5 sm:p-1 rounded transition-all duration-200 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-muted/50 hover:text-red-500 hover:bg-red-500/15"
+                className="p-1.5 sm:p-1 rounded transition-all duration-200 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-muted/50 hover:text-red-500 hover:bg-red-500/15 hover:shadow-sm interactive-base interactive-scale"
                 title="Delete entry"
               >
                 <XIcon className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
@@ -276,7 +276,7 @@ const TagFolder: React.FC<{
     <div className="border-b border-default/20 last:border-b-0">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center gap-2 px-3 py-2 hover:bg-bg-alt/30 transition-colors"
+        className="w-full flex items-center gap-2 px-3 py-2 hover:bg-bg-alt/30 transition-all duration-200 interactive-base"
       >
         <ChevronDownIcon
           className={`w-3 h-3 text-muted transition-transform ${isExpanded ? "" : "-rotate-90"}`}
@@ -632,7 +632,7 @@ const JournalEntryListComponent: React.FC<JournalEntryListProps> = ({
           </div>
           <button
             onClick={onCreate}
-            className="p-1.5 rounded-full text-muted hover:bg-accent/10 hover:text-default transition-colors"
+            className="p-1.5 rounded-full text-muted hover:bg-accent/10 hover:text-default hover:shadow-sm transition-all duration-200 interactive-base interactive-scale"
             title="New Entry"
             aria-label="Create new journal entry"
           >
@@ -666,7 +666,7 @@ const JournalEntryListComponent: React.FC<JournalEntryListProps> = ({
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
-              className="absolute right-2 top-2 sm:top-1.5 text-muted hover:text-default"
+              className="absolute right-2 top-2 sm:top-1.5 text-muted hover:text-default hover:bg-bg-alt/50 rounded p-0.5 transition-all duration-200 interactive-base interactive-scale"
             >
               <XIcon className="w-3 h-3" />
             </button>
@@ -677,20 +677,20 @@ const JournalEntryListComponent: React.FC<JournalEntryListProps> = ({
         <div className="flex gap-1 p-0.5 bg-bg rounded-md">
           <button
             onClick={() => setViewMode("all")}
-            className={`flex-1 px-2 py-1 text-xs font-medium rounded transition-colors ${
+            className={`flex-1 px-2 py-1 text-xs font-medium rounded transition-all duration-200 interactive-base ${
               viewMode === "all"
-                ? "bg-accent/15 text-accent"
-                : "text-muted hover:text-default"
+                ? "bg-accent/15 text-accent shadow-sm"
+                : "text-muted hover:text-default hover:bg-accent/10"
             }`}
           >
             All
           </button>
           <button
             onClick={() => setViewMode("tags")}
-            className={`flex-1 px-2 py-1 text-xs font-medium rounded transition-colors ${
+            className={`flex-1 px-2 py-1 text-xs font-medium rounded transition-all duration-200 interactive-base ${
               viewMode === "tags"
-                ? "bg-accent/15 text-accent"
-                : "text-muted hover:text-default"
+                ? "bg-accent/15 text-accent shadow-sm"
+                : "text-muted hover:text-default hover:bg-accent/10"
             }`}
           >
             By Tag

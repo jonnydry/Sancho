@@ -273,7 +273,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
         <h3 className="text-sm font-bold text-default">Reference</h3>
         <button
           onClick={onClose}
-          className="text-muted hover:text-default transition-colors p-1"
+          className="text-muted hover:text-default hover:bg-bg-alt/50 rounded p-1 transition-all duration-200 interactive-base interactive-scale"
           aria-label="Close reference pane"
         >
           <XIcon className="w-4 h-4" />
@@ -284,10 +284,10 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
       <div className="flex bg-bg border-b border-default shrink-0">
         <button
           onClick={() => setActiveTab("saved")}
-          className={`flex-1 py-2 text-xs font-medium transition-colors relative ${
+          className={`flex-1 py-2 text-xs font-medium transition-all duration-200 relative interactive-base ${
             activeTab === "saved"
               ? "text-default font-bold"
-              : "text-muted hover:text-default"
+              : "text-muted hover:text-default hover:bg-bg-alt/30"
           }`}
         >
           Saved
@@ -297,10 +297,10 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
         </button>
         <button
           onClick={() => setActiveTab("search")}
-          className={`flex-1 py-2 text-xs font-medium transition-colors relative ${
+          className={`flex-1 py-2 text-xs font-medium transition-all duration-200 relative interactive-base ${
             activeTab === "search"
               ? "text-default font-bold"
-              : "text-muted hover:text-default"
+              : "text-muted hover:text-default hover:bg-bg-alt/30"
           }`}
         >
           Search
@@ -326,10 +326,10 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                   <button
                     key={item.name}
                     onClick={() => onSelectTemplate(item.name)}
-                    className={`w-full text-left p-2 rounded-md border text-xs transition-all ${
+                    className={`w-full text-left p-2 rounded-md border text-xs transition-all duration-200 interactive-base interactive-scale ${
                       selectedTemplate === item.name
-                        ? "bg-accent/10 border-accent text-default"
-                        : "bg-bg border-default/50 text-muted hover:border-default hover:text-default"
+                        ? "bg-accent/10 border-accent text-default shadow-sm"
+                        : "bg-bg border-default/50 text-muted hover:border-default hover:text-default hover:bg-bg-alt/50 hover:shadow-sm"
                     }`}
                   >
                     <div className="flex justify-between items-center">
@@ -346,7 +346,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                 <p className="mb-2">No saved items yet.</p>
                 <button
                   onClick={() => setActiveTab("search")}
-                  className="text-accent hover:underline"
+                  className="text-accent hover:underline hover:text-accent-hover transition-all duration-200 interactive-base"
                 >
                   Search to add items
                 </button>
@@ -374,10 +374,10 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                     <div
                       key={item.name}
                       onClick={() => onSelectTemplate(item.name)}
-                      className={`group w-full text-left p-2 rounded-md border text-xs transition-all cursor-pointer relative ${
+                      className={`group w-full text-left p-2 rounded-md border text-xs transition-all duration-200 cursor-pointer relative interactive-base interactive-lift ${
                         selectedTemplate === item.name
-                          ? "bg-accent/10 border-accent text-default"
-                          : "bg-bg border-default/30 text-muted hover:border-default hover:text-default"
+                          ? "bg-accent/10 border-accent text-default shadow-sm"
+                          : "bg-bg border-default/30 text-muted hover:border-default hover:text-default hover:bg-bg-alt/50 hover:shadow-sm"
                       }`}
                     >
                       <div className="flex justify-between items-start">
@@ -406,7 +406,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                   <div className="border border-default/30 rounded-md overflow-hidden">
                     <button
                       onClick={() => toggleCategory("forms")}
-                      className="w-full flex items-center justify-between px-3 py-2 bg-bg/50 hover:bg-bg transition-colors"
+                      className="w-full flex items-center justify-between px-3 py-2 bg-bg/50 hover:bg-bg-alt/50 hover:shadow-sm transition-all duration-200 interactive-base"
                       aria-expanded={expandedCategories.forms}
                     >
                       <div className="flex items-center gap-2">
@@ -438,7 +438,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                           <button
                             key={item.name}
                             onClick={() => onSelectTemplate(item.name)}
-                            className="w-full text-left px-3 py-1.5 text-xs text-muted hover:text-default hover:bg-accent/10 transition-colors truncate"
+                            className="w-full text-left px-3 py-1.5 text-xs text-muted hover:text-default hover:bg-accent/10 transition-all duration-200 truncate interactive-base"
                           >
                             {item.name}
                           </button>
@@ -451,7 +451,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                   <div className="border border-default/30 rounded-md overflow-hidden">
                     <button
                       onClick={() => toggleCategory("meters")}
-                      className="w-full flex items-center justify-between px-3 py-2 bg-bg/50 hover:bg-bg transition-colors"
+                      className="w-full flex items-center justify-between px-3 py-2 bg-bg/50 hover:bg-bg-alt/50 hover:shadow-sm transition-all duration-200 interactive-base"
                       aria-expanded={expandedCategories.meters}
                     >
                       <div className="flex items-center gap-2">
@@ -483,7 +483,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                           <button
                             key={item.name}
                             onClick={() => onSelectTemplate(item.name)}
-                            className="w-full text-left px-3 py-1.5 text-xs text-muted hover:text-default hover:bg-accent/10 transition-colors truncate"
+                            className="w-full text-left px-3 py-1.5 text-xs text-muted hover:text-default hover:bg-accent/10 transition-all duration-200 truncate interactive-base"
                           >
                             {item.name}
                           </button>
@@ -496,7 +496,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                   <div className="border border-default/30 rounded-md overflow-hidden">
                     <button
                       onClick={() => toggleCategory("devices")}
-                      className="w-full flex items-center justify-between px-3 py-2 bg-bg/50 hover:bg-bg transition-colors"
+                      className="w-full flex items-center justify-between px-3 py-2 bg-bg/50 hover:bg-bg-alt/50 hover:shadow-sm transition-all duration-200 interactive-base"
                       aria-expanded={expandedCategories.devices}
                     >
                       <div className="flex items-center gap-2">
@@ -528,7 +528,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                           <button
                             key={item.name}
                             onClick={() => onSelectTemplate(item.name)}
-                            className="w-full text-left px-3 py-1.5 text-xs text-muted hover:text-default hover:bg-accent/10 transition-colors truncate"
+                            className="w-full text-left px-3 py-1.5 text-xs text-muted hover:text-default hover:bg-accent/10 transition-all duration-200 truncate interactive-base"
                           >
                             {item.name}
                           </button>
@@ -574,7 +574,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                                 "structure",
                               )
                             }
-                            className="flex items-center gap-1 text-[10px] bg-accent/10 hover:bg-accent hover:text-accent-text text-accent px-1.5 py-0.5 rounded transition-colors"
+                            className="flex items-center gap-1 text-[10px] bg-accent/10 hover:bg-accent hover:text-accent-text text-accent px-1.5 py-0.5 rounded hover:shadow-sm transition-all duration-200 interactive-base interactive-scale"
                             title="Insert structure into journal"
                           >
                             {inserting === "structure" ? (
@@ -608,7 +608,7 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                                 "example",
                               )
                             }
-                            className="flex items-center gap-1 text-[10px] bg-accent/10 hover:bg-accent hover:text-accent-text text-accent px-1.5 py-0.5 rounded transition-colors"
+                            className="flex items-center gap-1 text-[10px] bg-accent/10 hover:bg-accent hover:text-accent-text text-accent px-1.5 py-0.5 rounded hover:shadow-sm transition-all duration-200 interactive-base interactive-scale"
                             title="Insert example into journal"
                           >
                             {inserting === "example" ? (
