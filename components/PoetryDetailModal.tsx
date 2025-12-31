@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { PoetryItem, LearnMoreResponse } from '../types';
 import { XIcon } from './icons/XIcon';
+import { ErrorBoundary } from './ErrorBoundary';
 import { fetchLearnMoreContext } from '../services/apiService';
 import { LightbulbIcon } from './icons/LightbulbIcon';
 import { SpinnerIcon } from './icons/SpinnerIcon';
@@ -70,7 +71,7 @@ const TagButton: React.FC<{ onClick?: () => void; children: React.ReactNode }> =
   </button>
 );
 
-export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onClose, onSelectItem, onTagClick }) => {
+const PoetryDetailModalContent: React.FC<PoetryDetailModalProps> = ({ item, onClose, onSelectItem, onTagClick }) => {
   const [learnMoreContext, setLearnMoreContext] = useState<string | null>(null);
   const [isLoadingLearnMore, setIsLoadingLearnMore] = useState(false);
   const [learnMoreError, setLearnMoreError] = useState<string | null>(null);
@@ -293,5 +294,41 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = ({ item, onCl
         </div>
       </div>
     </div>
+  );
+};
+
+export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = (props) => {
+  return (
+    <ErrorBoundary fallback={
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-bg/80 backdrop-blur-sm"
+        onClick={props.onClose}
+      >
+        <div
+          className="relative bg-bg w-full max-w-md max-h-[85vh] overflow-y-auto m-4 border border-default/50 shadow-xl rounded-lg p-6"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            onClick={props.onClose}
+            className="absolute top-4 right-4 p-1 text-muted hover:text-default hover:bg-bg-alt/50 rounded-md transition-all duration-150"
+            aria-label="Close"
+          >
+            <XIcon className="w-5 h-5" />
+          </button>
+          <div className="text-center">
+            <h2 className="text-lg font-bold text-default mb-4">Modal Error</h2>
+            <p className="text-muted text-sm mb-4">Something went wrong displaying this poetry entry.</p>
+            <button
+              onClick={props.onClose}
+              className="px-4 py-2 bg-accent text-accent-text rounded-md hover:bg-accent-hover transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    }>
+      <PoetryDetailModalContent {...props} />
+    </ErrorBoundary>
   );
 };

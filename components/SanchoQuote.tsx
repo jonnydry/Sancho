@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { getRandomSanchoQuote, SanchoQuote as SanchoQuoteType, sanchoQuotes } from '../data/sanchoQuotes';
 import { fetchSanchoQuote } from '../services/apiService';
+import { ErrorBoundary } from './ErrorBoundary';
 import { SpinnerIcon } from './icons/SpinnerIcon';
 import { RefreshIcon } from './icons/RefreshIcon';
 
@@ -13,7 +14,7 @@ interface CachedQuote {
   isAI: boolean;
 }
 
-export const SanchoQuote: React.FC = () => {
+const SanchoQuoteContent: React.FC = () => {
   const [quote, setQuote] = useState<SanchoQuoteType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [usedFallback, setUsedFallback] = useState(false);
@@ -174,5 +175,20 @@ export const SanchoQuote: React.FC = () => {
         </button>
       </div>
     </div>
+  );
+};
+
+export const SanchoQuote: React.FC = () => {
+  return (
+    <ErrorBoundary fallback={
+      <div className="w-full py-6 px-4 sm:px-8 border-y border-default/10">
+        <div className="text-center">
+          <p className="text-muted text-sm font-mono uppercase tracking-wider mb-2">Quote Unavailable</p>
+          <p className="text-xs text-muted">Sancho's wisdom is temporarily hidden in the mists.</p>
+        </div>
+      </div>
+    }>
+      <SanchoQuoteContent />
+    </ErrorBoundary>
   );
 };
