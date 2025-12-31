@@ -177,7 +177,7 @@ export const HomePage: React.FC = () => {
               fetchPriority="high"
             />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-default mb-2 tracking-tight">Sancho.ref</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-default mb-2 tracking-tight">SanchoPoetry.ref</h1>
           <p className="text-muted text-xs uppercase tracking-[0.2em] mb-8">
             Poetic Reference Squire
           </p>

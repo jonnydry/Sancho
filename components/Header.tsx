@@ -34,7 +34,7 @@ export const Header: React.FC = () => {
         <div className="max-w-5xl mx-auto h-16 flex items-center justify-between">
           <div className="flex items-baseline gap-4 sm:gap-8">
             <Link to="/" className="text-lg font-bold text-default hover:text-accent transition-colors tracking-tight leading-none interactive-base">
-              Sancho.ref
+              SanchoPoetry.ref
             </Link>
             <nav className="flex gap-4 sm:gap-6">
               <Link to="/about" className="text-sm text-muted interactive-muted hover:underline underline-offset-4 transition-all leading-none interactive-base">
