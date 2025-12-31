@@ -48,19 +48,23 @@ export const PinButton: React.FC<PinButtonProps> = ({ item, className = '', size
       
       if (error instanceof Error) {
         errorMessage = error.message;
+        const errorCode = (error as any).code;
         
-        // Check if this is an authentication error that requires re-login
-        if (error.hasOwnProperty('requiresLogin') && (error as any).requiresLogin) {
+        // Guest limit reached - show info notification but don't redirect
+        if (errorCode === 'GUEST_LIMIT_REACHED') {
+          showNotification(errorMessage, 'info');
+          return;
+        }
+        
+        // Authentication required - show error and redirect to login
+        if (errorCode === 'NOT_AUTHENTICATED' || error.hasOwnProperty('requiresLogin') && (error as any).requiresLogin) {
           showNotification(errorMessage, 'error');
-          
-          // Redirect to login after a short delay to show the notification
           setTimeout(() => {
             window.location.href = '/api/login';
           }, 2000);
           return;
         }
         
-        // Log additional details for debugging
         console.error('Error details:', {
           message: error.message,
           name: error.name,

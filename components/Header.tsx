@@ -36,19 +36,17 @@ export const Header: React.FC = () => {
             SanchoPoetry.ref
           </Link>
           <div className="flex items-center gap-1.5 sm:gap-3">
-            {isAuthenticated && (
-              <button
-                onClick={() => setIsNotebookOpen(true)}
-                onMouseEnter={() => setIsNotebookHovered(true)}
-                onMouseLeave={() => setIsNotebookHovered(false)}
-                className={`flex items-center justify-center p-1.5 sm:p-2 rounded-full text-muted transition-all duration-200 interactive-base interactive-scale ${mode === 'dark' ? 'hover:bg-accent/10 hover:text-white' : 'hover:bg-accent/10 interactive-muted'
-                  }`}
-                aria-label="Open Notebook"
-                title="Notebook"
-              >
-                <BookPenIcon className="w-4 h-4 sm:w-5 sm:h-5" heartFilled={isNotebookHovered} />
-              </button>
-            )}
+            <button
+              onClick={() => setIsNotebookOpen(true)}
+              onMouseEnter={() => setIsNotebookHovered(true)}
+              onMouseLeave={() => setIsNotebookHovered(false)}
+              className={`flex items-center justify-center p-1.5 sm:p-2 rounded-full text-muted transition-all duration-200 interactive-base interactive-scale ${mode === 'dark' ? 'hover:bg-accent/10 hover:text-white' : 'hover:bg-accent/10 interactive-muted'
+                }`}
+              aria-label="Open Notebook"
+              title="Notebook"
+            >
+              <BookPenIcon className="w-4 h-4 sm:w-5 sm:h-5" heartFilled={isNotebookHovered} />
+            </button>
             <FontControls />
             <span className="h-4 w-px bg-default/20"></span>
             <ThemeSwitcher />
@@ -88,11 +86,9 @@ export const Header: React.FC = () => {
           </div>
         </div>
       </header>
-      {isAuthenticated && (
-        <Suspense fallback={<NotebookFallback />}>
-          <Notebook isOpen={isNotebookOpen} onClose={() => setIsNotebookOpen(false)} />
-        </Suspense>
-      )}
+      <Suspense fallback={<NotebookFallback />}>
+        <Notebook isOpen={isNotebookOpen} onClose={() => setIsNotebookOpen(false)} />
+      </Suspense>
     </>
   );
 };

@@ -2,6 +2,9 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import { PoetryItem } from '../types';
 import { useAuth } from '../hooks/useAuth.js';
 
+const GUEST_PINNED_ITEMS_KEY = 'sancho_guest_pinned_items';
+const GUEST_ITEM_LIMIT = 5;
+
 interface PinnedItemsContextType {
   pinnedItems: PoetryItem[];
   isLoading: boolean;
@@ -9,17 +12,41 @@ interface PinnedItemsContextType {
   unpinItem: (itemName: string) => Promise<void>;
   isPinned: (itemName: string) => boolean;
   refreshPinnedItems: () => Promise<void>;
+  isGuest: boolean;
+  guestLimitReached: boolean;
+  guestItemLimit: number;
 }
 
 const PinnedItemsContext = createContext<PinnedItemsContextType | undefined>(undefined);
 
-// Client-side cache TTL - 30 seconds
 const CACHE_TTL = 30000;
 
-// Extract CSRF token from cookie
 function getCsrfToken(): string | null {
   const match = document.cookie.match(/(?:^|;\s*)csrf-token=([^;]*)/);
   return match ? decodeURIComponent(match[1]) : null;
+}
+
+function getGuestPinnedItems(): PoetryItem[] {
+  try {
+    const stored = localStorage.getItem(GUEST_PINNED_ITEMS_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed)) {
+        return parsed;
+      }
+    }
+  } catch (error) {
+    console.error('Error reading guest pinned items from localStorage:', error);
+  }
+  return [];
+}
+
+function saveGuestPinnedItems(items: PoetryItem[]): void {
+  try {
+    localStorage.setItem(GUEST_PINNED_ITEMS_KEY, JSON.stringify(items));
+  } catch (error) {
+    console.error('Error saving guest pinned items to localStorage:', error);
+  }
 }
 
 export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -28,23 +55,24 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const cacheTimestampRef = useRef<number>(0);
 
+  const isGuest = !isAuthenticated && !isAuthLoading;
+  const guestLimitReached = isGuest && pinnedItems.length >= GUEST_ITEM_LIMIT;
+
   const fetchPinnedItems = useCallback(async (forceRefresh = false) => {
-    // Wait for auth to finish loading before fetching pinned items
     if (isAuthLoading) {
       return;
     }
 
     if (!isAuthenticated) {
-      setPinnedItems([]);
+      const guestItems = getGuestPinnedItems();
+      setPinnedItems(guestItems);
       return;
     }
 
-    // Check cache freshness - skip fetch if cache is still valid
     const now = Date.now();
     const cacheAge = now - cacheTimestampRef.current;
 
     if (!forceRefresh && cacheAge < CACHE_TTL && pinnedItems.length > 0) {
-      // Cache is still fresh, skip fetch
       return;
     }
 
@@ -57,7 +85,7 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
       if (response.ok) {
         const data = await response.json();
         setPinnedItems(data.items || []);
-        cacheTimestampRef.current = now; // Update cache timestamp
+        cacheTimestampRef.current = now;
       } else {
         console.error('Failed to fetch pinned items');
         setPinnedItems([]);
@@ -74,21 +102,15 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
     fetchPinnedItems();
   }, [fetchPinnedItems]);
 
-  // Invalidate cache when auth status changes
   useEffect(() => {
-    cacheTimestampRef.current = 0; // Force refresh on next fetch
+    cacheTimestampRef.current = 0;
   }, [isAuthenticated]);
 
   const pinItem = useCallback(async (item: PoetryItem) => {
-    // Wait for auth to finish loading and ensure user is authenticated
-    if (isAuthLoading || !isAuthenticated) {
-      const authError: any = new Error('Please log in to save items to your notebook');
-      authError.requiresLogin = true;
-      authError.code = 'NOT_AUTHENTICATED';
-      throw authError;
+    if (isAuthLoading) {
+      throw new Error('Please wait while we check your login status');
     }
 
-    // Validate PoetryItem structure before sending
     if (!item || typeof item !== 'object') {
       throw new Error('Invalid item: item must be an object');
     }
@@ -99,14 +121,32 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
       throw new Error('Invalid item: type must be Form, Meter, or Device');
     }
 
-    // Optimistic update: add item to local state if not already pinned
-    // Use functional update to ensure atomicity and avoid race conditions
+    if (!isAuthenticated) {
+      const currentItems = getGuestPinnedItems();
+      
+      if (currentItems.some(pinned => pinned.name === item.name)) {
+        return;
+      }
+
+      if (currentItems.length >= GUEST_ITEM_LIMIT) {
+        const limitError: any = new Error(`You've reached the limit of ${GUEST_ITEM_LIMIT} saved items. Log in for unlimited saves!`);
+        limitError.code = 'GUEST_LIMIT_REACHED';
+        limitError.requiresLogin = true;
+        throw limitError;
+      }
+
+      const newItems = [...currentItems, item];
+      saveGuestPinnedItems(newItems);
+      setPinnedItems(newItems);
+      return;
+    }
+
     let wasAlreadyPinned = false;
     setPinnedItems(prev => {
       const isAlreadyPinned = prev.some(pinned => pinned.name === item.name);
       wasAlreadyPinned = isAlreadyPinned;
       if (isAlreadyPinned) {
-        return prev; // No change needed
+        return prev;
       }
       return [...prev, item];
     });
@@ -135,17 +175,14 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
         if (import.meta.env.DEV) {
           console.log('Successfully pinned item:', item.name);
         }
-        // Update cache timestamp to mark data as fresh - no need to refetch
         cacheTimestampRef.current = Date.now();
       } else {
-        // Revert optimistic update on failure
         if (!wasAlreadyPinned) {
           setPinnedItems(prev => prev.filter(pinned => pinned.name !== item.name));
         }
         throw new Error('Server error pinning item');
       }
     } catch (error) {
-      // Revert optimistic update on any error
       if (!wasAlreadyPinned) {
         setPinnedItems(prev => prev.filter(pinned => pinned.name !== item.name));
       }
@@ -156,28 +193,30 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
         throw new Error(`Failed to pin item: ${String(error)}`);
       }
     }
-  }, [isAuthenticated, isAuthLoading, fetchPinnedItems]); // pinnedItems removed - using functional update
+  }, [isAuthenticated, isAuthLoading]);
 
   const unpinItem = useCallback(async (itemName: string) => {
-    // Wait for auth to finish loading and ensure user is authenticated
-    if (isAuthLoading || !isAuthenticated) {
-      const authError: any = new Error('Please log in to remove items from your notebook');
-      authError.requiresLogin = true;
-      authError.code = 'NOT_AUTHENTICATED';
-      throw authError;
+    if (isAuthLoading) {
+      throw new Error('Please wait while we check your login status');
     }
 
     if (!itemName || typeof itemName !== 'string' || itemName.trim().length === 0) {
       throw new Error('Invalid item name: name is required and must be a non-empty string');
     }
 
-    // Optimistic update: remove item from local state
-    // Use functional update to ensure atomicity and avoid race conditions
+    if (!isAuthenticated) {
+      const currentItems = getGuestPinnedItems();
+      const newItems = currentItems.filter(item => item.name !== itemName);
+      saveGuestPinnedItems(newItems);
+      setPinnedItems(newItems);
+      return;
+    }
+
     let wasPinned = false;
     setPinnedItems(prev => {
       wasPinned = prev.some(item => item.name === itemName);
       if (!wasPinned) {
-        return prev; // No change needed
+        return prev;
       }
       return prev.filter(item => item.name !== itemName);
     });
@@ -203,18 +242,15 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
         if (import.meta.env.DEV) {
           console.log('Successfully unpinned item:', itemName);
         }
-        // Update cache timestamp to mark data as fresh - optimistic update already done
         cacheTimestampRef.current = Date.now();
       } else {
-        // Revert optimistic update on failure by refreshing from server
         if (wasPinned) {
-          await fetchPinnedItems(true); // force refresh
+          await fetchPinnedItems(true);
         }
         throw new Error('Server error unpinning item');
       }
     } catch (error) {
-      // Revert by refreshing from server on error
-      await fetchPinnedItems(true); // force refresh
+      await fetchPinnedItems(true);
       console.error('Error unpinning item:', error);
       if (error instanceof Error) {
         throw error;
@@ -222,13 +258,12 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
         throw new Error(`Failed to unpin item: ${String(error)}`);
       }
     }
-  }, [isAuthenticated, isAuthLoading, fetchPinnedItems]); // pinnedItems removed - using functional update
+  }, [isAuthenticated, isAuthLoading, fetchPinnedItems]);
 
   const isPinned = useCallback((itemName: string) => {
     return pinnedItems.some(item => item.name === itemName);
   }, [pinnedItems]);
 
-  // Memoize context value to prevent unnecessary re-renders
   const contextValue = useMemo(() => ({
     pinnedItems,
     isLoading,
@@ -236,7 +271,10 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
     unpinItem,
     isPinned,
     refreshPinnedItems: fetchPinnedItems,
-  }), [pinnedItems, isLoading, pinItem, unpinItem, isPinned, fetchPinnedItems]);
+    isGuest,
+    guestLimitReached,
+    guestItemLimit: GUEST_ITEM_LIMIT,
+  }), [pinnedItems, isLoading, pinItem, unpinItem, isPinned, fetchPinnedItems, isGuest, guestLimitReached]);
 
   return (
     <PinnedItemsContext.Provider value={contextValue}>
@@ -252,4 +290,3 @@ export const usePinnedItems = (): PinnedItemsContextType => {
   }
   return context;
 };
-

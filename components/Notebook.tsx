@@ -1,6 +1,7 @@
 import React, { useState, useEffect, lazy, Suspense, useRef, useCallback, useMemo } from 'react';
 import { usePinnedItems } from '../contexts/PinnedItemsContext';
 import { useNotification } from '../contexts/NotificationContext';
+import { useAuth } from '../hooks/useAuth';
 import { PoetryItem } from '../types';
 import { XIcon } from './icons/XIcon';
 import { BookPenIcon } from './icons/BookPenIcon';
@@ -48,8 +49,9 @@ interface NotebookProps {
 type Tab = 'saved' | 'journal';
 
 export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
-  const { pinnedItems, isLoading, unpinItem } = usePinnedItems();
+  const { pinnedItems, isLoading, isGuest, guestLimitReached, guestItemLimit } = usePinnedItems();
   const { showNotification } = useNotification();
+  const { isAuthenticated } = useAuth();
   const [selectedItem, setSelectedItem] = useState<PoetryItem | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -189,14 +191,24 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
                 )}
               </button>
               <button
-                onClick={() => setActiveTab('journal')}
+                onClick={() => {
+                  if (isGuest) {
+                    showNotification('Log in to access the Journal feature', 'info');
+                  } else {
+                    setActiveTab('journal');
+                  }
+                }}
                 className={`px-2.5 py-0.5 text-xs font-medium rounded leading-none transition-all duration-200 interactive-base interactive-scale ${
                   activeTab === 'journal' 
                     ? 'bg-accent text-accent-text shadow-sm' 
-                    : 'text-muted interactive-muted hover:bg-accent/15 hover:shadow-sm'
+                    : isGuest
+                      ? 'text-muted/50 cursor-not-allowed'
+                      : 'text-muted interactive-muted hover:bg-accent/15 hover:shadow-sm'
                 }`}
+                title={isGuest ? 'Log in to access Journal' : 'Journal'}
               >
                 Journal
+                {isGuest && <span className="ml-1 text-[10px]">🔒</span>}
               </button>
             </div>
           </div>
@@ -214,6 +226,34 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
         {activeTab === 'saved' ? (
           <>
             <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+              {/* Guest limit banner */}
+              {isGuest && (
+                <div className={`mb-4 p-3 rounded-lg border ${guestLimitReached ? 'bg-amber-500/10 border-amber-500/30' : 'bg-accent/5 border-accent/20'}`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className={`text-xs font-medium ${guestLimitReached ? 'text-amber-600 dark:text-amber-400' : 'text-muted'}`}>
+                        {guestLimitReached 
+                          ? `Limit reached (${pinnedItems.length}/${guestItemLimit} items)`
+                          : `Saved locally (${pinnedItems.length}/${guestItemLimit} items)`
+                        }
+                      </p>
+                      <p className="text-xs text-muted mt-0.5">
+                        {guestLimitReached 
+                          ? 'Log in for unlimited saves and Journal access'
+                          : 'Log in to sync across devices and unlock Journal'
+                        }
+                      </p>
+                    </div>
+                    <a
+                      href="/api/login"
+                      className="text-xs font-medium text-accent hover:underline underline-offset-2 px-2 py-1 bg-accent/10 rounded transition-colors"
+                    >
+                      Log in
+                    </a>
+                  </div>
+                </div>
+              )}
+
               {isLoading ? (
                 <div className="flex items-center justify-center h-32">
                   <div className="text-muted">Loading...</div>
@@ -233,18 +273,20 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
               )}
             </div>
 
-            {/* Account Section */}
-            <div className="border-t border-default p-4 sm:p-6">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted">Account</span>
-                <button
-                  onClick={() => setShowDeleteConfirm(true)}
-                  className="text-xs text-muted hover:text-red-500 hover:bg-red-500/10 px-2 py-1 rounded transition-all duration-200 interactive-base"
-                >
-                  Delete Account
-                </button>
+            {/* Account Section - only show for authenticated users */}
+            {isAuthenticated && (
+              <div className="border-t border-default p-4 sm:p-6">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted">Account</span>
+                  <button
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="text-xs text-muted hover:text-red-500 hover:bg-red-500/10 px-2 py-1 rounded transition-all duration-200 interactive-base"
+                  >
+                    Delete Account
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </>
         ) : (
           <div className="flex-1 overflow-hidden">
