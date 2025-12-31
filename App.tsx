@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Header } from './components/Header';
+import { FloatingFooter } from './components/FloatingFooter';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { FontProvider } from './contexts/FontContext';
@@ -36,7 +37,7 @@ const App: React.FC = () => {
                 <BrowserRouter>
                   <div className="min-h-screen flex flex-col bg-bg text-default">
                     <Header />
-                    <div className="flex-grow">
+                    <div className="flex-grow pb-16">
                       <ErrorBoundary fallback={
                         <div className="flex items-center justify-center min-h-[50vh] p-8">
                           <div className="text-center">
@@ -65,17 +66,7 @@ const App: React.FC = () => {
                         </Suspense>
                       </ErrorBoundary>
                     </div>
-                    <footer className="text-center py-8 px-4 border-t border-default">
-                      <p className="text-muted text-sm mb-2">
-                        Powered by <a href="https://x.ai" className="underline hover:text-default transition-colors" target="_blank" rel="noopener noreferrer">XAI's Grok API</a>
-                      </p>
-                      <p className="text-muted text-xs">
-                        <Link to="/about" className="hover:text-default transition-colors">About</Link> •
-                        <Link to="/support" className="hover:text-default transition-colors ml-2">Support</Link> •
-                        <Link to="/privacy" className="hover:text-default transition-colors ml-2">Privacy</Link> •
-                        <Link to="/terms" className="hover:text-default transition-colors ml-2">Terms</Link>
-                      </p>
-                    </footer>
+                    <FloatingFooter />
                   </div>
                 </BrowserRouter>
               </PinnedItemsProvider>
