@@ -26,6 +26,21 @@ export const AboutPage: React.FC = () => {
         </div>
 
         <div className="space-y-8 sm:space-y-12">
+          <section className="bg-accent/5 border border-accent/20 p-5 sm:p-6 rounded-sm">
+            <h2 className="text-lg sm:text-xl font-bold text-default mb-4 tracking-tight">Our Mission</h2>
+            <div className="space-y-4 text-default/90 leading-relaxed">
+              <p>
+                At Sancho, we believe in giving people beautiful and functional interfaces to advance their learning and love of poetry, writing, and literature. Your data is yours alone, and we will always actively update our privacy and encryption standards to serve the user.
+              </p>
+              <p>
+                Sancho is an independent and open source effort created out of love and hope for future generations to write their own poems of any kind. Conventions are useful, but the best poets break them.
+              </p>
+              <p>
+                We're excited to see what could be possible with Sancho, a tool we wish we had as young writers. If you would like to partner with us in your educational institution, please visit our <Link to="/support" className="text-accent hover:underline underline-offset-2">support page</Link>.
+              </p>
+            </div>
+          </section>
+
           <section className="border-l-2 border-default/20 pl-4 sm:pl-6">
             <h2 className="text-lg sm:text-xl font-bold text-default mb-4 tracking-tight">What is Sancho?</h2>
             <div className="space-y-4 text-default/90 leading-relaxed">
