@@ -32,16 +32,9 @@ export const Header: React.FC = () => {
     <>
       <header className="sticky top-0 w-full bg-bg/80 backdrop-blur-md border-b border-default z-50 px-4 sm:px-6 md:px-8">
         <div className="max-w-5xl mx-auto h-16 flex items-center justify-between">
-          <div className="flex items-baseline gap-4 sm:gap-8">
-            <Link to="/" className="text-lg font-bold text-default hover:text-accent transition-colors tracking-tight leading-none interactive-base">
-              SanchoPoetry.ref
-            </Link>
-            <nav className="flex gap-4 sm:gap-6">
-              <Link to="/about" className="text-sm text-muted interactive-muted hover:underline underline-offset-4 transition-all leading-none interactive-base">
-                About
-              </Link>
-            </nav>
-          </div>
+          <Link to="/" className="text-lg font-bold text-default hover:text-accent transition-colors tracking-tight leading-none interactive-base">
+            SanchoPoetry.ref
+          </Link>
           <div className="flex items-center gap-1.5 sm:gap-3">
             {isAuthenticated && (
               <button
