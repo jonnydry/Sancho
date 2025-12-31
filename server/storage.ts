@@ -1,9 +1,10 @@
 import { users, pinnedItems, journalEntries } from "../shared/schema.js";
 import { db } from "./db.js";
 import { eq, and, desc } from "drizzle-orm";
-import { InferSelectModel } from "drizzle-orm";
+import { InferSelectModel, InferInsertModel } from "drizzle-orm";
 
 type User = InferSelectModel<typeof users>;
+type UserInsert = InferInsertModel<typeof users>;
 type PinnedItem = InferSelectModel<typeof pinnedItems>;
 
 // Simple in-memory cache with TTL for frequently accessed data
