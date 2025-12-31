@@ -34,13 +34,13 @@ export const AboutPage: React.FC = () => {
                 Sancho is a comprehensive poetry education platform named after Sancho Panza, the faithful squire from Miguel de Cervantes' "Don Quixote". Just as Sancho loyally served Don Quixote on his adventures, this application serves as your faithful companion on your journey through the world of poetry.
               </p>
               <p>
-                Whether you're a student, teacher, writer, or poetry enthusiast, Sancho provides instant access to essential poetic knowledge with AI-powered examples and classic snippets.
+                Whether you're a student, teacher, writer, or poetry enthusiast, Sancho provides instant access to essential poetic knowledge with AI-powered examples, classic snippets, and a personal journal to capture your creative thoughts.
               </p>
             </div>
           </section>
 
           <section>
-            <h2 className="text-lg sm:text-xl font-bold text-default mb-6 sm:mb-8 tracking-tight border-b border-default/20 pb-2">Features</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-default mb-6 sm:mb-8 tracking-tight border-b border-default/20 pb-2">Reference Library</h2>
             <div className="grid md:grid-cols-2 gap-5 sm:gap-8">
               <div className="group">
                 <h3 className="flex items-center gap-2 text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">
@@ -71,15 +71,6 @@ export const AboutPage: React.FC = () => {
               </div>
               <div className="group">
                 <h3 className="flex items-center gap-2 text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">
-                  <AiExamplesIcon className="w-5 h-5" />
-                  <span>AI-Powered Examples</span>
-                </h3>
-                <p className="text-muted text-sm leading-relaxed">
-                  Generate fresh poetry examples using XAI's Grok model to see any form, meter, or device in action.
-                </p>
-              </div>
-              <div className="group">
-                <h3 className="flex items-center gap-2 text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">
                   <ClassicSnippetsIcon className="w-5 h-5" />
                   <span>Classic Snippets</span>
                 </h3>
@@ -87,6 +78,88 @@ export const AboutPage: React.FC = () => {
                   Each entry includes authentic examples from renowned poets throughout literary history.
                 </p>
               </div>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-lg sm:text-xl font-bold text-default mb-6 sm:mb-8 tracking-tight border-b border-default/20 pb-2">Interactive Features</h2>
+            <div className="grid md:grid-cols-2 gap-5 sm:gap-8">
+              <div className="group">
+                <h3 className="flex items-center gap-2 text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">
+                  <AiExamplesIcon className="w-5 h-5" />
+                  <span>AI-Powered Examples</span>
+                </h3>
+                <p className="text-muted text-sm leading-relaxed">
+                  Generate fresh poetry examples using XAI's Grok model. See any form, meter, or device brought to life with original compositions.
+                </p>
+              </div>
+              <div className="group">
+                <h3 className="flex items-center gap-2 text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M12 6.5c1.5-2 4-2.5 6-1s2.5 4 1 6l-7 8-7-8c-1.5-2-1-4.5 1-6s4.5-.5 6 1z" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  <span>Historical Context</span>
+                </h3>
+                <p className="text-muted text-sm leading-relaxed">
+                  Select any reference item to explore its origins and evolution with AI-generated historical insights in the detail panel.
+                </p>
+              </div>
+              <div className="group">
+                <h3 className="flex items-center gap-2 text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M4 4h16v16H4z" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M4 9h16M9 4v16" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  <span>Detail Panel</span>
+                </h3>
+                <p className="text-muted text-sm leading-relaxed">
+                  Select a reference item to open a resizable bottom panel with AI examples, historical context, and related topics.
+                </p>
+              </div>
+              <div className="group">
+                <h3 className="flex items-center gap-2 text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M7 7h10M7 12h10M7 17h6" strokeLinecap="round"/>
+                  </svg>
+                  <span>Smart Tagging</span>
+                </h3>
+                <p className="text-muted text-sm leading-relaxed">
+                  Clickable tags connect related concepts. Select a tag to instantly filter the reference library by that topic.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section className="bg-bg-alt/30 border border-default/20 p-5 sm:p-6 rounded-sm">
+            <h2 className="text-lg sm:text-xl font-bold text-default mb-4 tracking-tight">Personal Journal</h2>
+            <div className="space-y-4 text-default/90 leading-relaxed">
+              <p>
+                Capture your creative thoughts with a built-in markdown journal. Write poetry, notes, or reflections with real-time preview and organize entries with custom tags.
+              </p>
+              <ul className="space-y-2 text-sm text-muted">
+                <li className="flex items-start gap-2">
+                  <span className="text-accent mt-1">&#8226;</span>
+                  <span><strong className="text-default">Account Sync:</strong> Log in to save entries to your account and access them across sessions</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-accent mt-1">&#8226;</span>
+                  <span><strong className="text-default">Local Mode:</strong> Use the journal without logging in (entries stored in browser only)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-accent mt-1">&#8226;</span>
+                  <span><strong className="text-default">Tag System:</strong> Organize entries with space or comma-separated tags for easy filtering</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-accent mt-1">&#8226;</span>
+                  <span><strong className="text-default">Markdown Support:</strong> Format your writing with headers, lists, emphasis, and more</span>
+                </li>
+              </ul>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-lg sm:text-xl font-bold text-default mb-6 sm:mb-8 tracking-tight border-b border-default/20 pb-2">Account Features</h2>
+            <div className="grid md:grid-cols-2 gap-5 sm:gap-8">
               <div className="group">
                 <h3 className="flex items-center gap-2 text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">
                   <PremiumThemesIcon className="w-5 h-5" />
@@ -94,6 +167,17 @@ export const AboutPage: React.FC = () => {
                 </h3>
                 <p className="text-muted text-sm leading-relaxed">
                   Unlock beautiful Paper and Slate color schemes by logging in with your Replit account.
+                </p>
+              </div>
+              <div className="group">
+                <h3 className="flex items-center gap-2 text-sm font-bold text-default uppercase tracking-wider mb-2 group-hover:text-accent transition-colors">
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  <span>Saved Items</span>
+                </h3>
+                <p className="text-muted text-sm leading-relaxed">
+                  Pin your favorite forms, meters, and devices for quick access from your personal collection.
                 </p>
               </div>
             </div>
@@ -108,24 +192,28 @@ export const AboutPage: React.FC = () => {
               <ul className="space-y-3 text-sm text-muted font-mono">
                 <li className="flex items-start gap-2">
                   <span className="text-accent">01.</span>
-                  <span>Frontend: React 19 with TypeScript, Tailwind CSS</span>
+                  <span>Frontend: React 19 + TypeScript, Tailwind CSS v4</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-accent">02.</span>
-                  <span>Backend: Express.js with secure API architecture</span>
+                  <span>Backend: Express.js with full TypeScript coverage</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-accent">03.</span>
-                  <span>AI: XAI's Grok API with multi-model optimization</span>
+                  <span>Database: PostgreSQL with Drizzle ORM</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-accent">04.</span>
-                  <span>Authentication: Replit Auth with PostgreSQL session storage</span>
+                  <span>AI: XAI Grok API for examples and context</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-accent">05.</span>
+                  <span>Auth: Replit OpenID Connect with session storage</span>
                 </li>
               </ul>
               <div className="mt-6 pt-6 border-t border-default/10">
                 <p className="text-xs text-muted italic">
-                  Latest optimization: Multi-model AI strategy reduces page load times by 40-50% while maintaining premium content quality through intelligent model selection.
+                  Performance optimized with lazy loading, cache-first strategies, and error boundaries for a smooth, resilient experience.
                 </p>
               </div>
             </div>
