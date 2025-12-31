@@ -39,7 +39,7 @@ export const UpgradePrompt: React.FC<UpgradePromptProps> = ({ isOpen, onClose })
 
   const benefits = [
     { Icon: InfinityIcon, title: 'Unlimited Saves', desc: 'Save as many poetry items as you like' },
-    { Icon: PenIcon, title: 'Journal Access', desc: 'Write and organize your poetry notes' },
+    { Icon: PenIcon, title: 'Journal Access', desc: 'Your personal writing space — write alongside the full reference library with markdown, live preview, and custom tags' },
     { Icon: RefreshIcon, title: 'Sync Everywhere', desc: 'Access your notebook on any device' },
     { Icon: CloudIcon, title: 'Google Drive Export', desc: 'Back up notes to your Drive' },
   ];
