@@ -1,8 +1,8 @@
-# Sancho - Poetry Guide
+# SanchoPoetry.ref - Poetry Guide
 
 ## Overview
 
-Sancho is a React-based web application that serves as a comprehensive guide to poetry. It allows users to explore various poetic forms, meters, and devices, and provides AI-generated poetry examples using XAI's Grok model. The project aims to be a valuable resource for poetry enthusiasts and learners, offering a rich educational experience with a focus on user-friendly design and modern web technologies. Key capabilities include an extensive poetry database, AI-powered examples, a dynamic theming system, responsive design, Replit Auth integration, and SEO optimization.
+SanchoPoetry.ref is a React-based web application that serves as a comprehensive guide to poetry. It allows users to explore various poetic forms, meters, and devices, and provides AI-powered historical context using XAI's Grok model. The project aims to be a valuable resource for poetry enthusiasts and learners, offering a rich educational experience with a focus on user-friendly design and modern web technologies. Key capabilities include an extensive poetry database, AI-powered historical context, a dynamic theming system, responsive design, Replit Auth integration, and SEO optimization.
 
 ## User Preferences
 
@@ -41,7 +41,7 @@ The project utilizes a dual-server architecture with a React frontend (Vite) and
 
 ## External Dependencies
 
-- **XAI Grok API**: Used for AI-powered poetry example generation and dynamic Sancho Panza quotes.
+- **XAI Grok API**: Used for AI-powered historical context and dynamic Sancho Panza quotes.
 - **PostgreSQL**: Database for storing user information, session data, and journal entries.
 - **Replit Auth**: Authentication service for user login and management.
 - **Tailwind CSS v4**: Utility-first CSS framework for styling.
