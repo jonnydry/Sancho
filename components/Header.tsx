@@ -87,7 +87,7 @@ export const Header: React.FC = () => {
       onClick={() => setIsNotebookOpen(true)}
       onMouseEnter={() => setIsNotebookHovered(true)}
       onMouseLeave={() => setIsNotebookHovered(false)}
-      className="flex items-center justify-center p-1.5 sm:p-2 rounded-full text-muted hover:text-accent hover:bg-accent/10 transition-all duration-200 interactive-base interactive-scale"
+      className="flex items-center justify-center p-1.5 sm:p-2 rounded-full text-muted interactive-muted hover:bg-accent/10 transition-all duration-200 interactive-base interactive-scale"
       aria-label="Open Notebook"
       title="Notebook"
     >
