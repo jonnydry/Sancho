@@ -123,6 +123,82 @@ export const TermsPage: React.FC = () => {
             </div>
           </section>
 
+          <section className="bg-bg-alt/30 p-5 sm:p-6 border border-default/20 rounded-sm">
+            <h3 className="text-sm font-bold text-default uppercase tracking-wider mb-3 flex items-center gap-2">
+              <ScrollIcon className="w-5 h-5 text-accent" />
+              <span>Don Quixote Quotes</span>
+            </h3>
+            <p className="text-muted text-sm leading-relaxed mb-3">
+              Quotes from Sancho Panza featured in this application are sourced from Miguel de Cervantes' <em>Don Quixote</em> (1605, 1615), a work in the public domain. Our AI-generated quotes aim to capture the spirit of acclaimed English translations, particularly the clarity and wit found in Edith Grossman's celebrated 2003 translation published by Ecco/HarperCollins.
+            </p>
+            <p className="text-xs text-muted/70 italic">
+              While we strive for accuracy, AI-generated quotes should be verified against authoritative translations for academic or scholarly use.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-lg sm:text-xl font-bold text-default mb-6 sm:mb-8 tracking-tight border-b border-default/20 pb-2">Third-Party Attributions</h2>
+            <div className="bg-bg-alt/30 p-5 sm:p-6 border border-default/20 rounded-sm">
+              <p className="text-muted text-sm leading-relaxed mb-4">
+                Sancho is built with the following open source technologies and services:
+              </p>
+              <div className="grid sm:grid-cols-2 gap-3 text-sm text-muted">
+                <div className="p-3 border border-default/20 bg-bg-alt/20 rounded-sm">
+                  <span className="font-bold text-default">React</span>
+                  <span className="text-muted/70 ml-2">— UI Framework (MIT License)</span>
+                </div>
+                <div className="p-3 border border-default/20 bg-bg-alt/20 rounded-sm">
+                  <span className="font-bold text-default">Tailwind CSS</span>
+                  <span className="text-muted/70 ml-2">— Styling (MIT License)</span>
+                </div>
+                <div className="p-3 border border-default/20 bg-bg-alt/20 rounded-sm">
+                  <span className="font-bold text-default">Vite</span>
+                  <span className="text-muted/70 ml-2">— Build Tool (MIT License)</span>
+                </div>
+                <div className="p-3 border border-default/20 bg-bg-alt/20 rounded-sm">
+                  <span className="font-bold text-default">Express.js</span>
+                  <span className="text-muted/70 ml-2">— Server (MIT License)</span>
+                </div>
+                <div className="p-3 border border-default/20 bg-bg-alt/20 rounded-sm">
+                  <span className="font-bold text-default">Drizzle ORM</span>
+                  <span className="text-muted/70 ml-2">— Database (Apache 2.0)</span>
+                </div>
+                <div className="p-3 border border-default/20 bg-bg-alt/20 rounded-sm">
+                  <span className="font-bold text-default">PostgreSQL</span>
+                  <span className="text-muted/70 ml-2">— Database (PostgreSQL License)</span>
+                </div>
+              </div>
+              <p className="text-xs text-muted/70 mt-4 pt-3 border-t border-default/10">
+                <strong>Services:</strong> Replit (hosting & authentication), xAI Grok (AI features), Stripe (payment processing), Google Drive API (export functionality).
+              </p>
+            </div>
+          </section>
+
+          <section className="border-l-2 border-accent/50 pl-4 sm:pl-6 py-2">
+            <h3 className="text-sm font-bold text-default uppercase tracking-wider mb-3">XAI Acceptable Use</h3>
+            <p className="text-muted mb-4 leading-relaxed text-sm">
+              Our use of xAI's Grok API complies with xAI's Acceptable Use Policy:
+            </p>
+            <ul className="space-y-2 text-sm text-muted font-mono">
+              <li className="flex items-start gap-2">
+                <span className="text-accent">01.</span>
+                <span>Content is strictly educational (poetry history & context)</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-accent">02.</span>
+                <span>No generation of harmful, illegal, or misleading content</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-accent">03.</span>
+                <span>User prompts are sanitized and validated</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-accent">04.</span>
+                <span>Rate limiting prevents abuse of AI resources</span>
+              </li>
+            </ul>
+          </section>
+
           <section className="bg-bg-alt/50 border border-default/30 p-5 sm:p-8 rounded-sm">
             <h2 className="text-lg sm:text-xl font-bold text-default mb-4 sm:mb-6 tracking-tight">Rate Limiting</h2>
             <p className="text-default/90 mb-4">

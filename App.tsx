@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Header } from './components/Header';
 import { FloatingFooter } from './components/FloatingFooter';
+import { CookieConsent } from './components/CookieConsent';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { FontProvider } from './contexts/FontContext';
@@ -67,6 +68,7 @@ const App: React.FC = () => {
                       </ErrorBoundary>
                     </div>
                     <FloatingFooter />
+                    <CookieConsent />
                   </div>
                 </BrowserRouter>
               </PinnedItemsProvider>
