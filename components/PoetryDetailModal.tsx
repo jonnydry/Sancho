@@ -23,6 +23,7 @@ interface PoetryDetailModalProps {
   onClose: () => void;
   onSelectItem?: (itemName: string) => void;
   onTagClick?: (tag: string) => void;
+  onBackdropClick?: () => void;
 }
 
 const SectionHeader: React.FC<{ icon: React.ReactNode; title: string }> = ({ icon, title }) => (
@@ -71,7 +72,7 @@ const TagButton: React.FC<{ onClick?: () => void; children: React.ReactNode }> =
   </button>
 );
 
-const PoetryDetailModalContent: React.FC<PoetryDetailModalProps> = ({ item, onClose, onSelectItem, onTagClick }) => {
+const PoetryDetailModalContent: React.FC<PoetryDetailModalProps> = ({ item, onClose, onSelectItem, onTagClick, onBackdropClick }) => {
   const [learnMoreContext, setLearnMoreContext] = useState<string | null>(null);
   const [isLoadingLearnMore, setIsLoadingLearnMore] = useState(false);
   const [learnMoreError, setLearnMoreError] = useState<string | null>(null);
@@ -144,8 +145,11 @@ const PoetryDetailModalContent: React.FC<PoetryDetailModalProps> = ({ item, onCl
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-bg/80 backdrop-blur-sm animate-fade-in-fast"
-      onClick={onClose}
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-bg/80 backdrop-blur-sm animate-fade-in-fast"
+      onClick={() => {
+        onClose();
+        onBackdropClick?.();
+      }}
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
@@ -301,7 +305,7 @@ export const PoetryDetailModal: React.FC<PoetryDetailModalProps> = (props) => {
   return (
     <ErrorBoundary fallback={
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-bg/80 backdrop-blur-sm"
+        className="fixed inset-0 z-[60] flex items-center justify-center bg-bg/80 backdrop-blur-sm"
         onClick={props.onClose}
       >
         <div

@@ -107,8 +107,11 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
     ))
   ), [pinnedItems, handleCardClick]);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = (shouldCloseSidebar = false) => {
     setSelectedItem(null);
+    if (shouldCloseSidebar) {
+      onClose();
+    }
   };
 
   const handleDeleteAccount = async () => {
@@ -332,7 +335,11 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
       {/* Modal for selected item */}
       {selectedItem && (
         <Suspense fallback={<ModalFallback />}>
-          <PoetryDetailModal item={selectedItem} onClose={handleCloseModal} />
+          <PoetryDetailModal 
+            item={selectedItem} 
+            onClose={handleCloseModal}
+            onBackdropClick={() => onClose()}
+          />
         </Suspense>
       )}
     </div>
