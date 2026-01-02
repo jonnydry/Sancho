@@ -6,13 +6,37 @@ import { Request, Response, NextFunction, Application } from "express";
 import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage.js";
+import type { SessionUser, OAuthClaims } from "./express.d.ts";
+
+function getClientId(): string {
+  const replId = process.env.REPL_ID;
+  if (!replId) {
+    console.error('[Auth] REPL_ID is not set. Available env vars:', 
+      Object.keys(process.env).filter(k => k.startsWith('REPL') || k.startsWith('REPLIT')).join(', '));
+    throw new Error(
+      'REPL_ID environment variable is required for OAuth authentication. ' +
+      'This should be automatically set by Replit. If you see this error in production, ' +
+      'ensure the deployment has access to Replit environment variables.'
+    );
+  }
+  return replId;
+}
 
 const getOidcConfig = memoize(
   async () => {
-    return await client.discovery(
-      new URL(process.env.ISSUER_URL ?? "https://replit.com/oidc"),
-      process.env.REPL_ID
-    );
+    const clientId = getClientId();
+    console.log(`[Auth] Initializing OIDC discovery with client_id: ${clientId.substring(0, 8)}...`);
+    try {
+      const config = await client.discovery(
+        new URL(process.env.ISSUER_URL ?? "https://replit.com/oidc"),
+        clientId
+      );
+      console.log('[Auth] OIDC discovery completed successfully');
+      return config;
+    } catch (error) {
+      console.error('[Auth] OIDC discovery failed:', error);
+      throw error;
+    }
   },
   { maxAge: 3600 * 1000 }
 );
@@ -79,7 +103,14 @@ export function getSession(): ReturnType<typeof session> {
     ttl: sessionTtl,
     tableName: "sessions",
   });
-  const isProduction = process.env.NODE_ENV === 'production';
+  
+  // Detect production: either explicit NODE_ENV or Replit production deployment
+  // In Replit production deployments: REPLIT_DOMAINS is set but REPLIT_DEV_DOMAIN is not
+  const isReplitProduction = Boolean(process.env.REPLIT_DOMAINS && !process.env.REPLIT_DEV_DOMAIN);
+  const isProduction = process.env.NODE_ENV === 'production' || isReplitProduction;
+  
+  console.log(`[Auth] Session configuration - isProduction: ${isProduction}, NODE_ENV: ${process.env.NODE_ENV}, REPLIT_DEV_DOMAIN: ${process.env.REPLIT_DEV_DOMAIN ? 'set' : 'not set'}, REPLIT_DOMAINS: ${process.env.REPLIT_DOMAINS ? 'set' : 'not set'}`);
+  
   return session({
     secret: process.env.SESSION_SECRET,
     store: sessionStore,
@@ -87,27 +118,29 @@ export function getSession(): ReturnType<typeof session> {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: isProduction, // Only secure in production (HTTPS)
-      sameSite: isProduction ? 'none' : 'lax', // 'none' required for OAuth redirects in production
+      secure: true, // Always secure since Replit uses HTTPS
+      sameSite: 'none', // Required for OAuth cross-origin redirects
       maxAge: sessionTtl,
     },
   });
 }
 
-function updateUserSession(user, tokens) {
-  user.claims = tokens.claims();
+function updateUserSession(user: SessionUser, tokens: client.TokenEndpointResponse): void {
+  const getClaims = tokens.claims as (() => Record<string, unknown>) | undefined;
+  const claims = (getClaims ? getClaims() : {}) as unknown as OAuthClaims;
+  user.claims = claims;
   user.access_token = tokens.access_token;
   user.refresh_token = tokens.refresh_token;
-  user.expires_at = user.claims?.exp;
+  user.expires_at = claims?.exp;
 }
 
-async function upsertUser(claims) {
+async function upsertUser(claims: OAuthClaims): Promise<void> {
   await storage.upsertUser({
-    id: claims["sub"],
-    email: claims["email"],
-    firstName: claims["first_name"],
-    lastName: claims["last_name"],
-    profileImageUrl: claims["profile_image_url"],
+    id: claims.sub,
+    email: claims.email,
+    firstName: claims.first_name,
+    lastName: claims.last_name,
+    profileImageUrl: claims.profile_image_url,
   });
 }
 
@@ -119,10 +152,12 @@ export async function setupAuth(app: Application): Promise<void> {
 
   const config = await getOidcConfig();
 
-  const verify = async (tokens, verified) => {
-    const user = {};
+  const verify = async (tokens: client.TokenEndpointResponse, verified: (err: Error | null, user?: SessionUser) => void): Promise<void> => {
+    const user: SessionUser = {};
     updateUserSession(user, tokens);
-    await upsertUser(tokens.claims());
+    const getClaims = tokens.claims as (() => Record<string, unknown>) | undefined;
+    const claims = (getClaims ? getClaims() : {}) as unknown as OAuthClaims;
+    await upsertUser(claims);
     verified(null, user);
   };
 
@@ -131,7 +166,7 @@ export async function setupAuth(app: Application): Promise<void> {
 
   // Helper function to ensure strategy exists for a domain
   // Uses req.hostname (just hostname, no port) as required by Replit Auth
-  const ensureStrategy = (hostname) => {
+  const ensureStrategy = (hostname: string): void => {
     const strategyName = `replitauth:${hostname}`;
     if (!registeredStrategies.has(strategyName)) {
       const strategy = new Strategy(
@@ -150,8 +185,8 @@ export async function setupAuth(app: Application): Promise<void> {
     }
   };
 
-  passport.serializeUser((user, cb) => cb(null, user));
-  passport.deserializeUser((user, cb) => cb(null, user));
+  passport.serializeUser((user: Express.User, cb) => cb(null, user));
+  passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
     // Use req.hostname (not req.get('host')) - hostname without port
@@ -174,7 +209,7 @@ export async function setupAuth(app: Application): Promise<void> {
     req.logout(() => {
       res.redirect(
         client.buildEndSessionUrl(config, {
-          client_id: process.env.REPL_ID,
+          client_id: getClientId(),
           post_logout_redirect_uri: `${req.protocol}://${req.hostname}`,
         }).href
       );
@@ -186,41 +221,47 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
   const user = req.user;
 
   if (!req.isAuthenticated() || !user || !user.expires_at) {
-    return res.status(401).json({ 
+    res.status(401).json({ 
       error: "Authentication required",
       message: "Please log in to continue",
       code: "NOT_AUTHENTICATED"
     });
+    return;
   }
 
   const now = Math.floor(Date.now() / 1000);
   if (now <= user.expires_at) {
-    return next();
+    next();
+    return;
   }
 
   const refreshToken = user.refresh_token;
   if (!refreshToken) {
-    return res.status(401).json({ 
+    res.status(401).json({ 
       error: "Session expired",
       message: "Your session has expired. Please log in again",
       code: "SESSION_EXPIRED"
     });
+    return;
   }
 
   try {
     const config = await getOidcConfig();
     const tokenResponse = await client.refreshTokenGrant(config, refreshToken, {
-      client_id: process.env.REPL_ID
+      client_id: getClientId()
     });
-    updateUserSession(user, tokenResponse);
-    return next();
+    updateUserSession(user as SessionUser, tokenResponse);
+    next();
+    return;
   } catch (error) {
-    console.error("Token refresh failed:", error.message);
+    const err = error as Error;
+    console.error("Token refresh failed:", err.message);
     console.error("Token refresh error details:", error);
-    return res.status(401).json({ 
+    res.status(401).json({ 
       error: "Session expired",
       message: "Your session has expired. Please log in again",
       code: "TOKEN_REFRESH_FAILED"
     });
+    return;
   }
 };
