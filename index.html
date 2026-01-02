@@ -27,9 +27,8 @@
         }
 
         let initialColor = 'dark';
-        if (storedColor === 'paper' || storedColor === 'slate') {
-          initialColor = storedColor;
-        }
+        // Don't apply premium themes from localStorage - let React handle after auth check
+        // This prevents flash of premium theme for logged-out users
 
         root.classList.remove('light', 'dark', 'theme-paper', 'theme-slate', 'theme-parchment', 'theme-veridian');
         root.classList.add(initialMode);

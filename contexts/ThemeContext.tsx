@@ -23,8 +23,10 @@ const getInitialColor = (): ThemeColor => {
     return 'dark';
   }
   const storedColor = window.localStorage.getItem('theme-color');
+  // Don't apply premium themes initially - wait for auth check
+  // This prevents flash of premium theme for logged-out users
   if (storedColor === 'paper' || storedColor === 'slate') {
-    return storedColor;
+    return 'dark'; // Default to dark, will be restored if authenticated
   }
   return 'dark';
 };
@@ -73,6 +75,61 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const setColor = useCallback((newColor: ThemeColor) => {
     setColorState(newColor);
   }, []);
+
+  // Immediate auth check to restore premium theme if user is authenticated
+  // This runs without delay to minimize flash
+  useEffect(() => {
+    if (!isBrowser) return;
+    
+    const storedColor = window.localStorage.getItem('theme-color');
+    // Only check if there's a premium theme stored
+    if (!storedColor || !PREMIUM_THEMES.includes(storedColor as ThemeColor)) {
+      return;
+    }
+
+    let isActive = true;
+
+    const checkAuthAndRestoreTheme = async () => {
+      try {
+        const response = await fetch('/api/auth/user', { credentials: 'include' });
+        
+        if (!isActive) return;
+        
+        if (response.ok) {
+          const data = await response.json();
+          
+          if (!isActive) return;
+          
+          const isAuthenticated = data.authenticated;
+          
+          // If authenticated and premium theme is stored, restore it
+          if (isAuthenticated === true && PREMIUM_THEMES.includes(storedColor as ThemeColor)) {
+            setColorState(storedColor as ThemeColor);
+          } else if (isAuthenticated === false) {
+            // Not authenticated, ensure we're on dark theme
+            setColorState('dark');
+            window.localStorage.setItem('theme-color', 'dark');
+          }
+        } else {
+          // Not authenticated, ensure dark theme
+          setColorState('dark');
+          window.localStorage.setItem('theme-color', 'dark');
+        }
+      } catch (error) {
+        // On error, stay on dark theme (safe default)
+        if (isActive && process.env.NODE_ENV === 'development') {
+          console.warn('Initial auth check failed, staying on dark theme:', error);
+        }
+      }
+    };
+    
+    // Run immediately without delay
+    checkAuthAndRestoreTheme();
+    
+    return () => {
+      isActive = false;
+    };
+  }, []); // Run once on mount
 
   // Enforce theme restrictions: reset premium themes if stored but user logs out
   // Only reset on explicit unauthenticated response, not on errors or pending states
