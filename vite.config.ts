@@ -18,7 +18,15 @@ export default defineConfig(({ mode }) => {
         proxy: {
           '/api': {
             target: 'http://localhost:3001',
-            changeOrigin: false, // Keep original host for OAuth callbacks
+            changeOrigin: false,
+            configure: (proxy) => {
+              proxy.on('proxyReq', (proxyReq, req) => {
+                // Preserve original Host header for OAuth callback URL generation
+                if (req.headers.host) {
+                  proxyReq.setHeader('Host', req.headers.host);
+                }
+              });
+            }
           }
         }
       },
@@ -28,7 +36,14 @@ export default defineConfig(({ mode }) => {
         proxy: {
           '/api': {
             target: 'http://localhost:3001',
-            changeOrigin: false, // Keep original host for OAuth callbacks
+            changeOrigin: false,
+            configure: (proxy) => {
+              proxy.on('proxyReq', (proxyReq, req) => {
+                if (req.headers.host) {
+                  proxyReq.setHeader('Host', req.headers.host);
+                }
+              });
+            }
           }
         }
       },
