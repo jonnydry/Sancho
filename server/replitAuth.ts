@@ -87,8 +87,7 @@ export function getSession(): ReturnType<typeof session> {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
+      secure: isProduction, // Only secure in production (HTTPS)
       maxAge: sessionTtl,
     },
   });
