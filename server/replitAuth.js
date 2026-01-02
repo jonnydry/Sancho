@@ -88,6 +88,7 @@ export function getSession(): ReturnType<typeof session> {
     cookie: {
       httpOnly: true,
       secure: isProduction, // Only secure in production (HTTPS)
+      sameSite: isProduction ? 'none' : 'lax', // 'none' required for OAuth redirects in production
       maxAge: sessionTtl,
     },
   });
