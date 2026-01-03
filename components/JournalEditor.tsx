@@ -1484,63 +1484,68 @@ export const JournalEditor: React.FC = () => {
                 </button>
               )}
 
-              {showSaveConfirm && (
-                <span className="text-xs text-green-500 font-medium animate-pulse">
-                  Saved
-                </span>
-              )}
-              {showSaveError && (
-                <span className="text-xs text-red-500 font-medium">
-                  Save failed
-                </span>
-              )}
-              {autosaveError && !showSaveError && (
-                <div className="flex items-center gap-1">
-                  <span className="text-xs text-red-500 font-medium">
-                    Auto-save failed
-                  </span>
-                  <button
-                    onClick={handleRetrySave}
-                    className="text-xs text-red-500 hover:text-red-600 hover:bg-red-500/10 px-2 py-1 rounded underline transition-all duration-200 interactive-base"
-                    title="Retry save"
-                  >
-                    Retry
-                  </button>
+              {/* Compact Sync Status Indicator */}
+              {isAuthenticated && (
+                <div className="flex items-center">
+                  {showSaveConfirm ? (
+                    <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 text-xs font-medium">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                      Saved
+                    </span>
+                  ) : showSaveError || autosaveError ? (
+                    <button
+                      onClick={handleRetrySave}
+                      className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-red-500/10 text-red-600 dark:text-red-400 text-xs font-medium hover:bg-red-500/20 transition-colors interactive-base"
+                      title="Click to retry save"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                      </svg>
+                      Save failed · Retry
+                    </button>
+                  ) : syncStatus === "syncing" ? (
+                    <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-accent/10 text-accent text-xs font-medium">
+                      <svg className="animate-spin" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                      </svg>
+                      Syncing
+                    </span>
+                  ) : syncStatus === "local" ? (
+                    <span 
+                      className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 text-xs font-medium"
+                      title="Local changes pending sync"
+                    >
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
+                      </span>
+                      Unsaved
+                    </span>
+                  ) : syncStatus === "synced" && !showSaveConfirm ? (
+                    <span 
+                      className="flex items-center gap-1 text-green-500/70 text-xs"
+                      title="All changes synced"
+                    >
+                      <span className="relative flex h-2 w-2">
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                      </span>
+                    </span>
+                  ) : null}
                 </div>
               )}
               {!isAuthLoading && !isAuthenticated && !isZenMode && (
                 <span
-                  className="text-xs text-yellow-500 font-medium"
+                  className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 text-xs font-medium"
                   title="Not logged in - saved locally only"
                 >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  </svg>
                   Local Only
-                </span>
-              )}
-              {isAuthenticated &&
-                !autosaveError &&
-                !showSaveError &&
-                syncStatus === "synced" && (
-                  <span
-                    className="text-xs text-green-500/70 font-medium"
-                    title="Synced to server"
-                  >
-                    ●
-                  </span>
-                )}
-              {isAuthenticated && syncStatus === "syncing" && (
-                <span
-                  className="text-xs text-muted font-medium animate-pulse"
-                  title="Syncing..."
-                >
-                  Syncing...
-                </span>
-              )}
-              {isAuthenticated && syncStatus === "local" && (
-                <span
-                  className="text-xs text-yellow-500/70 font-medium"
-                  title="Local changes pending sync"
-                >
-                  ○
                 </span>
               )}
             </div>
@@ -1845,45 +1850,6 @@ export const JournalEditor: React.FC = () => {
               )}
             </div>
           </div>
-
-          {/* Unsaved Changes Banner */}
-          {!isZenMode && isAuthenticated && (syncStatus === "local" || syncStatus === "error" || autosaveError) && (
-            <div className={`px-4 py-2 flex items-center justify-between text-sm border-b ${
-              syncStatus === "error" || autosaveError
-                ? "bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-900/30 text-red-700 dark:text-red-400"
-                : "bg-yellow-50 dark:bg-yellow-900/10 border-yellow-200 dark:border-yellow-900/30 text-yellow-700 dark:text-yellow-400"
-            }`}>
-              <div className="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-                  <path d="M12 9v4"/>
-                  <path d="M12 17h.01"/>
-                </svg>
-                <span className="font-medium">
-                  {autosaveError ? `Auto-save failed: ${autosaveError}` : 
-                   syncStatus === "error" ? "Failed to save changes" :
-                   "You have unsaved changes"}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                {(syncStatus === "error" || autosaveError) && (
-                  <button
-                    onClick={handleRetrySave}
-                    className="px-3 py-1 text-xs font-medium rounded-md bg-red-100 dark:bg-red-900/20 hover:bg-red-200 dark:hover:bg-red-900/30 hover:shadow-sm transition-all duration-200 interactive-base interactive-scale"
-                  >
-                    Retry Save
-                  </button>
-                )}
-                <button
-                  onClick={handleManualSave}
-                  disabled={isSaving}
-                  className="px-3 py-1 text-xs font-medium rounded-md bg-accent hover:bg-accent-hover text-accent-text hover:shadow-sm transition-all duration-200 disabled:opacity-50 interactive-base interactive-scale"
-                >
-                  {isSaving ? "Saving..." : "Save Now"}
-                </button>
-              </div>
-            </div>
-          )}
 
           {exportStatus && (
             <div className={`px-4 py-2 flex items-center justify-between text-sm border-b ${
