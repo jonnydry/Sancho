@@ -109,7 +109,16 @@ export function getSession(): ReturnType<typeof session> {
   const isReplitProduction = Boolean(process.env.REPLIT_DOMAINS && !process.env.REPLIT_DEV_DOMAIN);
   const isProduction = process.env.NODE_ENV === 'production' || isReplitProduction;
   
-  console.log(`[Auth] Session configuration - isProduction: ${isProduction}, NODE_ENV: ${process.env.NODE_ENV}, REPLIT_DEV_DOMAIN: ${process.env.REPLIT_DEV_DOMAIN ? 'set' : 'not set'}, REPLIT_DOMAINS: ${process.env.REPLIT_DOMAINS ? 'set' : 'not set'}`);
+  // Extract cookie domain from custom domain or REPLIT_DOMAINS for cross-subdomain session sharing
+  // This fixes mobile login issues where www.domain.com and domain.com don't share cookies
+  let cookieDomain: string | undefined;
+  const customDomain = process.env.CUSTOM_DOMAIN; // e.g., "sanchopoetry.com"
+  if (customDomain) {
+    // Prefix with dot for subdomain matching (e.g., ".sanchopoetry.com" matches www and apex)
+    cookieDomain = customDomain.startsWith('.') ? customDomain : `.${customDomain}`;
+  }
+  
+  console.log(`[Auth] Session configuration - isProduction: ${isProduction}, NODE_ENV: ${process.env.NODE_ENV}, REPLIT_DEV_DOMAIN: ${process.env.REPLIT_DEV_DOMAIN ? 'set' : 'not set'}, REPLIT_DOMAINS: ${process.env.REPLIT_DOMAINS ? 'set' : 'not set'}, cookieDomain: ${cookieDomain || 'default'}`);
   
   return session({
     secret: process.env.SESSION_SECRET,
@@ -121,6 +130,7 @@ export function getSession(): ReturnType<typeof session> {
       secure: true, // Always secure since Replit uses HTTPS
       sameSite: 'none', // Required for OAuth cross-origin redirects
       maxAge: sessionTtl,
+      domain: cookieDomain, // Set domain for cross-subdomain session sharing (www vs apex)
     },
   });
 }
@@ -190,16 +200,26 @@ export async function setupAuth(app: Application): Promise<void> {
 
   app.get("/api/login", (req, res, next) => {
     // Use req.hostname (not req.get('host')) - hostname without port
-    ensureStrategy(req.hostname);
-    passport.authenticate(`replitauth:${req.hostname}`, {
+    const hostname = req.hostname;
+    const userAgent = req.get('user-agent') || 'unknown';
+    const isMobile = /mobile|android|iphone|ipad/i.test(userAgent);
+    console.log(`[Auth] Login initiated - hostname: ${hostname}, mobile: ${isMobile}, userAgent: ${userAgent.substring(0, 100)}`);
+    
+    ensureStrategy(hostname);
+    passport.authenticate(`replitauth:${hostname}`, {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
     })(req, res, next);
   });
 
   app.get("/api/callback", (req, res, next) => {
-    ensureStrategy(req.hostname);
-    passport.authenticate(`replitauth:${req.hostname}`, {
+    const hostname = req.hostname;
+    const userAgent = req.get('user-agent') || 'unknown';
+    const isMobile = /mobile|android|iphone|ipad/i.test(userAgent);
+    console.log(`[Auth] Callback received - hostname: ${hostname}, mobile: ${isMobile}, userAgent: ${userAgent.substring(0, 100)}`);
+    
+    ensureStrategy(hostname);
+    passport.authenticate(`replitauth:${hostname}`, {
       successReturnToOrRedirect: "/",
       failureRedirect: "/api/login",
     })(req, res, next);
