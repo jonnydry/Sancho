@@ -174,36 +174,24 @@ export async function setupAuth(app: Application): Promise<void> {
   // Keep track of registered strategies
   const registeredStrategies = new Set();
 
-  // Normalize hostname to canonical form (remove www prefix if custom domain)
-  // This ensures OAuth callback URL matches what Replit has registered
-  const getCanonicalHostname = (hostname: string): string => {
-    const customDomain = process.env.CUSTOM_DOMAIN;
-    if (customDomain && hostname === `www.${customDomain}`) {
-      console.log(`[Auth] Normalizing hostname from www.${customDomain} to ${customDomain}`);
-      return customDomain;
-    }
-    return hostname;
-  };
-
   // Helper function to ensure strategy exists for a domain
   // Uses req.hostname (just hostname, no port) as required by Replit Auth
   const ensureStrategy = (hostname: string): void => {
-    const canonicalHostname = getCanonicalHostname(hostname);
-    const strategyName = `replitauth:${canonicalHostname}`;
+    const strategyName = `replitauth:${hostname}`;
     if (!registeredStrategies.has(strategyName)) {
       const strategy = new Strategy(
         {
           name: strategyName,
           config,
           scope: "openid email profile offline_access",
-          // Callback URL must match the domain registered with Replit OAuth
-          callbackURL: `https://${canonicalHostname}/api/callback`,
+          // Callback URL must match the domain the user is accessing
+          callbackURL: `https://${hostname}/api/callback`,
         },
         verify,
       );
       passport.use(strategy);
       registeredStrategies.add(strategyName);
-      console.log(`Registered OAuth strategy for: ${canonicalHostname}`);
+      console.log(`Registered OAuth strategy for: ${hostname}`);
     }
   };
 
@@ -213,13 +201,12 @@ export async function setupAuth(app: Application): Promise<void> {
   app.get("/api/login", (req, res, next) => {
     // Use req.hostname (not req.get('host')) - hostname without port
     const hostname = req.hostname;
-    const canonicalHostname = getCanonicalHostname(hostname);
     const userAgent = req.get('user-agent') || 'unknown';
     const isMobile = /mobile|android|iphone|ipad/i.test(userAgent);
-    console.log(`[Auth] Login initiated - hostname: ${hostname}, canonical: ${canonicalHostname}, mobile: ${isMobile}, userAgent: ${userAgent.substring(0, 100)}`);
+    console.log(`[Auth] Login initiated - hostname: ${hostname}, mobile: ${isMobile}, userAgent: ${userAgent.substring(0, 100)}`);
     
     ensureStrategy(hostname);
-    passport.authenticate(`replitauth:${canonicalHostname}`, {
+    passport.authenticate(`replitauth:${hostname}`, {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
     })(req, res, next);
@@ -227,25 +214,23 @@ export async function setupAuth(app: Application): Promise<void> {
 
   app.get("/api/callback", (req, res, next) => {
     const hostname = req.hostname;
-    const canonicalHostname = getCanonicalHostname(hostname);
     const userAgent = req.get('user-agent') || 'unknown';
     const isMobile = /mobile|android|iphone|ipad/i.test(userAgent);
-    console.log(`[Auth] Callback received - hostname: ${hostname}, canonical: ${canonicalHostname}, mobile: ${isMobile}, userAgent: ${userAgent.substring(0, 100)}`);
+    console.log(`[Auth] Callback received - hostname: ${hostname}, mobile: ${isMobile}, userAgent: ${userAgent.substring(0, 100)}`);
     
     ensureStrategy(hostname);
-    passport.authenticate(`replitauth:${canonicalHostname}`, {
+    passport.authenticate(`replitauth:${hostname}`, {
       successReturnToOrRedirect: "/",
       failureRedirect: "/api/login",
     })(req, res, next);
   });
 
   app.get("/api/logout", (req, res) => {
-    const canonicalHostname = getCanonicalHostname(req.hostname);
     req.logout(() => {
       res.redirect(
         client.buildEndSessionUrl(config, {
           client_id: getClientId(),
-          post_logout_redirect_uri: `${req.protocol}://${canonicalHostname}`,
+          post_logout_redirect_uri: `${req.protocol}://${req.hostname}`,
         }).href
       );
     });

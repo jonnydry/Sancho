@@ -174,6 +174,18 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+// Redirect www to apex domain in production for consistent OAuth
+// This ensures all OAuth flows use the canonical domain
+app.use((req, res, next) => {
+  const customDomain = process.env.CUSTOM_DOMAIN;
+  if (customDomain && req.hostname === `www.${customDomain}`) {
+    const redirectUrl = `https://${customDomain}${req.originalUrl}`;
+    console.log(`[Redirect] www to apex: ${req.hostname} -> ${customDomain}`);
+    return res.redirect(301, redirectUrl);
+  }
+  next();
+});
+
 // Cookie parser for CSRF tokens
 app.use(cookieParser());
 
