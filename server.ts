@@ -175,13 +175,14 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Redirect www to apex domain in production for consistent OAuth
-// This ensures all OAuth flows use the canonical domain
+// Uses 302 (temporary) instead of 301 (permanent) to prevent browser caching issues
+// that could cause OAuth state mismatches on mobile devices
 app.use((req, res, next) => {
   const customDomain = process.env.CUSTOM_DOMAIN;
   if (customDomain && req.hostname === `www.${customDomain}`) {
     const redirectUrl = `https://${customDomain}${req.originalUrl}`;
-    console.log(`[Redirect] www to apex: ${req.hostname} -> ${customDomain}`);
-    return res.redirect(301, redirectUrl);
+    console.log(`[Redirect] www to apex: ${req.hostname} -> ${customDomain} (302 temporary)`);
+    return res.redirect(302, redirectUrl);
   }
   next();
 });

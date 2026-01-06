@@ -154,6 +154,40 @@ async function upsertUser(claims: OAuthClaims): Promise<void> {
   });
 }
 
+// Get the canonical hostname for OAuth - always use the primary domain
+// This ensures OAuth callback URL is consistent regardless of www vs apex access
+function getCanonicalHostname(requestHostname: string): string {
+  // For local development, always use the request hostname
+  // This handles localhost, 127.0.0.1, etc.
+  if (requestHostname === 'localhost' || requestHostname.startsWith('127.') || requestHostname === '0.0.0.0') {
+    return requestHostname;
+  }
+  
+  // In production with custom domain, always use the canonical (apex) domain
+  const customDomain = process.env.CUSTOM_DOMAIN;
+  if (customDomain) {
+    // Strip www prefix if present, use the apex domain
+    return customDomain.replace(/^www\./, '');
+  }
+  
+  // For Replit production domains (no dev domain means production)
+  if (process.env.REPLIT_DOMAINS && !process.env.REPLIT_DEV_DOMAIN) {
+    const primaryDomain = process.env.REPLIT_DOMAINS.split(',')[0].trim();
+    if (primaryDomain) {
+      return primaryDomain;
+    }
+  }
+  
+  // For dev environment with REPLIT_DEV_DOMAIN, use the request hostname
+  // This allows the dev preview to work correctly
+  if (process.env.REPLIT_DEV_DOMAIN) {
+    return requestHostname;
+  }
+  
+  // Fallback to request hostname
+  return requestHostname;
+}
+
 export async function setupAuth(app: Application): Promise<void> {
   app.set("trust proxy", 1);
   app.use(getSession());
@@ -171,55 +205,62 @@ export async function setupAuth(app: Application): Promise<void> {
     verified(null, user);
   };
 
-  // Keep track of registered strategies
-  const registeredStrategies = new Set();
+  // Keep track of registered strategies - we only need ONE strategy for the canonical domain
+  const registeredStrategies = new Set<string>();
 
-  // Helper function to ensure strategy exists for a domain
-  // Uses req.hostname (just hostname, no port) as required by Replit Auth
-  const ensureStrategy = (hostname: string): void => {
-    const strategyName = `replitauth:${hostname}`;
+  // Helper function to ensure strategy exists for the canonical domain
+  // IMPORTANT: Always uses the canonical domain to ensure OAuth callback URL matches
+  // what's registered with Replit OAuth (only apex domain is whitelisted)
+  const ensureStrategy = (requestHostname: string): string => {
+    const canonicalHostname = getCanonicalHostname(requestHostname);
+    const strategyName = `replitauth:${canonicalHostname}`;
+    
     if (!registeredStrategies.has(strategyName)) {
+      const callbackURL = `https://${canonicalHostname}/api/callback`;
+      console.log(`[Auth] Registering OAuth strategy - canonical: ${canonicalHostname}, callback: ${callbackURL}, request was from: ${requestHostname}`);
+      
       const strategy = new Strategy(
         {
           name: strategyName,
           config,
           scope: "openid email profile offline_access",
-          // Callback URL must match the domain the user is accessing
-          callbackURL: `https://${hostname}/api/callback`,
+          callbackURL,
         },
         verify,
       );
       passport.use(strategy);
       registeredStrategies.add(strategyName);
-      console.log(`Registered OAuth strategy for: ${hostname}`);
     }
+    
+    return strategyName;
   };
 
   passport.serializeUser((user: Express.User, cb) => cb(null, user));
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
-    // Use req.hostname (not req.get('host')) - hostname without port
-    const hostname = req.hostname;
+    const requestHostname = req.hostname;
+    const canonicalHostname = getCanonicalHostname(requestHostname);
     const userAgent = req.get('user-agent') || 'unknown';
     const isMobile = /mobile|android|iphone|ipad/i.test(userAgent);
-    console.log(`[Auth] Login initiated - hostname: ${hostname}, mobile: ${isMobile}, userAgent: ${userAgent.substring(0, 100)}`);
+    console.log(`[Auth] Login initiated - request: ${requestHostname}, canonical: ${canonicalHostname}, mobile: ${isMobile}`);
     
-    ensureStrategy(hostname);
-    passport.authenticate(`replitauth:${hostname}`, {
+    const strategyName = ensureStrategy(requestHostname);
+    passport.authenticate(strategyName, {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
     })(req, res, next);
   });
 
   app.get("/api/callback", (req, res, next) => {
-    const hostname = req.hostname;
+    const requestHostname = req.hostname;
+    const canonicalHostname = getCanonicalHostname(requestHostname);
     const userAgent = req.get('user-agent') || 'unknown';
     const isMobile = /mobile|android|iphone|ipad/i.test(userAgent);
-    console.log(`[Auth] Callback received - hostname: ${hostname}, mobile: ${isMobile}, userAgent: ${userAgent.substring(0, 100)}`);
+    console.log(`[Auth] Callback received - request: ${requestHostname}, canonical: ${canonicalHostname}, mobile: ${isMobile}`);
     
-    ensureStrategy(hostname);
-    passport.authenticate(`replitauth:${hostname}`, {
+    const strategyName = ensureStrategy(requestHostname);
+    passport.authenticate(strategyName, {
       successReturnToOrRedirect: "/",
       failureRedirect: "/api/login",
     })(req, res, next);
