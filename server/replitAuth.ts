@@ -197,12 +197,22 @@ export async function setupAuth(app: Application): Promise<void> {
   const config = await getOidcConfig();
 
   const verify = async (tokens: client.TokenEndpointResponse, verified: (err: Error | null, user?: SessionUser) => void): Promise<void> => {
-    const user: SessionUser = {};
-    updateUserSession(user, tokens);
-    const getClaims = tokens.claims as (() => Record<string, unknown>) | undefined;
-    const claims = (getClaims ? getClaims() : {}) as unknown as OAuthClaims;
-    await upsertUser(claims);
-    verified(null, user);
+    try {
+      console.log('[Auth] Verify callback started - processing tokens');
+      const user: SessionUser = {};
+      updateUserSession(user, tokens);
+      const getClaims = tokens.claims as (() => Record<string, unknown>) | undefined;
+      const claims = (getClaims ? getClaims() : {}) as unknown as OAuthClaims;
+      console.log(`[Auth] Claims extracted - sub: ${claims?.sub || 'missing'}, email: ${claims?.email || 'missing'}`);
+      
+      await upsertUser(claims);
+      console.log('[Auth] User upserted successfully');
+      
+      verified(null, user);
+    } catch (error) {
+      console.error('[Auth] Verify callback error:', error);
+      verified(error as Error);
+    }
   };
 
   // Keep track of registered strategies - we only need ONE strategy for the canonical domain
@@ -244,8 +254,24 @@ export async function setupAuth(app: Application): Promise<void> {
     const userAgent = req.get('user-agent') || 'unknown';
     const isMobile = /mobile|android|iphone|ipad/i.test(userAgent);
     console.log(`[Auth] Login initiated - request: ${requestHostname}, canonical: ${canonicalHostname}, mobile: ${isMobile}`);
+    console.log(`[Auth] Session ID at login start: ${req.sessionID || 'none'}`);
     
     const strategyName = ensureStrategy(requestHostname);
+    
+    // Wrap the authenticate call to log cookie headers after redirect is set
+    const originalRedirect = res.redirect.bind(res);
+    res.redirect = ((statusOrUrl: number | string, url?: string) => {
+      const setCookieHeader = res.getHeader('set-cookie');
+      console.log(`[Auth] Redirect initiated with set-cookie header: ${setCookieHeader ? 'present' : 'MISSING'}`);
+      if (setCookieHeader) {
+        console.log(`[Auth] Cookie header value (first 100 chars): ${String(setCookieHeader).substring(0, 100)}...`);
+      }
+      if (typeof statusOrUrl === 'number') {
+        return originalRedirect(statusOrUrl, url as string);
+      }
+      return originalRedirect(statusOrUrl);
+    }) as typeof res.redirect;
+    
     passport.authenticate(strategyName, {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
@@ -258,11 +284,51 @@ export async function setupAuth(app: Application): Promise<void> {
     const userAgent = req.get('user-agent') || 'unknown';
     const isMobile = /mobile|android|iphone|ipad/i.test(userAgent);
     console.log(`[Auth] Callback received - request: ${requestHostname}, canonical: ${canonicalHostname}, mobile: ${isMobile}`);
+    console.log(`[Auth] Callback query params: code=${req.query.code ? 'present' : 'missing'}, state=${req.query.state ? 'present' : 'missing'}, error=${req.query.error || 'none'}`);
+    console.log(`[Auth] Session ID: ${req.sessionID || 'none'}, session exists: ${!!req.session}`);
+    console.log(`[Auth] Session data keys: ${req.session ? Object.keys(req.session).join(', ') : 'no session'}`);
+    
+    // Check if session cookie was sent - if not, state validation will fail
+    const cookieHeader = req.headers.cookie;
+    const hasSessionCookie = cookieHeader?.includes('connect.sid');
+    console.log(`[Auth] Cookie header present: ${!!cookieHeader}, session cookie found: ${hasSessionCookie}`);
+    
+    if (!hasSessionCookie && req.query.state) {
+      // Session cookie wasn't sent back - this will cause state mismatch
+      console.error(`[Auth] CRITICAL: No session cookie on callback! Browser may be blocking cookies. User-Agent: ${userAgent}`);
+      // Redirect with clear error message instead of letting it hang
+      return res.redirect('/?login_error=cookies_blocked&message=Please+enable+cookies+and+try+again');
+    }
+    
+    // Handle OAuth error responses from Replit
+    if (req.query.error) {
+      console.error(`[Auth] OAuth error from provider: ${req.query.error} - ${req.query.error_description || 'no description'}`);
+      return res.redirect('/api/login?error=oauth_denied');
+    }
     
     const strategyName = ensureStrategy(requestHostname);
-    passport.authenticate(strategyName, {
-      successReturnToOrRedirect: "/",
-      failureRedirect: "/api/login",
+    passport.authenticate(strategyName, (err: Error | null, user: Express.User | false, info: object | undefined) => {
+      if (err) {
+        console.error(`[Auth] Passport authentication error:`, err.message);
+        console.error(`[Auth] Full error:`, err);
+        return res.redirect('/api/login?error=auth_failed');
+      }
+      
+      if (!user) {
+        console.error(`[Auth] No user returned from authentication. Info:`, info);
+        return res.redirect('/api/login?error=no_user');
+      }
+      
+      // Manually log in the user
+      req.logIn(user, (loginErr) => {
+        if (loginErr) {
+          console.error(`[Auth] Session login error:`, loginErr.message);
+          return res.redirect('/api/login?error=session_failed');
+        }
+        
+        console.log(`[Auth] Login successful for user, redirecting to /`);
+        return res.redirect('/');
+      });
     })(req, res, next);
   });
 

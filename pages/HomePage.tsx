@@ -5,6 +5,7 @@ import { PoetryItem } from '../types';
 import { SanchoQuote } from '../components/SanchoQuote';
 import { DataLoadingSkeleton } from '../components/DataLoadingSkeleton';
 import { usePinnedItems } from '../contexts/PinnedItemsContext';
+import { useNotification } from '../contexts/NotificationContext';
 
 import { ArrowDownIcon } from '../components/icons/ArrowDownIcon';
 import { XIcon } from '../components/icons/XIcon';
@@ -39,6 +40,41 @@ export const HomePage: React.FC = () => {
   const [itemsToShow, setItemsToShow] = useState(20); // Increased from 10 for better initial load
 
   const { isPinned } = usePinnedItems();
+  const { showNotification } = useNotification();
+
+  // Check for login error in URL and show notification
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const loginError = urlParams.get('login_error');
+    
+    if (loginError) {
+      let message = 'Login failed. Please try again.';
+      
+      switch (loginError) {
+        case 'cookies_blocked':
+          message = 'Login failed: Your browser may be blocking cookies. Please enable cookies for this site and try again.';
+          break;
+        case 'auth_failed':
+          message = 'Authentication failed. Please try logging in again.';
+          break;
+        case 'session_failed':
+          message = 'Session could not be created. Please try again.';
+          break;
+        case 'no_user':
+          message = 'Could not retrieve user information. Please try again.';
+          break;
+        case 'oauth_denied':
+          message = 'Access was denied. Please try again.';
+          break;
+      }
+      
+      showNotification(message, 'error');
+      
+      // Clean up URL by removing the error parameter
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, [showNotification]);
 
   // Generate a random seed once per session for consistent shuffle
   const randomSeedRef = useRef<number>(Math.floor(Math.random() * 1000000));
