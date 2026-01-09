@@ -40,7 +40,20 @@ const getOidcConfig = memoize(
   { maxAge: 3600 * 1000 }
 );
 
-export function getFrontendOrigin(): string {
+export function getFrontendOrigin(req?: { hostname?: string }): string {
+  // In production with custom domain, use the custom domain for OAuth callback
+  const isProduction = process.env.REPLIT_DEPLOYMENT === '1' || process.env.NODE_ENV === 'production';
+  const customDomain = process.env.CUSTOM_DOMAIN;
+  
+  if (isProduction && customDomain) {
+    return `https://${customDomain}`;
+  }
+  
+  // Use request hostname if available (for dynamic callback matching)
+  if (req?.hostname) {
+    return `https://${req.hostname}`;
+  }
+  
   if (process.env.REPLIT_DEV_DOMAIN) {
     return `https://${process.env.REPLIT_DEV_DOMAIN}`;
   } else if (process.env.REPLIT_DOMAINS) {
