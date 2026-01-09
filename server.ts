@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import crypto from 'crypto';
 import OpenAI from 'openai';
 import sanitizeHtml from 'sanitize-html';
-import { setupAuth, isAuthenticated, getFrontendOrigin } from './server/replitAuth.js';
+import { setupAuth, isAuthenticated, getExternalUrl } from './server/replitAuth.js';
 import { storage } from './server/storage.js';
 import { pool } from './server/db.js';
 import { logger } from './utils/logger.js';
@@ -154,15 +154,27 @@ function isProductionEnvironment() {
 
 // Get all allowed origins for CORS in production
 function getAllowedOrigins() {
+  const origins: string[] = [];
+  
+  // Always include custom domain if set
+  if (process.env.CUSTOM_DOMAIN) {
+    origins.push(`https://${process.env.CUSTOM_DOMAIN}`);
+    origins.push(`https://www.${process.env.CUSTOM_DOMAIN}`);
+  }
+  
   if (isProductionEnvironment()) {
     // In production, allow all domains from REPLIT_DOMAINS
     if (process.env.REPLIT_DOMAINS) {
-      return process.env.REPLIT_DOMAINS.split(',')
+      const replitDomains = process.env.REPLIT_DOMAINS.split(',')
         .map(domain => `https://${domain.trim()}`)
-        .filter(url => url.length > 8); // Filter out empty/invalid entries
+        .filter(url => url.length > 8);
+      origins.push(...replitDomains);
     }
-    // Fallback to single origin
-    return [getFrontendOrigin()];
+    // Fallback to single origin if no origins yet
+    if (origins.length === 0) {
+      origins.push(getExternalUrl());
+    }
+    return origins;
   }
   return ['http://localhost:5000', 'http://127.0.0.1:5000'];
 }
@@ -798,7 +810,7 @@ app.post('/api/stripe/create-checkout', csrfProtection, rateLimit(5, 60000), asy
     }
 
     const { type, amount } = req.body;
-    const origin = getFrontendOrigin();
+    const origin = getExternalUrl();
     
     let result;
     if (type === 'subscription') {

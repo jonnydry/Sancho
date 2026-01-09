@@ -40,28 +40,47 @@ const getOidcConfig = memoize(
   { maxAge: 3600 * 1000 }
 );
 
-export function getFrontendOrigin(req?: { hostname?: string }): string {
-  // Always use custom domain when configured (for production deployments)
-  const customDomain = process.env.CUSTOM_DOMAIN;
-  if (customDomain) {
-    return `https://${customDomain}`;
+export function getExternalUrl(): string {
+  // For deployments with custom domains, Replit may not set REPLIT_DOMAINS
+  // Try multiple sources to find the correct external URL
+  
+  // 1. Check for custom domain (production)
+  if (process.env.CUSTOM_DOMAIN) {
+    return `https://${process.env.CUSTOM_DOMAIN}`;
   }
   
-  // Use request hostname if available (for dynamic callback matching)
-  if (req?.hostname) {
-    return `https://${req.hostname}`;
+  // 2. Check development domain
+  if (process.env.REPLIT_DEV_DOMAIN) {
+    return `https://${process.env.REPLIT_DEV_DOMAIN}`;
+  }
+  
+  // 3. Check deployment domains
+  if (process.env.REPLIT_DOMAINS) {
+    const firstDomain = process.env.REPLIT_DOMAINS.split(',')[0].trim();
+    return `https://${firstDomain}`;
+  }
+  
+  // 4. Fallback
+  return process.env.FRONTEND_ORIGIN || 'http://localhost:5000';
+}
+
+export function getAllowedDomains(): string[] {
+  const domains: string[] = [];
+  
+  if (process.env.CUSTOM_DOMAIN) {
+    domains.push(process.env.CUSTOM_DOMAIN);
+    domains.push(`www.${process.env.CUSTOM_DOMAIN}`);
   }
   
   if (process.env.REPLIT_DEV_DOMAIN) {
-    return `https://${process.env.REPLIT_DEV_DOMAIN}`;
-  } else if (process.env.REPLIT_DOMAINS) {
-    const firstDomain = process.env.REPLIT_DOMAINS.split(',')[0].trim();
-    return `https://${firstDomain}`;
-  } else if (process.env.FRONTEND_ORIGIN) {
-    return process.env.FRONTEND_ORIGIN;
-  } else {
-    return 'http://localhost:5000';
+    domains.push(process.env.REPLIT_DEV_DOMAIN);
   }
+  
+  if (process.env.REPLIT_DOMAINS) {
+    domains.push(...process.env.REPLIT_DOMAINS.split(',').map(d => d.trim()));
+  }
+  
+  return domains;
 }
 
 export function getSession(): ReturnType<typeof session> {
@@ -132,9 +151,18 @@ export async function setupAuth(app: Application): Promise<void> {
   app.use(passport.initialize());
   app.use(passport.session());
 
+  // Log environment for debugging
+  console.log('[Auth] Environment check:');
+  console.log(`  REPL_ID: ${process.env.REPL_ID ? process.env.REPL_ID.substring(0, 8) + '...' : 'NOT SET'}`);
+  console.log(`  CUSTOM_DOMAIN: ${process.env.CUSTOM_DOMAIN || 'NOT SET'}`);
+  console.log(`  REPLIT_DEV_DOMAIN: ${process.env.REPLIT_DEV_DOMAIN || 'NOT SET'}`);
+  console.log(`  REPLIT_DOMAINS: ${process.env.REPLIT_DOMAINS || 'NOT SET'}`);
+  console.log(`  NODE_ENV: ${process.env.NODE_ENV || 'NOT SET'}`);
+  console.log(`  Allowed domains: ${getAllowedDomains().join(', ')}`);
+
   const config = await getOidcConfig();
 
-  const callbackURL = `${getFrontendOrigin()}/api/callback`;
+  const callbackURL = `${getExternalUrl()}/api/callback`;
   console.log(`[Auth] Setting up OAuth with callback URL: ${callbackURL}`);
 
   const verify = async (
