@@ -41,11 +41,9 @@ const getOidcConfig = memoize(
 );
 
 export function getFrontendOrigin(req?: { hostname?: string }): string {
-  // In production with custom domain, use the custom domain for OAuth callback
-  const isProduction = process.env.REPLIT_DEPLOYMENT === '1' || process.env.NODE_ENV === 'production';
+  // Always use custom domain when configured (for production deployments)
   const customDomain = process.env.CUSTOM_DOMAIN;
-  
-  if (isProduction && customDomain) {
+  if (customDomain) {
     return `https://${customDomain}`;
   }
   
@@ -84,19 +82,15 @@ export function getSession(): ReturnType<typeof session> {
     tableName: "sessions",
   });
   
-  // Detect production environment
-  const isReplitProduction = Boolean(process.env.REPLIT_DEPLOYMENT === '1');
-  const isProduction = process.env.NODE_ENV === 'production' || isReplitProduction;
-  
   // Set cookie domain for custom domains to allow cross-subdomain session sharing
   // e.g., ".sanchopoetry.com" matches both www.sanchopoetry.com and sanchopoetry.com
   let cookieDomain: string | undefined;
   const customDomain = process.env.CUSTOM_DOMAIN;
-  if (isProduction && customDomain) {
+  if (customDomain) {
     cookieDomain = customDomain.startsWith('.') ? customDomain : `.${customDomain}`;
   }
   
-  console.log(`[Auth] Session configuration - isProduction: ${isProduction}, NODE_ENV: ${process.env.NODE_ENV}, REPLIT_DEPLOYMENT: ${process.env.REPLIT_DEPLOYMENT || 'not set'}, cookieDomain: ${cookieDomain || 'default'}`);
+  console.log(`[Auth] Session configuration - customDomain: ${customDomain || 'not set'}, cookieDomain: ${cookieDomain || 'default'}`);
   
   return session({
     secret: process.env.SESSION_SECRET,
