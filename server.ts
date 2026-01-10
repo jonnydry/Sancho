@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import crypto from 'crypto';
 import OpenAI from 'openai';
 import sanitizeHtml from 'sanitize-html';
-import { setupAuth, isAuthenticated, getExternalUrl } from './server/replitAuth.js';
+import { setupAuth, isAuthenticated, registerAuthRoutes } from './server/replit_integrations/auth/index.js';
 import { storage } from './server/storage.js';
 import { pool } from './server/db.js';
 import { logger } from './utils/logger.js';
@@ -150,6 +150,20 @@ function isProductionEnvironment() {
     return true;
   }
   return false;
+}
+
+// Get external URL for the application
+function getExternalUrl(): string {
+  if (process.env.CUSTOM_DOMAIN) {
+    return `https://${process.env.CUSTOM_DOMAIN}`;
+  }
+  if (process.env.REPLIT_DEV_DOMAIN) {
+    return `https://${process.env.REPLIT_DEV_DOMAIN}`;
+  }
+  if (process.env.REPLIT_DOMAINS) {
+    return `https://${process.env.REPLIT_DOMAINS.split(',')[0].trim()}`;
+  }
+  return 'http://localhost:5000';
 }
 
 // Get all allowed origins for CORS in production
