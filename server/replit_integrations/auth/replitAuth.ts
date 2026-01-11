@@ -97,7 +97,8 @@ export async function setupAuth(app: Express) {
     const strategyName = `replitauth:${domain}`;
     if (!registeredStrategies.has(strategyName)) {
       // Always use HTTPS for callback URLs - Replit's OAuth server only accepts HTTPS
-      const callbackURL = `https://${domain}/api/callback`;
+      // Use /auth/callback path as expected by Replit's OIDC provider
+      const callbackURL = `https://${domain}/auth/callback`;
       const strategy = new Strategy(
         {
           name: strategyName,
@@ -132,24 +133,8 @@ export async function setupAuth(app: Express) {
     // Use Host header which includes the full host
     const host = req.get('host') || req.hostname;
     const protocol = getEffectiveProtocol(req);
-    const callbackURL = `https://${host}/api/callback`;
     
     console.log(`[AUTH] Login request - host: ${host}, effective protocol: ${protocol}`);
-    console.log(`[AUTH] Headers - x-forwarded-host: ${req.get('x-forwarded-host')}, x-forwarded-proto: ${req.get('x-forwarded-proto')}, host: ${req.get('host')}`);
-    console.log(`[AUTH] REPL_ID (client_id): ${process.env.REPL_ID}`);
-    console.log(`[AUTH] Callback URL: ${callbackURL}`);
-    
-    // Build authorization URL manually to see what it looks like
-    try {
-      const authUrl = client.buildAuthorizationUrl(config, {
-        redirect_uri: callbackURL,
-        scope: "openid email profile offline_access",
-        prompt: "login consent",
-      });
-      console.log(`[AUTH] Built authorization URL: ${authUrl.href}`);
-    } catch (e) {
-      console.log(`[AUTH] Error building auth URL: ${e}`);
-    }
     
     const strategyName = ensureStrategy(host);
     passport.authenticate(strategyName, {
@@ -158,7 +143,8 @@ export async function setupAuth(app: Express) {
     })(req, res, next);
   });
 
-  app.get("/api/callback", (req, res, next) => {
+  // OAuth callback route - must match the callback URL registered with Replit
+  app.get("/auth/callback", (req, res, next) => {
     // Use Host header which includes the full host
     const host = req.get('host') || req.hostname;
     const protocol = getEffectiveProtocol(req);
