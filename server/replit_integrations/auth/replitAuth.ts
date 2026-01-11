@@ -132,21 +132,26 @@ export async function setupAuth(app: Express) {
     // Use Host header which includes the full host
     const host = req.get('host') || req.hostname;
     const protocol = getEffectiveProtocol(req);
+    const callbackURL = `https://${host}/api/callback`;
     
     console.log(`[AUTH] Login request - host: ${host}, effective protocol: ${protocol}`);
     console.log(`[AUTH] Headers - x-forwarded-host: ${req.get('x-forwarded-host')}, x-forwarded-proto: ${req.get('x-forwarded-proto')}, host: ${req.get('host')}`);
     console.log(`[AUTH] REPL_ID (client_id): ${process.env.REPL_ID}`);
-    console.log(`[AUTH] Expected callback URL: https://${host}/api/callback`);
+    console.log(`[AUTH] Callback URL: ${callbackURL}`);
+    
+    // Build authorization URL manually to see what it looks like
+    try {
+      const authUrl = client.buildAuthorizationUrl(config, {
+        redirect_uri: callbackURL,
+        scope: "openid email profile offline_access",
+        prompt: "login consent",
+      });
+      console.log(`[AUTH] Built authorization URL: ${authUrl.href}`);
+    } catch (e) {
+      console.log(`[AUTH] Error building auth URL: ${e}`);
+    }
     
     const strategyName = ensureStrategy(host);
-    
-    // Wrap passport.authenticate to capture the redirect URL
-    const originalRedirect = res.redirect.bind(res);
-    res.redirect = function(url: string) {
-      console.log(`[AUTH] Authorization redirect URL: ${url}`);
-      return originalRedirect(url);
-    } as any;
-    
     passport.authenticate(strategyName, {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
