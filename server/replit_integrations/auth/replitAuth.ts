@@ -78,67 +78,93 @@ export async function setupAuth(app: Express) {
     verified(null, user);
   };
 
-  // Keep track of registered strategies
+  // Keep track of registered strategies per domain
   const registeredStrategies = new Set<string>();
 
-  // Helper function to get the effective public hostname
-  // In production, Replit proxies requests through internal worker hosts,
-  // so we need to use x-forwarded-host to get the actual public domain
-  const getEffectiveHost = (req: any): string => {
-    const forwardedHost = req.get('x-forwarded-host');
-    if (forwardedHost) {
-      // x-forwarded-host may contain multiple hosts, take the first (original)
-      return forwardedHost.split(',')[0].trim();
+  // Helper function to get the effective protocol from proxy headers
+  // In production, Replit proxies use x-forwarded-proto to indicate the original protocol
+  const getEffectiveProtocol = (req: any): string => {
+    const forwardedProto = req.get('x-forwarded-proto');
+    if (forwardedProto) {
+      return forwardedProto.split(',')[0].trim();
     }
-    return req.hostname;
+    return req.secure ? 'https' : req.protocol;
   };
 
   // Helper function to ensure strategy exists for a domain
+  // Always use HTTPS for callback URLs as Replit only whitelists HTTPS origins
   const ensureStrategy = (domain: string) => {
     const strategyName = `replitauth:${domain}`;
     if (!registeredStrategies.has(strategyName)) {
+      // Always use HTTPS for callback URLs - Replit's OAuth server only accepts HTTPS
+      const callbackURL = `https://${domain}/api/callback`;
       const strategy = new Strategy(
         {
           name: strategyName,
           config,
           scope: "openid email profile offline_access",
-          callbackURL: `https://${domain}/api/callback`,
+          callbackURL,
         },
         verify
       );
       passport.use(strategy);
       registeredStrategies.add(strategyName);
+      console.log(`[AUTH] Registered strategy for domain: ${domain}, callback: ${callbackURL}`);
     }
+    return strategyName;
   };
+
+  console.log(`[AUTH] REPLIT_DOMAINS: ${process.env.REPLIT_DOMAINS || 'not set'}`);
+
+  // Pre-register strategies for all domains in REPLIT_DOMAINS
+  const replitDomains = process.env.REPLIT_DOMAINS || '';
+  if (replitDomains) {
+    const domains = replitDomains.split(',').map(d => d.trim()).filter(Boolean);
+    for (const domain of domains) {
+      ensureStrategy(domain);
+    }
+  }
 
   passport.serializeUser((user: Express.User, cb) => cb(null, user));
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
-    const host = getEffectiveHost(req);
-    ensureStrategy(host);
-    passport.authenticate(`replitauth:${host}`, {
+    // Use Host header which includes the full host
+    const host = req.get('host') || req.hostname;
+    const protocol = getEffectiveProtocol(req);
+    
+    console.log(`[AUTH] Login request - host: ${host}, effective protocol: ${protocol}`);
+    console.log(`[AUTH] Headers - x-forwarded-host: ${req.get('x-forwarded-host')}, x-forwarded-proto: ${req.get('x-forwarded-proto')}, host: ${req.get('host')}`);
+    
+    const strategyName = ensureStrategy(host);
+    passport.authenticate(strategyName, {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
     })(req, res, next);
   });
 
   app.get("/api/callback", (req, res, next) => {
-    const host = getEffectiveHost(req);
-    ensureStrategy(host);
-    passport.authenticate(`replitauth:${host}`, {
+    // Use Host header which includes the full host
+    const host = req.get('host') || req.hostname;
+    const protocol = getEffectiveProtocol(req);
+    
+    console.log(`[AUTH] Callback request - host: ${host}, effective protocol: ${protocol}`);
+    
+    const strategyName = ensureStrategy(host);
+    passport.authenticate(strategyName, {
       successReturnToOrRedirect: "/",
       failureRedirect: "/api/login",
     })(req, res, next);
   });
 
   app.get("/api/logout", (req, res) => {
-    const host = getEffectiveHost(req);
+    const host = req.get('host') || req.hostname;
+    const protocol = getEffectiveProtocol(req);
     req.logout(() => {
       res.redirect(
         client.buildEndSessionUrl(config, {
           client_id: process.env.REPL_ID!,
-          post_logout_redirect_uri: `https://${host}`,
+          post_logout_redirect_uri: `${protocol}://${host}`,
         }).href
       );
     });
