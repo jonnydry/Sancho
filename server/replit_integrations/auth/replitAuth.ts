@@ -81,6 +81,18 @@ export async function setupAuth(app: Express) {
   // Keep track of registered strategies
   const registeredStrategies = new Set<string>();
 
+  // Helper function to get the effective public hostname
+  // In production, Replit proxies requests through internal worker hosts,
+  // so we need to use x-forwarded-host to get the actual public domain
+  const getEffectiveHost = (req: any): string => {
+    const forwardedHost = req.get('x-forwarded-host');
+    if (forwardedHost) {
+      // x-forwarded-host may contain multiple hosts, take the first (original)
+      return forwardedHost.split(',')[0].trim();
+    }
+    return req.hostname;
+  };
+
   // Helper function to ensure strategy exists for a domain
   const ensureStrategy = (domain: string) => {
     const strategyName = `replitauth:${domain}`;
@@ -103,27 +115,30 @@ export async function setupAuth(app: Express) {
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
-    ensureStrategy(req.hostname);
-    passport.authenticate(`replitauth:${req.hostname}`, {
+    const host = getEffectiveHost(req);
+    ensureStrategy(host);
+    passport.authenticate(`replitauth:${host}`, {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
     })(req, res, next);
   });
 
   app.get("/api/callback", (req, res, next) => {
-    ensureStrategy(req.hostname);
-    passport.authenticate(`replitauth:${req.hostname}`, {
+    const host = getEffectiveHost(req);
+    ensureStrategy(host);
+    passport.authenticate(`replitauth:${host}`, {
       successReturnToOrRedirect: "/",
       failureRedirect: "/api/login",
     })(req, res, next);
   });
 
   app.get("/api/logout", (req, res) => {
+    const host = getEffectiveHost(req);
     req.logout(() => {
       res.redirect(
         client.buildEndSessionUrl(config, {
           client_id: process.env.REPL_ID!,
-          post_logout_redirect_uri: `${req.protocol}://${req.hostname}`,
+          post_logout_redirect_uri: `https://${host}`,
         }).href
       );
     });
