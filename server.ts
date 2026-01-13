@@ -979,8 +979,8 @@ if (process.env.NODE_ENV === 'production') {
   // SPA catchall - serve index.html for all non-API routes
   // This ensures React Router works when accessing Express directly
   app.get('*', (req, res, next) => {
-    // Skip API routes - let them fall through to 404 handler
-    if (req.path.startsWith('/api')) {
+    // Skip API and auth routes - let them fall through to their handlers
+    if (req.path.startsWith('/api') || req.path.startsWith('/auth')) {
       return next();
     }
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
