@@ -130,32 +130,42 @@ export async function setupAuth(app: Express) {
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
-    // Use Host header which includes the full host
-    const host = req.get('host') || req.hostname;
-    const protocol = getEffectiveProtocol(req);
-    
-    console.log(`[AUTH] Login request - host: ${host}, effective protocol: ${protocol}`);
-    
-    const strategyName = ensureStrategy(host);
-    passport.authenticate(strategyName, {
-      prompt: "login consent",
-      scope: ["openid", "email", "profile", "offline_access"],
-    })(req, res, next);
+    try {
+      // Use Host header which includes the full host
+      const host = req.get('host') || req.hostname;
+      const protocol = getEffectiveProtocol(req);
+      
+      console.log(`[AUTH] Login request - host: ${host}, effective protocol: ${protocol}`);
+      
+      const strategyName = ensureStrategy(host);
+      passport.authenticate(strategyName, {
+        prompt: "login consent",
+        scope: ["openid", "email", "profile", "offline_access"],
+      })(req, res, next);
+    } catch (error) {
+      console.error('[AUTH] Login error:', error);
+      res.status(500).json({ message: 'Authentication setup failed', error: String(error) });
+    }
   });
 
   // OAuth callback route - must match the callback URL registered with Replit
   app.get("/auth/callback", (req, res, next) => {
-    // Use Host header which includes the full host
-    const host = req.get('host') || req.hostname;
-    const protocol = getEffectiveProtocol(req);
-    
-    console.log(`[AUTH] Callback request - host: ${host}, effective protocol: ${protocol}`);
-    
-    const strategyName = ensureStrategy(host);
-    passport.authenticate(strategyName, {
-      successReturnToOrRedirect: "/",
-      failureRedirect: "/api/login",
-    })(req, res, next);
+    try {
+      // Use Host header which includes the full host
+      const host = req.get('host') || req.hostname;
+      const protocol = getEffectiveProtocol(req);
+      
+      console.log(`[AUTH] Callback request - host: ${host}, effective protocol: ${protocol}`);
+      
+      const strategyName = ensureStrategy(host);
+      passport.authenticate(strategyName, {
+        successReturnToOrRedirect: "/",
+        failureRedirect: "/api/login",
+      })(req, res, next);
+    } catch (error) {
+      console.error('[AUTH] Callback error:', error);
+      res.status(500).json({ message: 'Authentication callback failed', error: String(error) });
+    }
   });
 
   app.get("/api/logout", (req, res) => {
