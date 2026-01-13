@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import crypto from 'crypto';
 import OpenAI from 'openai';
 import sanitizeHtml from 'sanitize-html';
-import { setupAuth, isAuthenticated, registerAuthRoutes } from './server/replit_integrations/auth/index.js';
+import { setupAuth, isAuthenticated } from './server/replit_integrations/auth/index.js';
 import { storage } from './server/storage.js';
 import { pool } from './server/db.js';
 import { logger } from './utils/logger.js';
@@ -560,8 +560,8 @@ app.post('/api/poetry-learn-more', rateLimit(10, 60000), async (req, res) => { /
 app.get('/api/auth/user', async (req, res) => {
   try {
     // Check if user is authenticated via session
-    if (req.isAuthenticated() && req.user && req.user.claims) {
-      const userId = req.user.claims.sub;
+    if (req.isAuthenticated() && req.user && (req.user as any).claims) {
+      const userId = (req.user as any).claims.sub;
       const user = await storage.getUser(userId);
       
       if (user) {
