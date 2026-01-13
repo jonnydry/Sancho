@@ -97,8 +97,7 @@ export async function setupAuth(app: Express) {
     const strategyName = `replitauth:${domain}`;
     if (!registeredStrategies.has(strategyName)) {
       // Always use HTTPS for callback URLs - Replit's OAuth server only accepts HTTPS
-      // Use /auth/callback path as expected by Replit's OIDC provider
-      const callbackURL = `https://${domain}/auth/callback`;
+      const callbackURL = `https://${domain}/api/callback`;
       const strategy = new Strategy(
         {
           name: strategyName,
@@ -138,6 +137,9 @@ export async function setupAuth(app: Express) {
       console.log(`[AUTH] Login request - host: ${host}, effective protocol: ${protocol}`);
       
       const strategyName = ensureStrategy(host);
+      console.log(`[AUTH] Using strategy: ${strategyName}`);
+      
+      // Let passport handle the redirect - don't use custom callback for login
       passport.authenticate(strategyName, {
         prompt: "login consent",
         scope: ["openid", "email", "profile", "offline_access"],
@@ -149,7 +151,7 @@ export async function setupAuth(app: Express) {
   });
 
   // OAuth callback route - must match the callback URL registered with Replit
-  app.get("/auth/callback", (req, res, next) => {
+  app.get("/api/callback", (req, res, next) => {
     try {
       // Use Host header which includes the full host
       const host = req.get('host') || req.hostname;
