@@ -27,17 +27,6 @@ export default defineConfig(({ mode }) => {
                 }
               });
             }
-          },
-          '/auth': {
-            target: 'http://localhost:3001',
-            changeOrigin: false,
-            configure: (proxy) => {
-              proxy.on('proxyReq', (proxyReq, req) => {
-                if (req.headers.host) {
-                  proxyReq.setHeader('Host', req.headers.host);
-                }
-              });
-            }
           }
         }
       },
@@ -46,17 +35,6 @@ export default defineConfig(({ mode }) => {
         host: '0.0.0.0',
         proxy: {
           '/api': {
-            target: 'http://localhost:3001',
-            changeOrigin: false,
-            configure: (proxy) => {
-              proxy.on('proxyReq', (proxyReq, req) => {
-                if (req.headers.host) {
-                  proxyReq.setHeader('Host', req.headers.host);
-                }
-              });
-            }
-          },
-          '/auth': {
             target: 'http://localhost:3001',
             changeOrigin: false,
             configure: (proxy) => {
