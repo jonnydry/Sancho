@@ -109,7 +109,9 @@ export function getSession(): ReturnType<typeof session> {
     cookieDomain = customDomain.startsWith('.') ? customDomain : `.${customDomain}`;
   }
   
-  console.log(`[Auth] Session configuration - customDomain: ${customDomain || 'not set'}, cookieDomain: ${cookieDomain || 'default'}`);
+  const isProduction = process.env.NODE_ENV === 'production' || !!customDomain;
+  
+  console.log(`[Auth] Session configuration - customDomain: ${customDomain || 'not set'}, cookieDomain: ${cookieDomain || 'default'}, isProduction: ${isProduction}`);
   
   return session({
     secret: process.env.SESSION_SECRET,
@@ -119,7 +121,9 @@ export function getSession(): ReturnType<typeof session> {
     cookie: {
       httpOnly: true,
       secure: true,
-      sameSite: 'lax',
+      // Use 'none' for production to allow OAuth cross-site redirects
+      // Use 'lax' for development for better security during local testing
+      sameSite: isProduction ? 'none' : 'lax',
       maxAge: sessionTtl,
       ...(cookieDomain && { domain: cookieDomain }),
     },
@@ -202,7 +206,8 @@ export async function setupAuth(app: Application): Promise<void> {
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
-    console.log(`[Auth] Login initiated from ${req.hostname}`);
+    console.log(`[Auth] Login initiated from ${req.hostname}, protocol: ${req.protocol}, secure: ${req.secure}`);
+    console.log(`[Auth] Session ID before login: ${req.sessionID || 'none'}`);
     passport.authenticate("openid-client", {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
@@ -211,6 +216,7 @@ export async function setupAuth(app: Application): Promise<void> {
 
   app.get("/api/callback", (req, res, next) => {
     console.log(`[Auth] Callback received - code: ${req.query.code ? 'present' : 'missing'}, state: ${req.query.state ? 'present' : 'missing'}, error: ${req.query.error || 'none'}`);
+    console.log(`[Auth] Callback session ID: ${req.sessionID || 'none'}, has session: ${!!req.session}`);
     
     if (req.query.error) {
       console.error(`[Auth] OAuth error from provider: ${req.query.error} - ${req.query.error_description || 'no description'}`);
