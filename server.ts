@@ -979,7 +979,7 @@ if (process.env.NODE_ENV === 'production') {
   // SPA catchall - serve index.html for all non-API routes
   // This ensures React Router works when accessing Express directly
   app.get('*', (req, res, next) => {
-    // Skip API routes - let them fall through to 404 handler
+    // Skip API routes - let them fall through to their handlers
     if (req.path.startsWith('/api')) {
       return next();
     }

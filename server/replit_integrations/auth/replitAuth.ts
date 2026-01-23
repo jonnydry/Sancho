@@ -3,7 +3,7 @@ import { Strategy, type VerifyFunction } from "openid-client/passport";
 
 import passport from "passport";
 import session from "express-session";
-import type { Express, RequestHandler } from "express";
+import type { Application, RequestHandler } from "express";
 import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { authStorage } from "./storage";
@@ -23,10 +23,19 @@ export function getSession() {
   const pgStore = connectPg(session);
   const sessionStore = new pgStore({
     conString: process.env.DATABASE_URL,
-    createTableIfMissing: false,
+    createTableIfMissing: true,
     ttl: sessionTtl,
     tableName: "sessions",
   });
+
+  // Set cookie domain for custom domains to allow cross-subdomain session sharing
+  // e.g., ".sanchopoetry.com" matches both www.sanchopoetry.com and sanchopoetry.com
+  let cookieDomain: string | undefined;
+  const customDomain = process.env.CUSTOM_DOMAIN;
+  if (customDomain) {
+    cookieDomain = customDomain.startsWith('.') ? customDomain : `.${customDomain}`;
+  }
+
   return session({
     secret: process.env.SESSION_SECRET!,
     store: sessionStore,
@@ -35,7 +44,9 @@ export function getSession() {
     cookie: {
       httpOnly: true,
       secure: true,
+      sameSite: 'lax', // Required for OAuth redirects to preserve session
       maxAge: sessionTtl,
+      ...(cookieDomain && { domain: cookieDomain }),
     },
   });
 }
@@ -60,22 +71,60 @@ async function upsertUser(claims: any) {
   });
 }
 
-export async function setupAuth(app: Express) {
+export async function setupAuth(app: Application) {
+  // Validate required environment variables
+  if (!process.env.REPL_ID) {
+    console.error('[AUTH] REPL_ID is not set. Available env vars:',
+      Object.keys(process.env).filter(k => k.startsWith('REPL') || k.startsWith('REPLIT')).join(', '));
+    throw new Error(
+      'REPL_ID environment variable is required for OAuth authentication. ' +
+      'This should be automatically set by Replit.'
+    );
+  }
+
+  if (!process.env.SESSION_SECRET) {
+    throw new Error('SESSION_SECRET must be set for sessions to work.');
+  }
+
+  if (!process.env.DATABASE_URL) {
+    throw new Error('DATABASE_URL must be set. Sessions require a database connection.');
+  }
+
+  // Log environment for debugging
+  console.log('[AUTH] Environment check:');
+  console.log(`  REPL_ID: ${process.env.REPL_ID.substring(0, 8)}...`);
+  console.log(`  CUSTOM_DOMAIN: ${process.env.CUSTOM_DOMAIN || 'NOT SET'}`);
+  console.log(`  REPLIT_DEV_DOMAIN: ${process.env.REPLIT_DEV_DOMAIN || 'NOT SET'}`);
+  console.log(`  REPLIT_DOMAINS: ${process.env.REPLIT_DOMAINS || 'NOT SET'}`);
+  console.log(`  NODE_ENV: ${process.env.NODE_ENV || 'NOT SET'}`);
+
   app.set("trust proxy", 1);
   app.use(getSession());
   app.use(passport.initialize());
   app.use(passport.session());
 
   const config = await getOidcConfig();
+  console.log('[AUTH] OIDC discovery completed successfully');
 
   const verify: VerifyFunction = async (
     tokens: client.TokenEndpointResponse & client.TokenEndpointResponseHelpers,
     verified: passport.AuthenticateCallback
   ) => {
-    const user = {};
-    updateUserSession(user, tokens);
-    await upsertUser(tokens.claims());
-    verified(null, user);
+    try {
+      console.log('[AUTH] Verify callback started - processing tokens');
+      const user = {};
+      updateUserSession(user, tokens);
+      const claims = tokens.claims();
+      console.log(`[AUTH] Claims extracted - sub: ${claims?.sub || 'missing'}, email: ${claims?.email || 'missing'}`);
+
+      await upsertUser(claims);
+      console.log('[AUTH] User upserted successfully');
+
+      verified(null, user);
+    } catch (error) {
+      console.error('[AUTH] Verify callback error:', error);
+      verified(error as Error);
+    }
   };
 
   // Keep track of registered strategies per domain
@@ -97,6 +146,7 @@ export async function setupAuth(app: Express) {
     const strategyName = `replitauth:${domain}`;
     if (!registeredStrategies.has(strategyName)) {
       // Always use HTTPS for callback URLs - Replit's OAuth server only accepts HTTPS
+      // Use /api/callback path as this is Replit's standard callback path
       const callbackURL = `https://${domain}/api/callback`;
       const strategy = new Strategy(
         {
@@ -152,22 +202,41 @@ export async function setupAuth(app: Express) {
 
   // OAuth callback route - must match the callback URL registered with Replit
   app.get("/api/callback", (req, res, next) => {
-    try {
-      // Use Host header which includes the full host
-      const host = req.get('host') || req.hostname;
-      const protocol = getEffectiveProtocol(req);
-      
-      console.log(`[AUTH] Callback request - host: ${host}, effective protocol: ${protocol}`);
-      
-      const strategyName = ensureStrategy(host);
-      passport.authenticate(strategyName, {
-        successReturnToOrRedirect: "/",
-        failureRedirect: "/api/login",
-      })(req, res, next);
-    } catch (error) {
-      console.error('[AUTH] Callback error:', error);
-      res.status(500).json({ message: 'Authentication callback failed', error: String(error) });
+    // Use Host header which includes the full host
+    const host = req.get('host') || req.hostname;
+    const protocol = getEffectiveProtocol(req);
+
+    console.log(`[AUTH] Callback request - host: ${host}, effective protocol: ${protocol}`);
+    console.log(`[AUTH] Callback query params - code: ${req.query.code ? 'present' : 'missing'}, state: ${req.query.state ? 'present' : 'missing'}, error: ${req.query.error || 'none'}`);
+
+    // Check for OAuth errors from the provider
+    if (req.query.error) {
+      console.error(`[AUTH] OAuth error from provider: ${req.query.error} - ${req.query.error_description || 'no description'}`);
+      return res.redirect('/?login_error=oauth_denied');
     }
+
+    const strategyName = ensureStrategy(host);
+    passport.authenticate(strategyName, (err: Error | null, user: Express.User | false, info: object | undefined) => {
+      if (err) {
+        console.error(`[AUTH] Passport authentication error:`, err.message);
+        return res.redirect('/?login_error=auth_failed');
+      }
+
+      if (!user) {
+        console.error(`[AUTH] No user returned from authentication. Info:`, info);
+        return res.redirect('/?login_error=no_user');
+      }
+
+      req.logIn(user, (loginErr) => {
+        if (loginErr) {
+          console.error(`[AUTH] Session login error:`, loginErr.message);
+          return res.redirect('/?login_error=session_failed');
+        }
+
+        console.log(`[AUTH] Login successful, redirecting to /`);
+        return res.redirect('/');
+      });
+    })(req, res, next);
   });
 
   app.get("/api/logout", (req, res) => {
