@@ -515,3 +515,183 @@ body::-webkit-scrollbar-corner,
 .tag-folder-content {
   animation: folderExpand 0.2s ease-out;
 }
+
+/* ============================================
+   MOBILE JOURNAL STYLES
+   ============================================ */
+
+/* Safe area support for iOS devices */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+
+.safe-area-left {
+  padding-left: env(safe-area-inset-left, 0px);
+}
+
+.safe-area-right {
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Mobile view transition animations */
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutToRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@keyframes slideOutToLeft {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+}
+
+.mobile-slide-in-left {
+  animation: slideInFromRight 0.3s ease-out forwards;
+}
+
+.mobile-slide-in-right {
+  animation: slideInFromLeft 0.3s ease-out forwards;
+}
+
+.mobile-slide-out-left {
+  animation: slideOutToLeft 0.3s ease-out forwards;
+}
+
+.mobile-slide-out-right {
+  animation: slideOutToRight 0.3s ease-out forwards;
+}
+
+/* Bottom sheet animation */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+.mobile-bottom-sheet {
+  animation: slideUp 0.3s ease-out;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .mobile-slide-in-left,
+  .mobile-slide-in-right,
+  .mobile-slide-out-left,
+  .mobile-slide-out-right,
+  .animate-slide-up,
+  .mobile-bottom-sheet {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+/* Mobile-specific touch feedback */
+@media (hover: none) and (pointer: coarse) {
+  .interactive-base:active {
+    opacity: 0.7;
+    transform: scale(0.98);
+  }
+
+  /* Disable hover effects on touch devices */
+  .interactive-scale:hover {
+    transform: none;
+  }
+}
+
+/* Full height for mobile journal */
+.h-\[100dvh\] {
+  height: 100dvh;
+  height: -webkit-fill-available;
+}
+
+/* Line clamp utility */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Prevent text selection during swipe */
+.swipe-active {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Pull to refresh spinner */
+@keyframes pullRefreshSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Mobile keyboard handling */
+@supports (height: 100dvh) {
+  .mobile-keyboard-aware {
+    height: 100dvh;
+  }
+}
+
+/* Backdrop blur for bottom sheet (with fallback) */
+@supports (backdrop-filter: blur(10px)) {
+  .mobile-bottom-sheet {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+}

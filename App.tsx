@@ -18,6 +18,7 @@ const TermsPage = lazy(() => import('./pages/TermsPage').then(module => ({ defau
 const SupportPage = lazy(() => import('./pages/SupportPage').then(module => ({ default: module.SupportPage })));
 const SupportSuccessPage = lazy(() => import('./pages/SupportSuccessPage').then(module => ({ default: module.SupportSuccessPage })));
 const SupportCancelPage = lazy(() => import('./pages/SupportCancelPage').then(module => ({ default: module.SupportCancelPage })));
+const JournalPage = lazy(() => import('./pages/JournalPage').then(module => ({ default: module.JournalPage })));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage').then(module => ({ default: module.NotFoundPage })));
 
 // Loading fallback component
@@ -56,6 +57,8 @@ const App: React.FC = () => {
                         <Suspense fallback={<RouteLoadingFallback />}>
                           <Routes>
                             <Route path="/" element={<HomePage />} />
+                            <Route path="/journal" element={<JournalPage />} />
+                            <Route path="/journal/:entryId" element={<JournalPage />} />
                             <Route path="/about" element={<AboutPage />} />
                             <Route path="/privacy" element={<PrivacyPage />} />
                             <Route path="/terms" element={<TermsPage />} />
