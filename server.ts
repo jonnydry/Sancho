@@ -10,7 +10,10 @@ import { storage } from './server/storage.js';
 import { pool } from './server/db.js';
 import { logger } from './utils/logger.js';
 import { exportNoteToGoogleDrive } from './server/googleDrive.js';
-import { isStripeConfigured, createSubscriptionCheckout, createDonationCheckout, getSessionInfo, handleWebhookEvent } from './server/stripe.js';
+import { isStripeConfigured, createSubscriptionCheckout, createDonationCheckout, getSessionInfo } from './server/stripe.js';
+import { getStripeSync } from './server/stripeClient.js';
+import { WebhookHandlers } from './server/webhookHandlers.js';
+import { runMigrations } from 'stripe-replit-sync';
 
 // In-memory rate limiter
 // NOTE: In Autoscale deployments, each instance maintains its own rate limit store.
@@ -222,27 +225,16 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
   try {
     const signature = req.headers['stripe-signature'] as string;
     if (!signature) {
-      return res.status(400).json({ error: 'Missing signature' });
+      return res.status(400).json({ error: 'Missing stripe-signature' });
     }
 
-    const event = await handleWebhookEvent(req.body, signature);
-    if (!event) {
-      return res.status(400).json({ error: 'Invalid webhook' });
+    if (!Buffer.isBuffer(req.body)) {
+      logger.error('Stripe webhook error: req.body is not a Buffer');
+      return res.status(500).json({ error: 'Webhook processing error' });
     }
 
-    // Log successful payment events
-    if (event.type === 'checkout.session.completed') {
-      logger.info('Payment completed', { 
-        sessionId: event.data.id,
-        mode: event.data.mode
-      });
-    } else if (event.type === 'customer.subscription.created') {
-      logger.info('New subscription created', {
-        subscriptionId: event.data.id
-      });
-    }
-
-    res.json({ received: true });
+    await WebhookHandlers.processWebhook(req.body as Buffer, signature);
+    res.status(200).json({ received: true });
   } catch (error: any) {
     logger.error('Webhook error', error);
     res.status(400).json({ error: 'Webhook processing failed' });
@@ -397,6 +389,49 @@ app.use('/api', (req, res, next) => {
 
 // Setup authentication (must be done before routes)
 await setupAuth(app);
+
+// Initialize Stripe schema and sync data
+async function initStripe() {
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    logger.warn('DATABASE_URL not set - Stripe sync features will be limited');
+    return;
+  }
+
+  try {
+    logger.info('Initializing Stripe schema...');
+    await runMigrations({ databaseUrl, schema: 'stripe' });
+    logger.info('Stripe schema ready');
+
+    const stripeSync = await getStripeSync();
+
+    const webhookBaseUrl = `https://${process.env.REPLIT_DOMAINS?.split(',')[0]}`;
+    if (webhookBaseUrl !== 'https://undefined') {
+      logger.info('Setting up managed webhook...');
+      try {
+        const result = await stripeSync.findOrCreateManagedWebhook(
+          `${webhookBaseUrl}/api/stripe/webhook`
+        );
+        if (result?.webhook?.url) {
+          logger.info(`Webhook configured: ${result.webhook.url}`);
+        } else {
+          logger.info('Webhook setup completed');
+        }
+      } catch (webhookError) {
+        logger.warn('Could not set up managed webhook - continuing without it', webhookError);
+      }
+    }
+
+    logger.info('Syncing Stripe data in background...');
+    stripeSync.syncBackfill()
+      .then(() => logger.info('Stripe data synced'))
+      .catch((err: Error) => logger.error('Error syncing Stripe data', err));
+  } catch (error) {
+    logger.error('Failed to initialize Stripe', error);
+  }
+}
+
+await initStripe();
 
 const openai = new OpenAI({ 
   baseURL: "https://api.x.ai/v1", 

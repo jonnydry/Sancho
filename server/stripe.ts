@@ -1,23 +1,6 @@
-import Stripe from 'stripe';
+import { getUncachableStripeClient } from './stripeClient.js';
 
-let stripe: Stripe | null = null;
-
-function getStripeClient(): Stripe | null {
-  if (stripe) return stripe;
-  
-  const secretKey = process.env.STRIPE_SECRET_KEY;
-  if (!secretKey) {
-    console.warn('Stripe not configured: STRIPE_SECRET_KEY not found');
-    return null;
-  }
-  
-  stripe = new Stripe(secretKey);
-  return stripe;
-}
-
-export function isStripeConfigured(): boolean {
-  return !!process.env.STRIPE_SECRET_KEY;
-}
+export { isStripeConfigured } from './stripeClient.js';
 
 export interface CheckoutSession {
   url: string;
@@ -28,11 +11,8 @@ export async function createSubscriptionCheckout(
   successUrl: string,
   cancelUrl: string
 ): Promise<CheckoutSession> {
-  const client = getStripeClient();
-  if (!client) {
-    throw new Error('Stripe is not configured. Please connect your Stripe account.');
-  }
-
+  const client = await getUncachableStripeClient();
+  
   const priceId = process.env.STRIPE_SUBSCRIPTION_PRICE_ID;
   if (!priceId) {
     throw new Error('Subscription price not configured. Please set up your Stripe products.');
@@ -62,10 +42,7 @@ export async function createDonationCheckout(
   successUrl: string,
   cancelUrl: string
 ): Promise<CheckoutSession> {
-  const client = getStripeClient();
-  if (!client) {
-    throw new Error('Stripe is not configured. Please connect your Stripe account.');
-  }
+  const client = await getUncachableStripeClient();
 
   if (amountCents < 100) {
     throw new Error('Minimum donation is $1.00');
@@ -98,10 +75,8 @@ export async function createDonationCheckout(
 }
 
 export async function getSessionInfo(sessionId: string): Promise<{ type: string; amount?: number } | null> {
-  const client = getStripeClient();
-  if (!client) return null;
-
   try {
+    const client = await getUncachableStripeClient();
     const session = await client.checkout.sessions.retrieve(sessionId);
     return {
       type: session.mode === 'subscription' ? 'subscription' : 'donation',
@@ -109,31 +84,6 @@ export async function getSessionInfo(sessionId: string): Promise<{ type: string;
     };
   } catch (error) {
     console.error('Error retrieving Stripe session:', error);
-    return null;
-  }
-}
-
-export async function handleWebhookEvent(
-  payload: string | Buffer,
-  signature: string
-): Promise<{ type: string; data: any } | null> {
-  const client = getStripeClient();
-  if (!client) return null;
-
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  if (!webhookSecret) {
-    console.warn('Stripe webhook secret not configured');
-    return null;
-  }
-
-  try {
-    const event = client.webhooks.constructEvent(payload, signature, webhookSecret);
-    return {
-      type: event.type,
-      data: event.data.object,
-    };
-  } catch (error) {
-    console.error('Webhook signature verification failed:', error);
     return null;
   }
 }
