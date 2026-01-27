@@ -51,4 +51,4 @@ The project utilizes a dual-server architecture with a React frontend (Vite) and
 - **Replit Auth**: Authentication service for user login and management.
 - **Tailwind CSS v4**: Utility-first CSS framework for styling.
 - **React Router DOM v6**: For client-side routing and navigation.
-- **Stripe**: Payment processing for subscriptions and donations. Requires STRIPE_SECRET_KEY, STRIPE_SUBSCRIPTION_PRICE_ID, and STRIPE_WEBHOOK_SECRET environment variables.
+- **Stripe**: Payment processing for subscriptions and donations using Replit's Stripe connector with stripe-replit-sync for automatic credential management, webhook handling, and database synchronization. Requires STRIPE_SUBSCRIPTION_PRICE_ID environment variable for subscription pricing.
