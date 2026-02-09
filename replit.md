@@ -33,7 +33,10 @@ The project utilizes a dual-server architecture with a React frontend (Vite) and
   - **Guest users**: Can save up to 5 poetry items locally (localStorage), see a limit banner with login CTA, but cannot access the Journal feature.
   - **Authenticated users**: Unlimited saves synced to server, full Journal access, Google Drive export, and account management.
   - Includes Google Drive export feature to save individual notes as markdown files.
-- **Google Drive Export**: Users can export individual notes to their Google Drive as markdown files. Uses Replit's Google Drive connector for OAuth authentication. Files include title, creation date, tags, and content in formatted markdown.
+- **Google Drive Integration**: Modal-based Google Drive interface with two tabs:
+  - **Export**: Shows file name, save location (My Drive root), and format details before exporting journal entries as markdown files.
+  - **Import**: Browse and import text files (.txt, .md) and Google Docs from Google Drive into new journal entries.
+  Uses Replit's Google Drive connector for OAuth authentication.
 - **Bottom Panel**: IDE-style collapsible panel in journal view that appears when a poetry item is selected. Contains tabbed sections for Historical Context (AI-powered), AI Example generation, and Links (tags, see also, Grokipedia). Tags are clickable and open the Reference pane with search pre-filled. Panel is resizable (150-500px height range).
 
 **System Design Choices:**
