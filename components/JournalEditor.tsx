@@ -24,6 +24,7 @@ import {
 // Lazy load non-critical components that are conditionally rendered
 const BottomPanel = lazy(() => import("./BottomPanel").then(m => ({ default: m.BottomPanel })));
 const SlashMenu = lazy(() => import("./SlashMenu").then(m => ({ default: m.SlashMenu })));
+import { GoogleDriveModal } from "./GoogleDriveModal";
 import { TagInput } from "./TagInput";
 import { GridIcon } from "./icons/GridIcon";
 import { getCaretCoordinates } from "../utils/cursor";
@@ -225,8 +226,8 @@ export const JournalEditor: React.FC = () => {
   const [showSaveError, setShowSaveError] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
   const [exportStatus, setExportStatus] = useState<{ success: boolean; message: string; link?: string } | null>(null);
+  const [showDriveModal, setShowDriveModal] = useState(false);
   const [pendingEntrySwitch, setPendingEntrySwitch] =
     useState<JournalEntry | null>(null);
   const [autosaveError, setAutosaveError] = useState<string | null>(null);
@@ -899,39 +900,44 @@ export const JournalEditor: React.FC = () => {
     await deleteEntry(selectedId);
   }, [selectedId, deleteEntry]);
 
-  const handleExportToGoogleDrive = useCallback(async () => {
-    if (!selectedId || isExporting) return;
-    
-    setIsExporting(true);
-    setExportStatus(null);
-    
+  const handleOpenDriveModal = useCallback(() => {
+    setShowDriveModal(true);
+  }, []);
+
+  const handleDriveExportComplete = useCallback((result: { success: boolean; message: string; link?: string }) => {
+    setExportStatus(result);
+    setTimeout(() => setExportStatus(null), 5000);
+  }, []);
+
+  const handleDriveImportComplete = useCallback(async (content: string, importTitle: string) => {
+    const newEntry: JournalEntry = {
+      id: generateUUID(),
+      title: importTitle,
+      content: content,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      tags: [],
+      isStarred: false,
+    };
+
+    setEntries((prev) => [newEntry, ...prev]);
+    setSelectedId(newEntry.id);
+    setTitle(newEntry.title);
+    setContent(newEntry.content);
+    contentRef.current = newEntry.content;
+    setActiveTemplate(undefined);
+    setTags([]);
+    setIsStarred(false);
+    previousSelectedIdRef.current = newEntry.id;
+
     try {
-      const result = await JournalStorage.exportToGoogleDrive(selectedId);
-      
-      if (result.success) {
-        setExportStatus({
-          success: true,
-          message: `Exported "${result.fileName}" to Google Drive`,
-          link: result.webViewLink,
-        });
-      } else {
-        setExportStatus({
-          success: false,
-          message: result.error || 'Failed to export to Google Drive',
-        });
-      }
-      
-      setTimeout(() => setExportStatus(null), 5000);
+      await JournalStorage.save(newEntry);
+      setSyncStatus("synced");
     } catch (error) {
-      setExportStatus({
-        success: false,
-        message: 'Failed to export to Google Drive',
-      });
-      setTimeout(() => setExportStatus(null), 5000);
-    } finally {
-      setIsExporting(false);
+      console.error("Failed to save imported entry:", error);
+      setSyncStatus("error");
     }
-  }, [selectedId, isExporting]);
+  }, []);
 
   const handleTextareaBlur = useCallback(() => {
     if (textareaRef.current) {
@@ -1793,22 +1799,13 @@ export const JournalEditor: React.FC = () => {
               </button>
               {isAuthenticated && (
                 <button
-                  onClick={handleExportToGoogleDrive}
-                  disabled={isExporting}
-                  className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-blue-500 hover:bg-blue-500/15 hover:shadow-[0_0_10px_rgba(59,130,246,0.3)] disabled:opacity-50 disabled:hover:text-muted disabled:hover:bg-transparent disabled:hover:shadow-none interactive-base interactive-scale"
-                  title="Export to Google Drive"
+                  onClick={handleOpenDriveModal}
+                  className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-blue-500 hover:bg-blue-500/15 hover:shadow-[0_0_10px_rgba(59,130,246,0.3)] interactive-base interactive-scale"
+                  title="Google Drive"
                 >
-                  {isExporting ? (
-                    <svg className="animate-spin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-                    </svg>
-                  ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                      <polyline points="17 8 12 3 7 8"/>
-                      <line x1="12" y1="3" x2="12" y2="15"/>
-                    </svg>
-                  )}
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                  </svg>
                 </button>
               )}
               <button
@@ -2057,6 +2054,15 @@ export const JournalEditor: React.FC = () => {
           </div>
         </div>
       )}
+
+      <GoogleDriveModal
+        isOpen={showDriveModal}
+        onClose={() => setShowDriveModal(false)}
+        entryTitle={title}
+        entryId={selectedId}
+        onExportComplete={handleDriveExportComplete}
+        onImportComplete={handleDriveImportComplete}
+      />
 
       {/* Daily goal editing modal */}
       {isEditingGoal && (

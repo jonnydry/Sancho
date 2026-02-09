@@ -9,7 +9,7 @@ import { setupAuth, isAuthenticated } from './server/replit_integrations/auth/in
 import { storage } from './server/storage.js';
 import { pool } from './server/db.js';
 import { logger } from './utils/logger.js';
-import { exportNoteToGoogleDrive } from './server/googleDrive.js';
+import { exportNoteToGoogleDrive, listDriveFiles, readDriveFile } from './server/googleDrive.js';
 import { isStripeConfigured, createSubscriptionCheckout, createDonationCheckout, getSessionInfo } from './server/stripe.js';
 import { getStripeSync } from './server/stripeClient.js';
 import { WebhookHandlers } from './server/webhookHandlers.js';
@@ -812,6 +812,34 @@ app.post('/api/journal/:id/export-drive', csrfProtection, isAuthenticated, rateL
   } catch (error) {
     logger.error("Error exporting journal entry to Google Drive", error);
     res.status(500).json({ error: "Failed to export to Google Drive" });
+  }
+});
+
+app.get('/api/drive/files', isAuthenticated, rateLimit(20, 60000), async (req, res) => {
+  try {
+    const pageToken = req.query.pageToken as string | undefined;
+    const result = await listDriveFiles(pageToken);
+    res.json(result);
+  } catch (error: any) {
+    logger.error("Error listing Google Drive files", error);
+    if (error.message === 'Google Drive not connected') {
+      return res.status(503).json({ error: 'Google Drive is not connected' });
+    }
+    res.status(500).json({ error: "Failed to list Google Drive files" });
+  }
+});
+
+app.get('/api/drive/files/:fileId', isAuthenticated, rateLimit(20, 60000), async (req, res) => {
+  try {
+    const { fileId } = req.params;
+    const result = await readDriveFile(fileId);
+    res.json(result);
+  } catch (error: any) {
+    logger.error("Error reading Google Drive file", error);
+    if (error.message === 'Google Drive not connected') {
+      return res.status(503).json({ error: 'Google Drive is not connected' });
+    }
+    res.status(500).json({ error: "Failed to read file from Google Drive" });
   }
 });
 

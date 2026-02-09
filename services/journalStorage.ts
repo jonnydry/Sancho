@@ -251,6 +251,15 @@ export const JournalStorage = {
     localStorage.removeItem(MIGRATION_FLAG_KEY);
   },
 
+  listDriveFiles: async (pageToken?: string): Promise<{ files: Array<{ id: string; name: string; mimeType: string; modifiedTime: string; size?: string }>; nextPageToken?: string }> => {
+    const url = pageToken ? `/api/drive/files?pageToken=${encodeURIComponent(pageToken)}` : '/api/drive/files';
+    return fetchWithAuth(url);
+  },
+
+  importFromDrive: async (fileId: string): Promise<{ content: string; name: string }> => {
+    return fetchWithAuth(`/api/drive/files/${encodeURIComponent(fileId)}`);
+  },
+
   exportToGoogleDrive: async (id: string): Promise<{ success: boolean; fileName?: string; webViewLink?: string; error?: string }> => {
     try {
       const data = await fetchWithAuth(`/api/journal/${id}/export-drive`, {

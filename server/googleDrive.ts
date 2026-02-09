@@ -60,6 +60,76 @@ export async function getUncachableGoogleDriveClient() {
   return google.drive({ version: 'v3', auth: oauth2Client });
 }
 
+export interface DriveFile {
+  id: string;
+  name: string;
+  mimeType: string;
+  modifiedTime: string;
+  size?: string;
+}
+
+export async function listDriveFiles(pageToken?: string): Promise<{ files: DriveFile[]; nextPageToken?: string }> {
+  try {
+    const drive = await getUncachableGoogleDriveClient();
+
+    const response = await drive.files.list({
+      q: "(mimeType='text/plain' or mimeType='text/markdown' or mimeType='text/x-markdown' or mimeType='application/vnd.google-apps.document')",
+      fields: 'nextPageToken, files(id, name, mimeType, modifiedTime, size)',
+      orderBy: 'modifiedTime desc',
+      pageSize: 20,
+      pageToken: pageToken || undefined,
+    });
+
+    return {
+      files: (response.data.files || []).map(f => ({
+        id: f.id || '',
+        name: f.name || 'Untitled',
+        mimeType: f.mimeType || '',
+        modifiedTime: f.modifiedTime || '',
+        size: f.size || undefined,
+      })),
+      nextPageToken: response.data.nextPageToken || undefined,
+    };
+  } catch (error: any) {
+    if (error.message === 'Google Drive not connected') {
+      throw error;
+    }
+    console.error('Error listing Google Drive files:', error);
+    throw new Error('Failed to list Google Drive files');
+  }
+}
+
+export async function readDriveFile(fileId: string): Promise<{ content: string; name: string }> {
+  try {
+    const drive = await getUncachableGoogleDriveClient();
+
+    const meta = await drive.files.get({ fileId, fields: 'id, name, mimeType' });
+    const name = meta.data.name || 'Untitled';
+    const mimeType = meta.data.mimeType || '';
+
+    let content: string;
+
+    if (mimeType === 'application/vnd.google-apps.document') {
+      const exported = await drive.files.export({ fileId, mimeType: 'text/plain' });
+      content = typeof exported.data === 'string' ? exported.data : String(exported.data);
+    } else {
+      const downloaded = await drive.files.get(
+        { fileId, alt: 'media' },
+        { responseType: 'text' }
+      );
+      content = typeof downloaded.data === 'string' ? downloaded.data : String(downloaded.data);
+    }
+
+    return { content, name };
+  } catch (error: any) {
+    if (error.message === 'Google Drive not connected') {
+      throw error;
+    }
+    console.error('Error reading Google Drive file:', error);
+    throw new Error('Failed to read file from Google Drive');
+  }
+}
+
 export interface ExportNoteResult {
   success: boolean;
   fileId?: string;
