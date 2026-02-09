@@ -809,8 +809,11 @@ app.post('/api/journal/:id/export-drive', csrfProtection, isAuthenticated, rateL
       fileName: result.fileName,
       webViewLink: result.webViewLink,
     });
-  } catch (error) {
+  } catch (error: any) {
     logger.error("Error exporting journal entry to Google Drive", error);
+    if (error.message === 'Google Drive not connected') {
+      return res.status(503).json({ error: 'Google Drive is not connected', code: 'DRIVE_NOT_CONNECTED' });
+    }
     res.status(500).json({ error: "Failed to export to Google Drive" });
   }
 });
@@ -823,7 +826,7 @@ app.get('/api/drive/files', isAuthenticated, rateLimit(20, 60000), async (req, r
   } catch (error: any) {
     logger.error("Error listing Google Drive files", error);
     if (error.message === 'Google Drive not connected') {
-      return res.status(503).json({ error: 'Google Drive is not connected' });
+      return res.status(503).json({ error: 'Google Drive is not connected', code: 'DRIVE_NOT_CONNECTED' });
     }
     res.status(500).json({ error: "Failed to list Google Drive files" });
   }
@@ -837,7 +840,7 @@ app.get('/api/drive/files/:fileId', isAuthenticated, rateLimit(20, 60000), async
   } catch (error: any) {
     logger.error("Error reading Google Drive file", error);
     if (error.message === 'Google Drive not connected') {
-      return res.status(503).json({ error: 'Google Drive is not connected' });
+      return res.status(503).json({ error: 'Google Drive is not connected', code: 'DRIVE_NOT_CONNECTED' });
     }
     res.status(500).json({ error: "Failed to read file from Google Drive" });
   }

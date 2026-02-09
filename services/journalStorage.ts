@@ -44,14 +44,16 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
   });
   
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ error: 'Unknown error' }));
-    const errorMsg = error.error || `Request failed with status ${response.status}`;
-    // Only log unexpected errors - 404 on PATCH is expected for new entries
+    const errorBody = await response.json().catch(() => ({ error: 'Unknown error' }));
+    const errorMsg = errorBody.error || `Request failed with status ${response.status}`;
     const isExpected404 = response.status === 404 && method === 'PATCH';
     if (process.env.NODE_ENV === 'development' && !isExpected404) {
       console.warn(`[Journal] API error (${response.status}): ${errorMsg}`);
     }
-    throw new Error(errorMsg);
+    const err = new Error(errorMsg) as Error & { code?: string; status?: number };
+    err.code = errorBody.code;
+    err.status = response.status;
+    throw err;
   }
 
   if (process.env.NODE_ENV === 'development') {

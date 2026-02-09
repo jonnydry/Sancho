@@ -20,6 +20,13 @@ interface GoogleDriveModalProps {
 
 type Tab = "export" | "import";
 
+function isDriveNotConnected(err: any): boolean {
+  if (err?.code === 'DRIVE_NOT_CONNECTED') return true;
+  if (err?.status === 503) return true;
+  const msg = typeof err === 'string' ? err : err?.message || '';
+  return msg.toLowerCase().includes("not connected");
+}
+
 export const GoogleDriveModal: React.FC<GoogleDriveModalProps> = ({
   isOpen,
   onClose,
@@ -35,6 +42,7 @@ export const GoogleDriveModal: React.FC<GoogleDriveModalProps> = ({
   const [nextPageToken, setNextPageToken] = useState<string | undefined>();
   const [importingFileId, setImportingFileId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [driveNotConnected, setDriveNotConnected] = useState(false);
   const [filesLoaded, setFilesLoaded] = useState(false);
 
   const loadFiles = useCallback(async (pageToken?: string) => {
@@ -50,7 +58,11 @@ export const GoogleDriveModal: React.FC<GoogleDriveModalProps> = ({
       setNextPageToken(result.nextPageToken);
       setFilesLoaded(true);
     } catch (err: any) {
-      setError(err.message || "Failed to load files from Google Drive");
+      if (isDriveNotConnected(err)) {
+        setDriveNotConnected(true);
+      } else {
+        setError(err.message || "Failed to load files from Google Drive");
+      }
     } finally {
       setIsLoadingFiles(false);
     }
@@ -68,6 +80,7 @@ export const GoogleDriveModal: React.FC<GoogleDriveModalProps> = ({
       setFiles([]);
       setNextPageToken(undefined);
       setError(null);
+      setDriveNotConnected(false);
       setActiveTab("export");
     }
   }, [isOpen]);
@@ -85,19 +98,23 @@ export const GoogleDriveModal: React.FC<GoogleDriveModalProps> = ({
           message: `Exported "${result.fileName}" to Google Drive`,
           link: result.webViewLink,
         });
+        onClose();
       } else {
-        onExportComplete({
-          success: false,
-          message: result.error || "Failed to export to Google Drive",
-        });
+        const errMsg = result.error || "Failed to export to Google Drive";
+        if (isDriveNotConnected({ message: errMsg })) {
+          setDriveNotConnected(true);
+        } else {
+          onExportComplete({ success: false, message: errMsg });
+          onClose();
+        }
       }
-      onClose();
-    } catch {
-      onExportComplete({
-        success: false,
-        message: "Failed to export to Google Drive",
-      });
-      onClose();
+    } catch (err: any) {
+      if (isDriveNotConnected(err)) {
+        setDriveNotConnected(true);
+      } else {
+        onExportComplete({ success: false, message: err.message || "Failed to export to Google Drive" });
+        onClose();
+      }
     } finally {
       setIsExporting(false);
     }
@@ -114,7 +131,11 @@ export const GoogleDriveModal: React.FC<GoogleDriveModalProps> = ({
       onImportComplete(result.content, cleanName);
       onClose();
     } catch (err: any) {
-      setError(err.message || "Failed to import file");
+      if (isDriveNotConnected(err)) {
+        setDriveNotConnected(true);
+      } else {
+        setError(err.message || "Failed to import file");
+      }
     } finally {
       setImportingFileId(null);
     }
@@ -212,7 +233,38 @@ export const GoogleDriveModal: React.FC<GoogleDriveModalProps> = ({
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {activeTab === "export" ? (
+          {driveNotConnected ? (
+            <div className="p-6 flex flex-col items-center text-center gap-4">
+              <div className="w-14 h-14 rounded-full bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                  <line x1="12" y1="9" x2="12" y2="13"/>
+                  <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+              </div>
+              <div>
+                <h4 className="text-base font-semibold text-default mb-1">Google Drive Not Connected</h4>
+                <p className="text-sm text-muted leading-relaxed">
+                  To use Google Drive features, you need to connect your Google Drive account first.
+                </p>
+              </div>
+              <div className="bg-bg-alt rounded-lg p-4 w-full text-left space-y-3 border border-default/30">
+                <p className="text-sm font-medium text-default">How to connect:</p>
+                <ol className="text-sm text-muted space-y-2 list-decimal list-inside">
+                  <li>Open the <span className="font-medium text-default">Tools</span> pane in your Replit workspace</li>
+                  <li>Find <span className="font-medium text-default">Google Drive</span> in the integrations list</li>
+                  <li>Click <span className="font-medium text-default">Connect</span> and sign in with your Google account</li>
+                  <li>Come back here and try again</li>
+                </ol>
+              </div>
+              <button
+                onClick={onClose}
+                className="mt-2 px-5 py-2 rounded-md text-sm font-medium bg-bg-alt text-default border border-default hover:bg-bg-alt/80 transition-all duration-200"
+              >
+                Got it
+              </button>
+            </div>
+          ) : activeTab === "export" ? (
             <div className="p-5 space-y-4">
               <p className="text-sm text-muted">
                 Export this journal entry as a Markdown file to your Google Drive.
