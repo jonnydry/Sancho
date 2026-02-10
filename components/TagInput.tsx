@@ -182,7 +182,7 @@ export const TagInput: React.FC<TagInputProps> = ({
 
       {/* Autocomplete Suggestions */}
       {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-bg border border-default rounded-sm shadow-lg z-20 overflow-hidden">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-bg border border-default rounded-sm shadow-lg z-20 overflow-hidden animate-fade-in-fast">
           {suggestions.map((suggestion, index) => (
             <button
               key={suggestion}

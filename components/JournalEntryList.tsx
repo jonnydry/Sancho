@@ -126,8 +126,10 @@ const EntryItem: React.FC<{
 
       {/* Main content */}
       <div
-        className={`relative group cursor-pointer border-l-2 transition-all duration-200 bg-bg interactive-base ${
-          isSwiping ? "" : "duration-200"
+        role="button"
+        tabIndex={0}
+        className={`relative group cursor-pointer border-l-2 transition-colors duration-150 bg-bg interactive-base focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-inset focus-visible:outline-none ${
+          isSwiping ? "" : ""
         } hover:bg-bg-alt/50 hover:shadow-sm ${
           isSelected ? "border-accent bg-bg-alt" : "border-transparent"
         } ${compact ? "px-2 py-1" : "px-2 py-1.5"}`}
@@ -136,6 +138,7 @@ const EntryItem: React.FC<{
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
         onClick={onSelect}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onSelect(); } }}
       >
         <div className="flex-1 w-full overflow-hidden">
           <div className="flex items-center gap-1.5">
@@ -701,11 +704,13 @@ const JournalEntryListComponent: React.FC<JournalEntryListProps> = ({
       {/* Entry List */}
       <div ref={listContainerRef} className="overflow-y-auto flex-1">
         {filteredEntries.length === 0 ? (
-          <div className="p-4 text-center">
-            <p className="hidden sm:block text-xs text-muted">
-              {searchQuery ? "No matches" : "No entries"}
+          <div className="p-6 sm:p-8 text-center">
+            <p className="text-xs text-muted">
+              {searchQuery ? "No matches for your search" : "No entries yet"}
             </p>
-            <p className="sm:hidden text-xs text-muted">-</p>
+            <p className="text-xs text-muted/70 mt-1">
+              {searchQuery ? "Try a different query" : "Create one with + above"}
+            </p>
           </div>
         ) : viewMode === "all" ? (
           /* All Notes View - Virtualized when many entries */
@@ -886,10 +891,10 @@ const JournalEntryListComponent: React.FC<JournalEntryListProps> = ({
             {allTags.length === 0 &&
               untaggedEntries.length === 0 &&
               starredEntries.length === 0 && (
-                <div className="p-4 text-center">
+                <div className="p-6 sm:p-8 text-center">
                   <p className="text-xs text-muted">No tags yet</p>
-                  <p className="text-xs text-muted/60 mt-1">
-                    Add #tags to your notes
+                  <p className="text-xs text-muted/70 mt-1">
+                    Add #tags in your notes to organize
                   </p>
                 </div>
               )}
