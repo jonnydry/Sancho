@@ -28,14 +28,6 @@ export function getSession() {
     tableName: "sessions",
   });
 
-  // Set cookie domain for custom domains to allow cross-subdomain session sharing
-  // e.g., ".sanchopoetry.com" matches both www.sanchopoetry.com and sanchopoetry.com
-  let cookieDomain: string | undefined;
-  const customDomain = process.env.CUSTOM_DOMAIN;
-  if (customDomain) {
-    cookieDomain = customDomain.startsWith('.') ? customDomain : `.${customDomain}`;
-  }
-
   return session({
     secret: process.env.SESSION_SECRET!,
     store: sessionStore,
@@ -44,9 +36,8 @@ export function getSession() {
     cookie: {
       httpOnly: true,
       secure: true,
-      sameSite: 'lax', // Required for OAuth redirects to preserve session
+      sameSite: 'lax',
       maxAge: sessionTtl,
-      ...(cookieDomain && { domain: cookieDomain }),
     },
   });
 }
@@ -127,11 +118,6 @@ export async function setupAuth(app: Application) {
     }
   };
 
-  // Keep track of registered strategies per domain
-  const registeredStrategies = new Set<string>();
-
-  // Helper function to get the effective protocol from proxy headers
-  // In production, Replit proxies use x-forwarded-proto to indicate the original protocol
   const getEffectiveProtocol = (req: any): string => {
     const forwardedProto = req.get('x-forwarded-proto');
     if (forwardedProto) {
@@ -140,13 +126,16 @@ export async function setupAuth(app: Application) {
     return req.secure ? 'https' : req.protocol;
   };
 
-  // Helper function to ensure strategy exists for a domain
-  // Always use HTTPS for callback URLs as Replit only whitelists HTTPS origins
+  const replitDomains = (process.env.REPLIT_DOMAINS || '').split(',').map(d => d.trim()).filter(Boolean);
+  if (replitDomains.length === 0) {
+    throw new Error('REPLIT_DOMAINS environment variable is required for OAuth authentication.');
+  }
+
+  const registeredStrategies = new Set<string>();
+
   const ensureStrategy = (domain: string) => {
     const strategyName = `replitauth:${domain}`;
     if (!registeredStrategies.has(strategyName)) {
-      // Always use HTTPS for callback URLs - Replit's OAuth server only accepts HTTPS
-      // Use /api/callback path as this is Replit's standard callback path
       const callbackURL = `https://${domain}/api/callback`;
       const strategy = new Strategy(
         {
@@ -164,32 +153,27 @@ export async function setupAuth(app: Application) {
     return strategyName;
   };
 
-  console.log(`[AUTH] REPLIT_DOMAINS: ${process.env.REPLIT_DOMAINS || 'not set'}`);
-
-  // Pre-register strategies for all domains in REPLIT_DOMAINS
-  const replitDomains = process.env.REPLIT_DOMAINS || '';
-  if (replitDomains) {
-    const domains = replitDomains.split(',').map(d => d.trim()).filter(Boolean);
-    for (const domain of domains) {
-      ensureStrategy(domain);
-    }
+  for (const domain of replitDomains) {
+    ensureStrategy(domain);
   }
+
+  const getStrategyForHost = (host: string): string => {
+    const matchedDomain = replitDomains.find(d => host === d || host.startsWith(d));
+    if (matchedDomain) {
+      return ensureStrategy(matchedDomain);
+    }
+    return ensureStrategy(replitDomains[0]);
+  };
 
   passport.serializeUser((user: Express.User, cb) => cb(null, user));
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
     try {
-      // Use Host header which includes the full host
       const host = req.get('host') || req.hostname;
-      const protocol = getEffectiveProtocol(req);
-      
-      console.log(`[AUTH] Login request - host: ${host}, effective protocol: ${protocol}`);
-      
-      const strategyName = ensureStrategy(host);
-      console.log(`[AUTH] Using strategy: ${strategyName}`);
-      
-      // Let passport handle the redirect - don't use custom callback for login
+      const strategyName = getStrategyForHost(host);
+      console.log(`[AUTH] Login request - host: ${host}, strategy: ${strategyName}`);
+
       passport.authenticate(strategyName, {
         prompt: "login consent",
         scope: ["openid", "email", "profile", "offline_access"],
@@ -200,22 +184,18 @@ export async function setupAuth(app: Application) {
     }
   });
 
-  // OAuth callback route - must match the callback URL registered with Replit
   app.get("/api/callback", (req, res, next) => {
-    // Use Host header which includes the full host
     const host = req.get('host') || req.hostname;
-    const protocol = getEffectiveProtocol(req);
+    const strategyName = getStrategyForHost(host);
 
-    console.log(`[AUTH] Callback request - host: ${host}, effective protocol: ${protocol}`);
+    console.log(`[AUTH] Callback request - host: ${host}, strategy: ${strategyName}`);
     console.log(`[AUTH] Callback query params - code: ${req.query.code ? 'present' : 'missing'}, state: ${req.query.state ? 'present' : 'missing'}, error: ${req.query.error || 'none'}`);
 
-    // Check for OAuth errors from the provider
     if (req.query.error) {
       console.error(`[AUTH] OAuth error from provider: ${req.query.error} - ${req.query.error_description || 'no description'}`);
       return res.redirect('/?login_error=oauth_denied');
     }
 
-    const strategyName = ensureStrategy(host);
     passport.authenticate(strategyName, (err: Error | null, user: Express.User | false, info: object | undefined) => {
       if (err) {
         console.error(`[AUTH] Passport authentication error:`, err.message);
