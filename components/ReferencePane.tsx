@@ -625,6 +625,28 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
                       </div>
                     </div>
                   )}
+
+                  {activeItem.tags && activeItem.tags.length > 0 && (
+                    <div>
+                      <h5 className="font-semibold uppercase tracking-wider text-muted text-[10px] mb-1.5">
+                        Tags
+                      </h5>
+                      <div className="flex flex-wrap gap-1.5">
+                        {activeItem.tags.map((tag, index) => (
+                          <button
+                            key={index}
+                            onClick={() => {
+                              setSearchQuery(tag);
+                              setActiveTab("search");
+                            }}
+                            className="text-[10px] px-2 py-0.5 rounded-full border border-accent/30 bg-accent/5 text-accent hover:bg-accent hover:text-accent-text transition-all duration-200 interactive-base interactive-scale cursor-pointer"
+                          >
+                            {tag}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
