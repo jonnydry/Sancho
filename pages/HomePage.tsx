@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, Suspense, lazy, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { PoetryCard } from '../components/PoetryCard';
 import { SearchFilter } from '../components/SearchFilter';
 import { PoetryItem } from '../types';
@@ -31,16 +32,27 @@ const seededShuffle = <T,>(array: T[], seed: number): T[] => {
 const PoetryDetailModal = lazy(() => import('../components/PoetryDetailModal').then(module => ({ default: module.PoetryDetailModal })));
 
 export const HomePage: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [modalItem, setModalItem] = useState<PoetryItem | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<'all' | 'Form' | 'Meter' | 'Device'>('all');
   const [activeTagFilter, setActiveTagFilter] = useState<string | null>(null);
   const [allData, setAllData] = useState<PoetryItem[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
-  const [itemsToShow, setItemsToShow] = useState(20); // Increased from 10 for better initial load
+  const [itemsToShow, setItemsToShow] = useState(20);
 
   const { isPinned } = usePinnedItems();
   const { showNotification } = useNotification();
+
+  useEffect(() => {
+    const tagParam = searchParams.get('tag');
+    if (tagParam) {
+      setActiveTagFilter(tagParam);
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('tag');
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   // Check for login error in URL and show notification
   useEffect(() => {

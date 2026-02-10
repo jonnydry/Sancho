@@ -1,4 +1,5 @@
 import React, { useState, useEffect, lazy, Suspense, useRef, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { usePinnedItems } from '../contexts/PinnedItemsContext';
 import { useNotification } from '../contexts/NotificationContext';
 import { useAuth } from '../hooks/useAuth';
@@ -52,6 +53,7 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
   const { pinnedItems, isLoading, isGuest, guestLimitReached, guestItemLimit } = usePinnedItems();
   const { showNotification } = useNotification();
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [selectedItem, setSelectedItem] = useState<PoetryItem | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -94,18 +96,24 @@ export const Notebook: React.FC<NotebookProps> = ({ isOpen, onClose }) => {
     setSelectedItem(item);
   }, []);
 
+  const handleTagClick = useCallback((tag: string) => {
+    onClose();
+    navigate(`/?tag=${encodeURIComponent(tag)}`);
+  }, [onClose, navigate]);
+
   const savedItemsList = useMemo(() => (
     pinnedItems.map((item, index) => (
       <div key={item.name} className="relative">
         <PoetryCard
           item={item}
           onSelect={handleCardClick}
+          onTagClick={handleTagClick}
           animationIndex={index}
           variant="matte"
         />
       </div>
     ))
-  ), [pinnedItems, handleCardClick]);
+  ), [pinnedItems, handleCardClick, handleTagClick]);
 
   const handleCloseModal = () => {
     setSelectedItem(null);
