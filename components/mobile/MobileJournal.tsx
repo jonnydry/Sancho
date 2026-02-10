@@ -5,6 +5,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { MobileJournalHeader } from './MobileJournalHeader';
 import { MobileJournalList } from './MobileJournalList';
 import { MobileJournalEditor } from './MobileJournalEditor';
+import { MobileJournalMoreSheet } from './MobileJournalMoreSheet';
 import { MobileReferenceSheet } from './MobileReferenceSheet';
 
 type MobileView = 'list' | 'editor';
@@ -46,6 +47,7 @@ export const MobileJournal: React.FC = () => {
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [showReference, setShowReference] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showMoreSheet, setShowMoreSheet] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null);
 
@@ -197,6 +199,7 @@ export const MobileJournal: React.FC = () => {
               onToggleStar={handleToggleCurrentStar}
               onTogglePreview={() => setIsPreviewMode(!isPreviewMode)}
               onOpenReference={() => setShowReference(true)}
+              onMoreOpen={() => setShowMoreSheet(true)}
               isStarred={isStarred}
               isPreviewMode={isPreviewMode}
               isSaving={isSaving}
@@ -218,6 +221,22 @@ export const MobileJournal: React.FC = () => {
           </>
         )}
       </div>
+
+      {/* More action sheet */}
+      <MobileJournalMoreSheet
+        isOpen={showMoreSheet}
+        onClose={() => setShowMoreSheet(false)}
+        onToggleStar={handleToggleCurrentStar}
+        onTogglePreview={() => setIsPreviewMode(!isPreviewMode)}
+        onOpenReference={() => setShowReference(true)}
+        onSave={handleManualSave}
+        onDelete={() => setShowDeleteConfirm(true)}
+        isStarred={isStarred}
+        isPreviewMode={isPreviewMode}
+        isSaving={isSaving}
+        syncStatus={syncStatus}
+        wordCount={wordCount}
+      />
 
       {/* Reference bottom sheet */}
       <MobileReferenceSheet

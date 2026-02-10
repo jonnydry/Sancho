@@ -418,11 +418,11 @@ export const MobileJournalList: React.FC<MobileJournalListProps> = ({
         <div className="h-24"></div>
       </div>
 
-      {/* Floating action button */}
+      {/* Floating action button - clears footer (3rem) + gap + safe area */}
       <button
         onClick={onCreate}
-        className="fixed right-4 bottom-20 w-14 h-14 rounded-full bg-accent text-accent-text shadow-lg flex items-center justify-center active:scale-95 transition-transform safe-area-bottom z-20"
-        style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
+        className="fixed right-4 w-14 h-14 rounded-full bg-accent text-accent-text shadow-lg flex items-center justify-center active:scale-95 transition-transform z-20"
+        style={{ bottom: 'calc(3rem + 2rem + env(safe-area-inset-bottom, 0px))' }}
         aria-label="Create new entry"
       >
         <svg

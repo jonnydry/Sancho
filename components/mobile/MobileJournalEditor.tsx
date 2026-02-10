@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect, lazy, Suspense } from 'react';
 import remarkGfm from 'remark-gfm';
-import { TagInput } from '../TagInput';
+import { MobileTagInput } from './MobileTagInput';
 import { SLASH_COMMANDS, SlashCommand, replaceSlashCommand } from '../SlashMenu';
 import { getCaretCoordinates } from '../../utils/cursor';
 
@@ -96,15 +96,33 @@ export const MobileJournalEditor: React.FC<MobileJournalEditorProps> = ({
         setSlashQuery(match[1]);
         setSlashSelectedIndex(0);
 
-        // Calculate position for menu
+        // Calculate position for menu, constrained to viewport on small screens
         const coords = getCaretCoordinates(e.target, cursorPos);
         const rect = e.target.getBoundingClientRect();
         const scrollTop = e.target.scrollTop;
+        const menuWidth = 220;
+        const menuHeight = 280;
+        const padding = 8;
+        const viewportWidth = window.innerWidth;
 
-        setSlashMenuPosition({
-          top: Math.min(coords.top - scrollTop + 24, rect.height - 200),
-          left: Math.min(coords.left + 10, rect.width - 200),
-        });
+        // Horizontal: clamp to stay within viewport
+        let left = coords.left + 10;
+        left = Math.max(padding, Math.min(left, viewportWidth - menuWidth - padding));
+        // Also keep within textarea bounds
+        left = Math.max(0, Math.min(left, rect.width - menuWidth));
+
+        // Vertical: prefer below caret, but show above if near bottom
+        let top = coords.top - scrollTop + 24;
+        const spaceBelow = rect.height - (coords.top - scrollTop) - 30;
+        if (spaceBelow < menuHeight && coords.top > menuHeight) {
+          // Render above caret
+          top = coords.top - scrollTop - menuHeight - 8;
+        } else {
+          top = Math.min(top, rect.height - menuHeight - padding);
+        }
+        top = Math.max(padding, top);
+
+        setSlashMenuPosition({ top, left });
       } else {
         setShowSlashMenu(false);
       }
@@ -253,9 +271,9 @@ export const MobileJournalEditor: React.FC<MobileJournalEditorProps> = ({
         />
       </div>
 
-      {/* Tag input */}
+      {/* Tag input (collapsible) */}
       <div className="px-4 pb-2">
-        <TagInput
+        <MobileTagInput
           tags={tags}
           onChange={onTagsChange}
           allTags={allTags}

@@ -665,6 +665,15 @@ body::-webkit-scrollbar-corner,
   overflow: hidden;
 }
 
+/* Hide scrollbar (e.g. horizontal tag row) */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* Prevent text selection during swipe */
 .swipe-active {
   user-select: none;
