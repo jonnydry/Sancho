@@ -17,6 +17,10 @@ interface MobileJournalEditorProps {
   onTitleChange: (title: string) => void;
   onContentChange: (content: string) => void;
   onTagsChange: (tags: string[]) => void;
+  onSwipeStar?: () => void;
+  onSwipeDelete?: () => void;
+  fontFace?: 'monospace' | 'serif' | 'sans-serif';
+  fontSize?: number;
 }
 
 const PreviewLoadingFallback: React.FC = () => (
@@ -36,9 +40,19 @@ export const MobileJournalEditor: React.FC<MobileJournalEditorProps> = ({
   onTitleChange,
   onContentChange,
   onTagsChange,
+  onSwipeStar,
+  onSwipeDelete,
+  fontFace = 'sans-serif',
+  fontSize = 18,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const contentRef = useRef<string>(content);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Swipe gesture state
+  const [swipeX, setSwipeX] = useState(0);
+  const swipeStartX = useRef<number | null>(null);
+  const SWIPE_THRESHOLD = 80;
 
   // Slash command state
   const [showSlashMenu, setShowSlashMenu] = useState(false);
@@ -254,11 +268,110 @@ export const MobileJournalEditor: React.FC<MobileJournalEditorProps> = ({
     [showSlashMenu, slashQuery, slashSelectedIndex, executeSlashCommand, onContentChange]
   );
 
+  // Swipe gesture handlers
+  // Only trigger swipes when touch starts on left/right edge of screen (not on text content)
+  const SWIPE_EDGE_WIDTH = 40; // pixels from edge to detect swipe zone
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (isPreviewMode) return;
+    const touch = e.touches[0];
+    const screenWidth = window.innerWidth;
+    const isOnEdge = touch.clientX < SWIPE_EDGE_WIDTH || touch.clientX > screenWidth - SWIPE_EDGE_WIDTH;
+    
+    if (isOnEdge) {
+      swipeStartX.current = touch.clientX;
+    } else {
+      swipeStartX.current = null;
+    }
+  }, [isPreviewMode]);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (swipeStartX.current === null || isPreviewMode) return;
+    
+    const touch = e.touches[0];
+    const deltaX = touch.clientX - swipeStartX.current;
+    
+    // Only track horizontal swipes
+    if (Math.abs(deltaX) > 10) {
+      e.preventDefault();
+      setSwipeX(deltaX);
+    }
+  }, [isPreviewMode]);
+
+  const handleTouchEnd = useCallback(() => {
+    if (swipeStartX.current === null) return;
+    
+    const deltaX = swipeX;
+    
+    if (deltaX > SWIPE_THRESHOLD) {
+      // Swipe right - star
+      onSwipeStar?.();
+      if ('vibrate' in navigator) {
+        navigator.vibrate([10, 50, 10]);
+      }
+    } else if (deltaX < -SWIPE_THRESHOLD) {
+      // Swipe left - delete
+      onSwipeDelete?.();
+      if ('vibrate' in navigator) {
+        navigator.vibrate([10, 50, 10]);
+      }
+    }
+    
+    setSwipeX(0);
+    swipeStartX.current = null;
+  }, [swipeX, onSwipeStar, onSwipeDelete]);
+
+  const handleTouchCancel = useCallback(() => {
+    setSwipeX(0);
+    swipeStartX.current = null;
+  }, []);
+
+  // Get swipe action background color
+  const getSwipeBackground = () => {
+    if (swipeX > SWIPE_THRESHOLD) return 'bg-yellow-500/20';
+    if (swipeX < -SWIPE_THRESHOLD) return 'bg-red-500/20';
+    return '';
+  };
+
+  // Get swipe action icon
+  const getSwipeIcon = () => {
+    if (swipeX > SWIPE_THRESHOLD) {
+      return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" className="text-yellow-500">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+      );
+    }
+    if (swipeX < -SWIPE_THRESHOLD) {
+      return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-500">
+          <polyline points="3 6 5 6 21 6" />
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+        </svg>
+      );
+    }
+    return null;
+  };
+
   return (
     <div
-      className="flex flex-col h-full overflow-hidden"
+      ref={containerRef}
+      className="flex flex-col h-full overflow-hidden relative"
       style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchCancel}
     >
+      {/* Swipe background indicators - only show when actively swiping */}
+      {Math.abs(swipeX) > 10 && (
+        <div className={`absolute inset-0 flex items-center justify-center pointer-events-none ${getSwipeBackground()}`}>
+          <div className="opacity-80">
+            {getSwipeIcon()}
+          </div>
+        </div>
+      )}
+      
       {/* Title input */}
       <div className="px-4 pt-4 pb-2">
         <input
@@ -300,8 +413,14 @@ export const MobileJournalEditor: React.FC<MobileJournalEditorProps> = ({
               onChange={handleTextareaInput}
               onKeyDown={handleTextareaKeyDown}
               placeholder="Start writing... Type '/' for commands"
-              className="journal-font w-full h-full bg-transparent border-none outline-none resize-none leading-relaxed text-default placeholder:text-muted/30 text-base"
-              style={{ minHeight: '300px' }}
+              className="journal-font w-full h-full bg-transparent border-none outline-none resize-none leading-relaxed text-default placeholder:text-muted/30"
+              style={{ 
+                minHeight: '300px',
+                fontFamily: fontFace === 'monospace' ? "'Source Code Pro', 'Menlo', 'Monaco', monospace" : 
+                             fontFace === 'serif' ? "'Source Serif Pro', 'Georgia', 'Times New Roman', serif" : 
+                             "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+                fontSize: fontSize,
+              }}
             />
 
             {/* Slash command menu */}

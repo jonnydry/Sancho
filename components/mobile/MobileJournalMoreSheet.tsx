@@ -1,5 +1,9 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState, lazy, Suspense } from 'react';
 import { SyncStatus } from '../../hooks/useJournalState';
+
+const GoogleDriveModal = lazy(() => import('../GoogleDriveModal').then(m => ({ default: m.GoogleDriveModal })));
+
+type FontFace = 'monospace' | 'serif' | 'sans-serif';
 
 interface MobileJournalMoreSheetProps {
   isOpen: boolean;
@@ -7,14 +11,30 @@ interface MobileJournalMoreSheetProps {
   onToggleStar?: () => void;
   onTogglePreview?: () => void;
   onOpenReference?: () => void;
+  onToggleZen?: () => void;
   onSave?: () => void;
   onDelete?: () => void;
+  onDownload?: () => void;
+  onImport?: (content: string, title: string) => void;
+  onFontChange?: (face: FontFace) => void;
+  onFontSizeChange?: (size: 'increase' | 'decrease') => void;
   isStarred?: boolean;
   isPreviewMode?: boolean;
+  isZenMode?: boolean;
   isSaving?: boolean;
   syncStatus?: SyncStatus;
   wordCount?: number;
+  currentFontFace?: FontFace;
+  currentFontSize?: number;
+  entryId?: string | null;
+  entryTitle?: string;
 }
+
+const FontFaceOptions: { value: FontFace; label: string }[] = [
+  { value: 'sans-serif', label: 'Sans' },
+  { value: 'serif', label: 'Serif' },
+  { value: 'monospace', label: 'Mono' },
+];
 
 export const MobileJournalMoreSheet: React.FC<MobileJournalMoreSheetProps> = ({
   isOpen,
@@ -22,14 +42,27 @@ export const MobileJournalMoreSheet: React.FC<MobileJournalMoreSheetProps> = ({
   onToggleStar,
   onTogglePreview,
   onOpenReference,
+  onToggleZen,
   onSave,
   onDelete,
+  onDownload,
+  onImport,
+  onFontChange,
+  onFontSizeChange,
   isStarred = false,
   isPreviewMode = false,
+  isZenMode = false,
   isSaving = false,
   syncStatus = 'synced',
   wordCount,
+  currentFontFace = 'sans-serif',
+  currentFontSize = 18,
+  entryId,
+  entryTitle,
 }) => {
+  const [showFontMenu, setShowFontMenu] = useState(false);
+  const [showDriveModal, setShowDriveModal] = useState(false);
+
   const handleStar = useCallback(() => {
     onToggleStar?.();
   }, [onToggleStar]);
@@ -37,6 +70,10 @@ export const MobileJournalMoreSheet: React.FC<MobileJournalMoreSheetProps> = ({
   const handlePreview = useCallback(() => {
     onTogglePreview?.();
   }, [onTogglePreview]);
+
+  const handleZen = useCallback(() => {
+    onToggleZen?.();
+  }, [onToggleZen]);
 
   const handleReference = useCallback(() => {
     onClose();
@@ -53,6 +90,16 @@ export const MobileJournalMoreSheet: React.FC<MobileJournalMoreSheetProps> = ({
     onDelete?.();
   }, [onClose, onDelete]);
 
+  const handleDownload = useCallback(() => {
+    onDownload?.();
+    onClose();
+  }, [onDownload, onClose]);
+
+  const handleFontSelect = useCallback((face: FontFace) => {
+    onFontChange?.(face);
+    setShowFontMenu(false);
+  }, [onFontChange]);
+
   if (!isOpen) return null;
 
   return (
@@ -63,11 +110,11 @@ export const MobileJournalMoreSheet: React.FC<MobileJournalMoreSheetProps> = ({
       />
 
       <div
-        className="fixed inset-x-0 bottom-0 z-50 bg-bg rounded-t-2xl shadow-xl animate-slide-up safe-area-bottom"
+        className="fixed inset-x-0 bottom-0 z-50 bg-bg rounded-t-2xl shadow-xl animate-slide-up safe-area-bottom max-h-[80vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Handle */}
-        <div className="flex justify-center pt-3 pb-2">
+        <div className="flex justify-center pt-3 pb-2 sticky top-0 bg-bg">
           <div className="w-10 h-1 bg-muted/30 rounded-full" />
         </div>
 
@@ -107,6 +154,31 @@ export const MobileJournalMoreSheet: React.FC<MobileJournalMoreSheetProps> = ({
 
           {/* Actions */}
           <div className="space-y-1">
+            {/* Zen Mode */}
+            {onToggleZen && (
+              <button
+                onClick={handleZen}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-bg-alt active:bg-bg-alt transition-colors"
+              >
+                {isZenMode ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent">
+                    <polyline points="4 14 10 14 10 20" />
+                    <polyline points="20 10 14 10 14 4" />
+                    <line x1="14" x2="21" y1="10" y2="3" />
+                    <line x1="3" x2="10" y1="21" y2="14" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted">
+                    <polyline points="15 3 21 3 21 9" />
+                    <polyline points="9 21 3 21 3 15" />
+                    <line x1="21" x2="14" y1="3" y2="10" />
+                    <line x1="3" x2="10" y1="21" y2="14" />
+                  </svg>
+                )}
+                <span className="font-medium text-default">{isZenMode ? 'Exit Zen Mode' : 'Zen Mode'}</span>
+              </button>
+            )}
+
             {onToggleStar && (
               <button
                 onClick={handleStar}
@@ -161,6 +233,90 @@ export const MobileJournalMoreSheet: React.FC<MobileJournalMoreSheetProps> = ({
               </button>
             )}
 
+            {/* Font controls */}
+            {onFontChange && (
+              <div className="relative">
+                <button
+                  onClick={() => setShowFontMenu(!showFontMenu)}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-bg-alt active:bg-bg-alt transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted">
+                    <polyline points="4 7 4 4 20 4 20 7" />
+                    <line x1="9" y1="20" x2="15" y2="20" />
+                    <line x1="12" y1="4" x2="12" y2="20" />
+                  </svg>
+                  <span className="font-medium text-default">Font: {FontFaceOptions.find(f => f.value === currentFontFace)?.label}</span>
+                  <span className="text-xs text-muted ml-auto">{currentFontSize}px</span>
+                </button>
+                
+                {showFontMenu && (
+                  <div className="ml-4 mt-1 space-y-1 bg-bg-alt rounded-lg p-2">
+                    <div className="flex gap-1 mb-2">
+                      {FontFaceOptions.map((option) => (
+                        <button
+                          key={option.value}
+                          onClick={() => handleFontSelect(option.value)}
+                          className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                            currentFontFace === option.value
+                              ? 'bg-accent text-white'
+                              : 'bg-bg text-default hover:bg-bg-alt'
+                          }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => onFontSizeChange?.('decrease')}
+                        className="flex-1 py-2 px-3 rounded-lg bg-bg text-default hover:bg-bg-alt transition-colors text-sm"
+                      >
+                        A-
+                      </button>
+                      <span className="text-sm text-muted">{currentFontSize}px</span>
+                      <button
+                        onClick={() => onFontSizeChange?.('increase')}
+                        className="flex-1 py-2 px-3 rounded-lg bg-bg text-default hover:bg-bg-alt transition-colors text-sm"
+                      >
+                        A+
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Google Drive */}
+            <button
+              onClick={() => {
+                onClose();
+                setShowDriveModal(true);
+              }}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-bg-alt active:bg-bg-alt transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                <path d="M2 17l10 5 10-5" />
+                <path d="M2 12l10 5 10-5" />
+              </svg>
+              <span className="font-medium text-default">Google Drive</span>
+            </button>
+
+            {/* Download */}
+            {onDownload && (
+              <button
+                onClick={handleDownload}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-bg-alt active:bg-bg-alt transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" x2="12" y1="15" y2="3" />
+                </svg>
+                <span className="font-medium text-default">Download as Markdown</span>
+              </button>
+            )}
+
             {onSave && (
               <button
                 onClick={handleSave}
@@ -191,6 +347,25 @@ export const MobileJournalMoreSheet: React.FC<MobileJournalMoreSheetProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Google Drive Modal */}
+      <Suspense fallback={null}>
+        {showDriveModal && (
+          <GoogleDriveModal
+            isOpen={showDriveModal}
+            onClose={() => setShowDriveModal(false)}
+            entryTitle={entryTitle || ''}
+            entryId={entryId || null}
+            onExportComplete={(result) => {
+              console.log('Export result:', result);
+            }}
+            onImportComplete={(content, title) => {
+              onImport?.(content, title);
+              setShowDriveModal(false);
+            }}
+          />
+        )}
+      </Suspense>
     </>
   );
 };

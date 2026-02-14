@@ -2,9 +2,11 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useJournalState } from '../../hooks/useJournalState';
 import { useAuth } from '../../hooks/useAuth';
+import { useFont } from '../../hooks/useFont';
 import { MobileJournalHeader } from './MobileJournalHeader';
 import { MobileJournalList } from './MobileJournalList';
 import { MobileJournalEditor } from './MobileJournalEditor';
+import { MobileJournalToolbar } from './MobileJournalToolbar';
 import { MobileJournalMoreSheet } from './MobileJournalMoreSheet';
 import { MobileReferenceSheet } from './MobileReferenceSheet';
 
@@ -14,6 +16,7 @@ export const MobileJournal: React.FC = () => {
   const navigate = useNavigate();
   const { entryId } = useParams<{ entryId?: string }>();
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const { fontFace, fontSize, setFontFace, increaseFontSize, decreaseFontSize } = useFont();
 
   const {
     entries,
@@ -45,6 +48,7 @@ export const MobileJournal: React.FC = () => {
     return entryId ? 'editor' : 'list';
   });
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [isZenMode, setIsZenMode] = useState(false);
   const [showReference, setShowReference] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showMoreSheet, setShowMoreSheet] = useState(false);
@@ -58,6 +62,23 @@ export const MobileJournal: React.FC = () => {
       setCurrentView('editor');
     }
   }, [entryId, selectedId, selectEntryById]);
+
+  // Handle Escape key to exit zen mode
+  useEffect(() => {
+    if (!isZenMode) return;
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        // Don't exit if modals/sheets are open
+        if (!showMoreSheet && !showReference && !showDeleteConfirm) {
+          setIsZenMode(false);
+        }
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isZenMode, showMoreSheet, showReference, showDeleteConfirm]);
 
   // Handle entry selection
   const handleSelectEntry = useCallback((id: string) => {
@@ -133,6 +154,36 @@ export const MobileJournal: React.FC = () => {
     setContent(content + '\n\n' + text);
   }, [content, setContent]);
 
+  // Handle zen mode toggle
+  const handleToggleZenMode = useCallback(() => {
+    setIsZenMode(prev => !prev);
+    if ('vibrate' in navigator) {
+      navigator.vibrate(5);
+    }
+  }, []);
+
+  // Handle download
+  const handleDownload = useCallback(() => {
+    const blob = new Blob([content], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${title || 'untitled'}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [content, title]);
+
+  // Handle import from Google Drive - creates new entry with imported content
+  const handleImport = useCallback(async (importContent: string, importTitle: string) => {
+    await createNewEntry();
+    // Wait for state to update
+    setTimeout(() => {
+      setTitle(importTitle || 'Imported');
+      setContent(importContent);
+      setCurrentView('editor');
+    }, 100);
+  }, [createNewEntry, setTitle, setContent]);
+
   // Get animation class based on view and direction
   const getAnimationClass = () => {
     if (!slideDirection) return '';
@@ -190,23 +241,25 @@ export const MobileJournal: React.FC = () => {
           </>
         ) : (
           <>
-            <MobileJournalHeader
-              showBackButton
-              onBack={handleBack}
-              title={title || 'Untitled'}
-              onSave={handleManualSave}
-              onDelete={() => setShowDeleteConfirm(true)}
-              onToggleStar={handleToggleCurrentStar}
-              onTogglePreview={() => setIsPreviewMode(!isPreviewMode)}
-              onOpenReference={() => setShowReference(true)}
-              onMoreOpen={() => setShowMoreSheet(true)}
-              isStarred={isStarred}
-              isPreviewMode={isPreviewMode}
-              isSaving={isSaving}
-              syncStatus={syncStatus}
-              wordCount={wordCount}
-            />
-            <div className="flex-1 h-[calc(100%-56px)] overflow-hidden">
+            {!isZenMode && (
+              <MobileJournalHeader
+                showBackButton
+                onBack={handleBack}
+                title={title || 'Untitled'}
+                onSave={handleManualSave}
+                onDelete={() => setShowDeleteConfirm(true)}
+                onToggleStar={handleToggleCurrentStar}
+                onTogglePreview={() => setIsPreviewMode(!isPreviewMode)}
+                onOpenReference={() => setShowReference(true)}
+                onMoreOpen={() => setShowMoreSheet(true)}
+                isStarred={isStarred}
+                isPreviewMode={isPreviewMode}
+                isSaving={isSaving}
+                syncStatus={syncStatus}
+                wordCount={wordCount}
+              />
+            )}
+            <div className={`flex-1 overflow-hidden ${isZenMode ? 'h-full pt-safe' : 'h-[calc(100%-56px)]'}`}>
               <MobileJournalEditor
                 title={title}
                 content={content}
@@ -216,8 +269,64 @@ export const MobileJournal: React.FC = () => {
                 onTitleChange={setTitle}
                 onContentChange={setContent}
                 onTagsChange={setTags}
+                onSwipeStar={handleToggleCurrentStar}
+                onSwipeDelete={() => setShowDeleteConfirm(true)}
+                fontFace={fontFace}
+                fontSize={fontSize}
               />
+              {/* Floating controls in zen mode */}
+              {isZenMode && (
+                <div className="fixed top-4 right-4 z-50 flex items-center gap-2 p-1.5 rounded-full bg-bg-alt/80 backdrop-blur-sm shadow-md">
+                  {/* Preview toggle in zen mode */}
+                  <button
+                    onClick={() => setIsPreviewMode(!isPreviewMode)}
+                    className={`p-1.5 rounded-full transition-all ${
+                      isPreviewMode ? 'text-accent bg-accent/20' : 'text-muted hover:text-default hover:bg-bg/50'
+                    }`}
+                    aria-label={isPreviewMode ? 'Edit mode' : 'Preview mode'}
+                  >
+                    {isPreviewMode ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                        <line x1="1" x2="23" y1="1" y2="23" />
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    )}
+                  </button>
+                  {/* Exit zen mode */}
+                  <button
+                    onClick={handleToggleZenMode}
+                    className="p-1.5 rounded-full text-muted hover:text-default hover:bg-bg/50 transition-all"
+                    aria-label="Exit Zen Mode"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="4 14 10 14 10 20" />
+                      <polyline points="20 10 14 10 14 4" />
+                      <line x1="14" x2="21" y1="10" y2="3" />
+                      <line x1="3" x2="10" y1="21" y2="14" />
+                    </svg>
+                  </button>
+                </div>
+              )}
             </div>
+            {/* Bottom toolbar - hidden in zen mode */}
+            {!isZenMode && (
+              <MobileJournalToolbar
+                onTogglePreview={() => setIsPreviewMode(!isPreviewMode)}
+                onOpenReference={() => setShowReference(true)}
+                onToggleStar={handleToggleCurrentStar}
+                onSave={handleManualSave}
+                onToggleZen={handleToggleZenMode}
+                isPreviewMode={isPreviewMode}
+                isStarred={isStarred}
+                isZenMode={isZenMode}
+                isSaving={isSaving}
+              />
+            )}
           </>
         )}
       </div>
@@ -229,13 +338,23 @@ export const MobileJournal: React.FC = () => {
         onToggleStar={handleToggleCurrentStar}
         onTogglePreview={() => setIsPreviewMode(!isPreviewMode)}
         onOpenReference={() => setShowReference(true)}
+        onToggleZen={handleToggleZenMode}
         onSave={handleManualSave}
         onDelete={() => setShowDeleteConfirm(true)}
+        onDownload={handleDownload}
+        onImport={handleImport}
+        onFontChange={setFontFace}
+        onFontSizeChange={(action) => action === 'increase' ? increaseFontSize() : decreaseFontSize()}
         isStarred={isStarred}
         isPreviewMode={isPreviewMode}
+        isZenMode={isZenMode}
         isSaving={isSaving}
         syncStatus={syncStatus}
         wordCount={wordCount}
+        currentFontFace={fontFace}
+        currentFontSize={fontSize}
+        entryId={selectedId}
+        entryTitle={title}
       />
 
       {/* Reference bottom sheet */}
