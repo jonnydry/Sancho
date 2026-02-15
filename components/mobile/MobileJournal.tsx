@@ -223,11 +223,11 @@ export const MobileJournal: React.FC = () => {
       )}
 
       {/* Main content */}
-      <div className={`flex-1 overflow-hidden ${getAnimationClass()}`}>
+      <div className={`flex-1 overflow-hidden flex flex-col ${getAnimationClass()}`}>
         {currentView === 'list' ? (
           <>
             <MobileJournalHeader title="Journal" />
-            <div className="flex-1 h-[calc(100%-56px)]">
+            <div className="flex-1 overflow-hidden">
               <MobileJournalList
                 entries={entries}
                 selectedId={selectedId}
@@ -259,7 +259,7 @@ export const MobileJournal: React.FC = () => {
                 wordCount={wordCount}
               />
             )}
-            <div className={`flex-1 overflow-hidden ${isZenMode ? 'h-full pt-safe' : 'h-[calc(100%-56px)]'}`}>
+            <div className={`flex-1 overflow-hidden ${isZenMode ? 'pt-safe' : ''}`}>
               <MobileJournalEditor
                 title={title}
                 content={content}

@@ -24,7 +24,7 @@ export const MobileJournalToolbar: React.FC<MobileJournalToolbarProps> = memo(({
   isSaving = false,
 }) => {
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-30 px-4 pb-safe pb-3 pt-2 bg-bg/95 backdrop-blur-sm border-t border-default/10 safe-area-bottom">
+    <div className="fixed bottom-0 left-0 right-0 z-40 px-4 pb-3 pt-2 bg-bg/95 backdrop-blur-sm border-t border-default/10 safe-area-bottom">
       <div className="flex items-center justify-center gap-1 bg-bg-alt rounded-full px-2 py-1.5 shadow-sm">
         {/* Zen Mode */}
         {onToggleZen && (

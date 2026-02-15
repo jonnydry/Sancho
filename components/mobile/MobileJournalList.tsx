@@ -279,7 +279,7 @@ export const MobileJournalList: React.FC<MobileJournalListProps> = ({
   return (
     <div className="flex flex-col h-full bg-bg">
       {/* Search bar */}
-      <div className="px-4 pt-3 pb-2 sticky top-0 bg-bg z-10 safe-area-top">
+      <div className="px-4 pt-3 pb-2 sticky top-0 bg-bg z-10">
         <div className="relative">
           <input
             type="text"
@@ -418,11 +418,11 @@ export const MobileJournalList: React.FC<MobileJournalListProps> = ({
         <div className="h-24"></div>
       </div>
 
-      {/* Floating action button - clears footer (3rem) + gap + safe area */}
+      {/* Floating action button */}
       <button
         onClick={onCreate}
         className="fixed right-4 w-14 h-14 rounded-full bg-accent text-accent-text shadow-lg flex items-center justify-center active:scale-95 transition-transform z-20"
-        style={{ bottom: 'calc(3rem + 2rem + env(safe-area-inset-bottom, 0px))' }}
+        style={{ bottom: 'calc(1.5rem + env(safe-area-inset-bottom, 0px))' }}
         aria-label="Create new entry"
       >
         <svg
