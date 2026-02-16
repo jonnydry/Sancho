@@ -433,8 +433,6 @@ async function initStripe() {
   }
 }
 
-await initStripe();
-
 const openai = new OpenAI({ 
   baseURL: "https://api.x.ai/v1", 
   apiKey: process.env.XAI_API_KEY
@@ -1043,8 +1041,7 @@ if (isProduction) {
   
   // SPA catchall - serve index.html for all non-API routes
   // This ensures React Router works when accessing Express directly
-  app.get('*', (req, res, next) => {
-    // Skip API routes - let them fall through to their handlers
+  app.get('/{*splat}', (req, res, next) => {
     if (req.path.startsWith('/api')) {
       return next();
     }
@@ -1064,7 +1061,8 @@ const HOST = '0.0.0.0';
 app.listen(PORT, HOST, () => {
   logger.info(`Backend server running on http://${HOST}:${PORT}`);
   logger.info(`Accessible at http://localhost:${PORT} in development`);
-  if (process.env.NODE_ENV === 'production') {
+  if (isProduction) {
     logger.info('Serving production build from dist/');
   }
+  initStripe().catch(err => logger.error('Stripe initialization failed (non-blocking)', err));
 });
