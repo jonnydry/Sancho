@@ -140,7 +140,9 @@ if (!process.env.XAI_API_KEY) {
 }
 
 const app: Application = express();
-const PORT = 3001;
+const isProduction = process.env.NODE_ENV === 'production' || 
+  (process.env.REPLIT_DOMAINS && !process.env.REPLIT_DEV_DOMAIN);
+const PORT = isProduction ? 5000 : 3001;
 
 // Determine if we're in production (Replit production or explicit NODE_ENV)
 function isProductionEnvironment() {
@@ -1013,11 +1015,8 @@ app.use((err, req, res, next) => {
 });
 
 // Serve static files from the dist directory in production
-// NOTE: In normal production deployment, Vite preview (port 5000) handles static file serving
-// and proxies API requests to this Express server (port 3001). This static file serving
-// is a fallback for direct access to port 3001, which shouldn't happen in production but
-// provides resilience. In development, Vite dev server handles static files.
-if (process.env.NODE_ENV === 'production') {
+// Express handles both API routes and static file serving on port 5000
+if (isProduction) {
   const path = await import('path');
   const { fileURLToPath } = await import('url');
   const __filename = fileURLToPath(import.meta.url);

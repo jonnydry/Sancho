@@ -7,7 +7,7 @@
     "dev": "npx tsx server.ts & vite",
     "build": "vite build",
     "preview": "vite preview --port 5000 --host 0.0.0.0",
-    "preview:prod": "npx tsx server.ts & vite preview --port 5000 --host 0.0.0.0",
+    "preview:prod": "NODE_ENV=production npx tsx server.ts",
     "server": "npx tsx server.ts",
     "db:push": "drizzle-kit push"
   },
