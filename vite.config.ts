@@ -9,11 +9,22 @@ const __dirname = path.dirname(__filename);
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
+
+    const allowedHosts = [
+      'sanchopoetry.com',
+      'www.sanchopoetry.com',
+      '.replit.dev',
+      '.replit.app',
+      '.repl.co',
+      '.worf.replit.dev',
+      'localhost',
+    ];
+
     return {
       server: {
         port: 5000,
         host: '0.0.0.0',
-        allowedHosts: true,
+        allowedHosts,
         hmr: { clientPort: 5000 },
         proxy: {
           '/api': {
@@ -33,7 +44,7 @@ export default defineConfig(({ mode }) => {
       preview: {
         port: 5000,
         host: '0.0.0.0',
-        allowedHosts: true,
+        allowedHosts,
         proxy: {
           '/api': {
             target: 'http://localhost:3001',
