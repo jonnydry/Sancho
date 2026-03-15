@@ -54,4 +54,3 @@ publicDir = "dist/public"
 CUSTOM_DOMAIN = "sanchopoetry.com"
 
 [userenv.shared]
-STRIPE_SUBSCRIPTION_PRICE_ID = "price_1SkHYDFeXrgu2YoYbRn1cOij"
