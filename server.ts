@@ -3,6 +3,8 @@ import cors from 'cors';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import crypto from 'crypto';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import OpenAI from 'openai';
 import sanitizeHtml from 'sanitize-html';
 import { setupAuth, isAuthenticated } from './server/replit_integrations/auth/index.js';
@@ -27,19 +29,6 @@ function rateLimit(maxRequests: number, windowMs: number): (req: Request, res: R
     const key = req.ip;
     const now = Date.now();
     const windowStart = now - windowMs;
-
-    // Aggressive cleanup: if store is getting too large, clean expired entries immediately
-    if (rateLimitStore.size >= MAX_STORE_SIZE * 0.9) { // 90% threshold
-      const cutoff = now - windowMs;
-      for (const [k, requests] of rateLimitStore.entries()) {
-        const validRequests = requests.filter(time => time > cutoff);
-        if (validRequests.length === 0) {
-          rateLimitStore.delete(k);
-        } else {
-          rateLimitStore.set(k, validRequests);
-        }
-      }
-    }
 
     if (!rateLimitStore.has(key)) {
       // If still at capacity after cleanup, use LRU eviction
@@ -1015,8 +1004,6 @@ app.use((err, req, res, next) => {
 // Serve static files from the dist directory in production
 // Express handles both API routes and static file serving on port 5000
 if (isProduction) {
-  const path = await import('path');
-  const { fileURLToPath } = await import('url');
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
   

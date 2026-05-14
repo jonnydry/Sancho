@@ -58,6 +58,9 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const isGuest = !isAuthenticated && !isAuthLoading;
   const guestLimitReached = isGuest && pinnedItems.length >= GUEST_ITEM_LIMIT;
 
+  const pinnedItemsRef = useRef(pinnedItems);
+  pinnedItemsRef.current = pinnedItems;
+
   const fetchPinnedItems = useCallback(async (forceRefresh = false) => {
     if (isAuthLoading) {
       return;
@@ -72,7 +75,7 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
     const now = Date.now();
     const cacheAge = now - cacheTimestampRef.current;
 
-    if (!forceRefresh && cacheAge < CACHE_TTL && pinnedItems.length > 0) {
+    if (!forceRefresh && cacheAge < CACHE_TTL && pinnedItemsRef.current.length > 0) {
       return;
     }
 
@@ -96,7 +99,7 @@ export const PinnedItemsProvider: React.FC<{ children: React.ReactNode }> = ({ c
     } finally {
       setIsLoading(false);
     }
-  }, [isAuthenticated, isAuthLoading, pinnedItems.length]);
+  }, [isAuthenticated, isAuthLoading]);
 
   useEffect(() => {
     fetchPinnedItems();

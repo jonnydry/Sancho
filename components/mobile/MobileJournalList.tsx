@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, memo, useEffect } from 'react';
+import React, { useState, useCallback, useRef, memo, useEffect, useMemo } from 'react';
 import { JournalEntry } from '../../services/journalStorage';
 import { SearchSparkleIcon } from '../icons/SearchSparkleIcon';
 import { XIcon } from '../icons/XIcon';
@@ -231,19 +231,21 @@ export const MobileJournalList: React.FC<MobileJournalListProps> = ({
   const pullStartY = useRef<number | null>(null);
   const [pullDistance, setPullDistance] = useState(0);
 
-  // Filter entries by search
-  const filteredEntries = searchQuery.trim()
-    ? entries.filter(
-        (entry) =>
-          (entry.title?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
-          (entry.content?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
-          entry.tags?.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-      )
-    : entries;
+  // Filter entries by search - memoized to avoid re-filtering on every render
+  const filteredEntries = useMemo(() => {
+    if (!searchQuery.trim()) return entries;
+    const q = searchQuery.toLowerCase();
+    return entries.filter(
+      (entry) =>
+        (entry.title?.toLowerCase() || '').includes(q) ||
+        (entry.content?.toLowerCase() || '').includes(q) ||
+        entry.tags?.some((tag) => tag.toLowerCase().includes(q))
+    );
+  }, [entries, searchQuery]);
 
-  // Separate starred and unstarred
-  const starredEntries = filteredEntries.filter((e) => e.isStarred);
-  const recentEntries = filteredEntries.filter((e) => !e.isStarred);
+  // Separate starred and unstarred - memoized
+  const starredEntries = useMemo(() => filteredEntries.filter((e) => e.isStarred), [filteredEntries]);
+  const recentEntries = useMemo(() => filteredEntries.filter((e) => !e.isStarred), [filteredEntries]);
 
   // Pull to refresh handlers
   const handleTouchStart = (e: React.TouchEvent) => {

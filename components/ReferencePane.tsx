@@ -12,8 +12,6 @@ import { ArrowDownIcon } from "./icons/ArrowDownIcon";
 import { CheckIcon } from "./icons/CheckIcon";
 import { PinButton } from "./PinButton";
 import { usePinnedItems } from "../contexts/PinnedItemsContext";
-import { poetryData } from "../data/poetryData";
-import { poeticDevicesData } from "../data/poeticDevicesData";
 import { PoeticFormsIcon } from "./icons/PoeticFormsIcon";
 import { PoeticMetersIcon } from "./icons/PoeticMetersIcon";
 import { LiteraryDevicesIcon } from "./icons/LiteraryDevicesIcon";
@@ -196,9 +194,15 @@ export const ReferencePane: React.FC<ReferencePaneProps> = ({
     });
   }, []);
 
-  // Combine data sources for search
-  const allItems = useMemo(() => {
-    return [...poetryData, ...poeticDevicesData];
+  // Lazily load large data files so they don't block the initial render
+  const [allItems, setAllItems] = useState<PoetryItem[]>([]);
+  useEffect(() => {
+    Promise.all([
+      import("../data/poetryData"),
+      import("../data/poeticDevicesData"),
+    ]).then(([{ poetryData }, { poeticDevicesData }]) => {
+      setAllItems([...poetryData, ...poeticDevicesData]);
+    });
   }, []);
 
   // Categorize items for browse sections - optimized with stable reference

@@ -298,21 +298,19 @@ export class DatabaseStorage {
   // Delete user account and all associated data
   async deleteUser(userId: string): Promise<User | undefined> {
     try {
-      // First delete all pinned items for this user
-      await db
-        .delete(pinnedItems)
-        .where(eq(pinnedItems.userId, userId));
-
-      // Delete all journal entries for this user
-      await db
-        .delete(journalEntries)
-        .where(eq(journalEntries.userId, userId));
-
-      // Then delete the user record
-      const [deletedUser] = await db
-        .delete(users)
-        .where(eq(users.id, userId))
-        .returning();
+      const deletedUser = await db.transaction(async (tx) => {
+        // Delete pinned items and journal entries in parallel for speed
+        await Promise.all([
+          tx.delete(pinnedItems).where(eq(pinnedItems.userId, userId)),
+          tx.delete(journalEntries).where(eq(journalEntries.userId, userId)),
+        ]);
+        // Delete user record last (after all dependents are gone)
+        const [deleted] = await tx
+          .delete(users)
+          .where(eq(users.id, userId))
+          .returning();
+        return deleted;
+      });
 
       // Clear all caches for this user
       userCache.delete(`user:${userId}`);

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 
 export interface SlashCommand {
   id: string;
@@ -117,11 +117,13 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
 }) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Filter commands based on query
-  const filteredCommands = SLASH_COMMANDS.filter(cmd =>
-    cmd.label.toLowerCase().includes(query.toLowerCase()) ||
-    cmd.id.includes(query.toLowerCase())
-  );
+  // Filter commands based on query - memoized to avoid re-filtering on every render
+  const filteredCommands = useMemo(() =>
+    SLASH_COMMANDS.filter(cmd =>
+      cmd.label.toLowerCase().includes(query.toLowerCase()) ||
+      cmd.id.includes(query.toLowerCase())
+    ),
+  [query]);
 
   // Close on click outside
   useEffect(() => {

@@ -9,6 +9,19 @@ import { LightbulbIcon } from "./icons/LightbulbIcon";
 import { ActionButton } from "./PoetryDetailModal";
 import { getGrokipediaUrl } from "../utils/grokipediaAvailability";
 
+const PANEL_TABS: { id: PanelTab; label: string; icon: React.ReactNode }[] = [
+  {
+    id: "context",
+    label: "Context",
+    icon: <HistoryIcon className="w-3.5 h-3.5" />,
+  },
+  {
+    id: "links",
+    label: "Links",
+    icon: <ArrowUpRightIcon className="w-3.5 h-3.5" />,
+  },
+];
+
 interface BottomPanelProps {
   item: PoetryItem | null;
   isOpen: boolean;
@@ -146,19 +159,6 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
 
   if (!item) return null;
 
-  const tabs: { id: PanelTab; label: string; icon: React.ReactNode }[] = [
-    {
-      id: "context",
-      label: "Context",
-      icon: <HistoryIcon className="w-3.5 h-3.5" />,
-    },
-    {
-      id: "links",
-      label: "Links",
-      icon: <ArrowUpRightIcon className="w-3.5 h-3.5" />,
-    },
-  ];
-
   const headerHeight = 36;
 
   return (
@@ -173,7 +173,7 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
         style={{ minHeight: headerHeight - 3 }}
       >
         <div className="flex items-center gap-1">
-          {tabs.map((tab) => (
+          {PANEL_TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => {

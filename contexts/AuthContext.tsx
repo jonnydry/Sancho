@@ -21,10 +21,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const fetchUser = async () => {
       try {
         const response = await fetch('/api/auth/user', {
           credentials: 'include',
+          signal: controller.signal,
         });
         
         if (response.ok) {
@@ -38,6 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUser(null);
         }
       } catch (error) {
+        if ((error as Error).name === 'AbortError') return;
         console.error('Failed to fetch user:', error);
         setUser(null);
       } finally {
@@ -46,6 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     fetchUser();
+    return () => controller.abort();
   }, []);
 
   // Memoize context value to prevent unnecessary re-renders
