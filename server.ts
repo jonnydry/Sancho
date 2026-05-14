@@ -471,7 +471,7 @@ Quote should reflect Sancho's personality: earthy humor, folk wisdom, loyalty, o
 Respond with JSON: { "quote": "the English quote text", "context": "Part X, Chapter Y - brief situation context" }`;
 
     const response = await openai.chat.completions.create({
-      model: "grok-4-1-fast-non-reasoning",
+      model: "grok-4.3",
       messages: [
         {
           role: "system",
@@ -563,7 +563,7 @@ app.post('/api/poetry-learn-more', csrfProtection, rateLimit(10, 60000), async (
     const prompt = `Provide a concise historical and cultural context paragraph about ${topic} in poetry. The paragraph should be 2-4 sentences and cover: (1) historical origins and evolution of this poetic form/device/meter, (2) its cultural and literary significance, and (3) key historical periods or movements associated with it. Use a scholarly but accessible tone. Respond with JSON in this format: { "context": "the paragraph text" }`;
 
     const response = await openai.chat.completions.create({
-      model: "grok-4-1-fast-non-reasoning",
+      model: "grok-4.3",
       messages: [
         {
           role: "system",
