@@ -1318,12 +1318,20 @@ export const JournalEditor: React.FC = () => {
         e.preventDefault();
         setShowTemplate((prev) => !prev);
       }
-      // Escape: Exit zen mode (only if no modals/menus are open)
-      else if (e.key === "Escape" && isZenMode) {
-        // Check if any modal or menu is open
-        const hasOpenModal = showSlashMenu || showDeleteConfirm || showUnsavedWarning || isEditingGoal || showFontMenu;
-        
-        if (!hasOpenModal) {
+      // Escape: Close any open modal first, then exit zen mode
+      else if (e.key === "Escape") {
+        if (showDeleteConfirm) {
+          e.preventDefault();
+          setShowDeleteConfirm(false);
+        } else if (isEditingGoal) {
+          e.preventDefault();
+          setTempGoal(dailyGoal.toString());
+          setIsEditingGoal(false);
+        } else if (showUnsavedWarning) {
+          e.preventDefault();
+          setShowUnsavedWarning(false);
+          setPendingEntrySwitch(null);
+        } else if (isZenMode && !showSlashMenu && !showFontMenu) {
           e.preventDefault();
           setIsZenMode(false);
         }
@@ -1800,8 +1808,9 @@ export const JournalEditor: React.FC = () => {
               {isAuthenticated && (
                 <button
                   onClick={handleOpenDriveModal}
-                  className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-blue-500 hover:bg-blue-500/15 hover:shadow-[0_0_10px_rgba(59,130,246,0.3)] interactive-base interactive-scale"
+                  className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-blue-500 hover:bg-blue-500/15 hover:shadow-[0_0_10px_rgba(59,130,246,0.3)] interactive-base interactive-scale focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
                   title="Google Drive"
+                  aria-label="Open Google Drive import and export"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
@@ -1810,8 +1819,9 @@ export const JournalEditor: React.FC = () => {
               )}
               <button
                 onClick={() => setShowDeleteConfirm(true)}
-                className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-red-500 hover:bg-red-500/15 hover:shadow-[0_0_10px_rgba(239,68,68,0.3)] interactive-base interactive-scale"
+                className="p-1.5 rounded-md transition-all duration-200 text-muted hover:text-red-500 hover:bg-red-500/15 hover:shadow-[0_0_10px_rgba(239,68,68,0.3)] interactive-base interactive-scale focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/60"
                 title="Delete Entry"
+                aria-label="Delete current journal entry"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -1944,9 +1954,18 @@ export const JournalEditor: React.FC = () => {
       </div>
 
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-fade-in-fast">
-          <div className="bg-bg border border-default rounded-lg p-6 max-w-sm mx-4 shadow-xl animate-modal-in">
-            <h3 className="text-lg font-semibold text-default mb-2">
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-fade-in-fast"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-confirm-title"
+          onClick={() => setShowDeleteConfirm(false)}
+        >
+          <div
+            className="bg-bg border border-default rounded-lg p-6 max-w-sm mx-4 shadow-xl animate-modal-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 id="delete-confirm-title" className="text-lg font-semibold text-default mb-2">
               Delete Entry?
             </h3>
             <p className="text-sm text-muted mb-4">
@@ -1972,9 +1991,14 @@ export const JournalEditor: React.FC = () => {
       )}
 
       {showUnsavedWarning && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-fade-in-fast">
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-fade-in-fast"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="unsaved-warning-title"
+        >
           <div className="bg-bg border border-default rounded-lg p-6 max-w-sm mx-4 shadow-xl animate-modal-in">
-            <h3 className="text-lg font-semibold text-default mb-2">
+            <h3 id="unsaved-warning-title" className="text-lg font-semibold text-default mb-2">
               Unsaved Changes
             </h3>
             <p className="text-sm text-muted mb-4">
@@ -2022,16 +2046,25 @@ export const JournalEditor: React.FC = () => {
 
       {/* Daily goal editing modal */}
       {isEditingGoal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-fade-in-fast">
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-fade-in-fast"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="daily-goal-title"
+        >
           <div className="bg-bg border border-default rounded-lg p-6 max-w-sm mx-4 shadow-xl animate-modal-in">
-            <h3 className="text-lg font-semibold text-default mb-2">
+            <h3 id="daily-goal-title" className="text-lg font-semibold text-default mb-2">
               Daily Writing Goal
             </h3>
             <p className="text-sm text-muted mb-4">
               Set a word count goal to track your daily writing progress.
             </p>
             <form onSubmit={handleGoalSubmit}>
+              <label htmlFor="daily-goal-input" className="sr-only">
+                Daily word count goal
+              </label>
               <input
+                id="daily-goal-input"
                 type="number"
                 value={tempGoal}
                 onChange={(e) => setTempGoal(e.target.value)}

@@ -39,13 +39,25 @@ export const fetchSanchoQuote = async (): Promise<SanchoQuoteResponse> => {
   }
 };
 
+const getCsrfToken = (): string | null => {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(/(?:^|;\s*)csrf-token=([^;]*)/);
+  return match ? decodeURIComponent(match[1]) : null;
+};
+
 export const fetchLearnMoreContext = async (topic: string): Promise<LearnMoreResponse> => {
   try {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    const csrfToken = getCsrfToken();
+    if (csrfToken) {
+      headers['x-csrf-token'] = csrfToken;
+    }
+
     const response = await fetch('/api/poetry-learn-more', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify({ topic }),
     });
 

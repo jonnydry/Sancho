@@ -303,7 +303,7 @@ app.use((req, res, next) => {
   if (req.path === '/api/stripe/webhook') {
     return next();
   }
-  express.json({ limit: '10mb' })(req, res, next);
+  express.json({ limit: '1mb' })(req, res, next);
 });
 
 // Caching headers middleware
@@ -546,7 +546,7 @@ Respond with JSON: { "quote": "the English quote text", "context": "Part X, Chap
   }
 });
 
-app.post('/api/poetry-learn-more', rateLimit(10, 60000), async (req, res) => { // 10 requests per minute
+app.post('/api/poetry-learn-more', csrfProtection, rateLimit(10, 60000), async (req, res) => { // 10 requests per minute
   try {
     const { topic } = req.body;
 

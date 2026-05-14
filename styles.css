@@ -34,11 +34,27 @@ body {
   font-size: var(--app-font-size, 16px);
   background-color: rgb(var(--app-bg));
   color: rgb(var(--app-text));
+  transition: background-color 280ms ease, color 280ms ease;
 }
 
 html {
   font-size: var(--app-font-size, 16px);
   background-color: rgb(var(--app-bg));
+  transition: background-color 280ms ease;
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  body, html {
+    transition: none;
+  }
+}
+
+/* Consistent, theme-aware focus ring for keyboard users */
+:focus-visible {
+  outline: 2px solid rgb(var(--app-accent) / 0.7);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 /* Mobile font size reduction - scale down by 10% instead of hardcoding */

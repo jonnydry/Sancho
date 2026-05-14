@@ -15,7 +15,7 @@ export const JournalPage: React.FC = () => {
 
   // Desktop experience - full JournalEditor
   return (
-    <div className="h-[calc(100vh-64px)]">
+    <div className="h-[calc(100dvh-64px)]">
       <JournalEditor />
     </div>
   );
